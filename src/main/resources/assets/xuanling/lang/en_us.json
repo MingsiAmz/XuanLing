@@ -1,0 +1,13 @@
+{
+  "itemGroup.xuanling": "Example Mod Tab",
+  "block.xuanling.example_block": "Example Block",
+  "item.xuanling.example_item": "Example Item",
+
+  "xuanling.configuration.title": "XuanLing Configs",
+  "xuanling.configuration.section.xuanling.common.toml": "XuanLing Configs",
+  "xuanling.configuration.section.xuanling.common.toml.title": "XuanLing Configs",
+  "xuanling.configuration.items": "Item List",
+  "xuanling.configuration.logDirtBlock": "Log Dirt Block",
+  "xuanling.configuration.magicNumberIntroduction": "Magic Number Text",
+  "xuanling.configuration.magicNumber": "Magic Number"
+}
