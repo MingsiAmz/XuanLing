@@ -11,5 +11,5 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 public class RegisterCapabilities {
-    public static final EntityCapability<?,?> DEFAULT_CAP = EntityCapability.create(XuanLing.prefix("default_cap"), typeClass, contextClass);
+    // public static final EntityCapability<?,?> DEFAULT_CAP = EntityCapability.create(XuanLing.prefix("default_cap"), typeClass, contextClass);
 }

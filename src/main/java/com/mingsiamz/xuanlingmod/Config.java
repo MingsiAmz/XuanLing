@@ -79,11 +79,11 @@ public class Config {
         return obj instanceof String itemName && BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(itemName));
     }
 
-    public static double getMaxValue(ModConfigSpec.DoubleValue spec) {
-	return (double)spec.getSpec().getRange().getMax();
+    public static Double getMaxValue(ModConfigSpec.DoubleValue spec) {
+	return (Double)spec.getSpec().getRange().getMax();
     }
 
-    public static double getMinValue(ModConfigSpec.DoubleValue spec) {
-	return (double)spec.getSpec().getRange().getMin();
+    public static Double getMinValue(ModConfigSpec.DoubleValue spec) {
+	return (Double)spec.getSpec().getRange().getMin();
     }
 }

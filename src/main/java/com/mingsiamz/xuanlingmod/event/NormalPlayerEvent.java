@@ -30,6 +30,6 @@ public class NormalPlayerEvent {
 	Entity entity = event.getEntity();
 	if (!(entity instanceof LivingEntity)) return;
 	LivingEntity living = (LivingEntity) entity;
-	if (living
+
     }
 }
