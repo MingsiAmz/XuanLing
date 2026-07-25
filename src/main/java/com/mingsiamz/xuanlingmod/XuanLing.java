@@ -52,7 +52,7 @@ public class XuanLing {
 	NeoForge.EVENT_BUS.register(this);
 	modEventBus.addListener(this::addCreative);
 	// modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-	modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC, MODID+"/"+MODID);
+	modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC, MODID+"/"+MODID+".toml");
 
 	RegisterAttachments.register(modEventBus);
     }
