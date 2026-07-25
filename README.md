@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 Installation information
 =======
@@ -23,3 +24,6 @@ Additional Resources:
 ==========
 Community Documentation: https://docs.neoforged.net/  
 NeoForged Discord: https://discord.neoforged.net/
+=======
+# XuanLing
+>>>>>>> efcb8ae6ea6f9f7ff2a6932665420486c401a2f0
