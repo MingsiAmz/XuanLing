@@ -8,6 +8,7 @@ import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.register.RegisterBlocks;
 import com.mingsiamz.xuanlingmod.register.RegisterCapabilities;
 import com.mingsiamz.xuanlingmod.register.RegisterItems;
+import com.mingsiamz.xuanlingmod.register.RegisterKey;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -51,10 +52,10 @@ public class XuanLing {
 	CREATIVE_MODE_TABS.register(modEventBus);
 	NeoForge.EVENT_BUS.register(this);
 	modEventBus.addListener(this::addCreative);
-	// modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 	modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC, MODID+"/"+MODID+".toml");
 
 	RegisterAttachments.register(modEventBus);
+	modEventBus.addListener(RegisterKey::register);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
