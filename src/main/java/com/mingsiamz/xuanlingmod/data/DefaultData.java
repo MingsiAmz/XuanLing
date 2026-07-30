@@ -1,5 +1,6 @@
 package com.mingsiamz.xuanlingmod.data;
 
+import com.electronwill.nightconfig.core.ConfigSpec;
 import com.mingsiamz.xuanlingmod.Config;
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mojang.serialization.Codec;
@@ -60,60 +61,110 @@ public class DefaultData {
 	return normalLife;
     }
     public void setNormalLife(double normalLife) {
+	if (normalLife >= Config.getMaxValue(Config.RANGE_NORMAL_LIFE)) {
+	    normalLife = Config.getMaxValue(Config.RANGE_NORMAL_LIFE);
+	} else if (normalLife <= Config.getMinValue(Config.RANGE_NORMAL_LIFE)) {
+	    normalLife = Config.getMinValue(Config.RANGE_NORMAL_LIFE);
+	}
 	this.normalLife = normalLife;
     }
     public double getSoulLife() {
 	return soulLife;
     }
     public void setSoulLife(double soulLife) {
+	if (soulLife >= Config.getMaxValue(Config.RANGE_SOUL_LIFE)) {
+	    soulLife = Config.getMaxValue(Config.RANGE_SOUL_LIFE);
+	} else if (soulLife <= Config.getMinValue(Config.RANGE_SOUL_LIFE)) {
+	    soulLife = Config.getMinValue(Config.RANGE_SOUL_LIFE);
+	}
 	this.soulLife = soulLife;
     }
     public double getMoveSpeedMof() {
 	return moveSpeedMof;
     }
     public void setMoveSpeedMof(double moveSpeedMof) {
+	if (moveSpeedMof >= Config.getMaxValue(Config.RANGE_MOVE_SPEED)) {
+	    moveSpeedMof = Config.getMaxValue(Config.RANGE_MOVE_SPEED);
+	} else if (moveSpeedMof <= Config.getMinValue(Config.RANGE_MOVE_SPEED)) {
+	    moveSpeedMof = Config.getMinValue(Config.RANGE_MOVE_SPEED);
+	}
 	this.moveSpeedMof = moveSpeedMof;
     }
     public double getFlySpeedMof() {
 	return flySpeedMof;
     }
     public void setFlySpeedMof(double flySpeedMof) {
+	if (flySpeedMof >= Config.getMaxValue(Config.RANGE_FLY_SPEED)) {
+	    flySpeedMof = Config.getMaxValue(Config.RANGE_FLY_SPEED);
+	} else if (flySpeedMof <= Config.getMinValue(Config.RANGE_FLY_SPEED)) {
+	    flySpeedMof = Config.getMinValue(Config.RANGE_FLY_SPEED);
+	}
 	this.flySpeedMof = flySpeedMof;
     }
     public double getEnergy() {
 	return energy;
     }
     public void setEnergy(double energy) {
+	if (energy >= Config.getMaxValue(Config.RANGE_ENERGY)) {
+	    energy = Config.getMaxValue(Config.RANGE_ENERGY);
+	} else if (energy <= Config.getMinValue(Config.RANGE_ENERGY)) {
+	    energy = Config.getMinValue(Config.RANGE_ENERGY);
+	}
 	this.energy = energy;
     }
     public double getTPAO() {
 	return TPAO;
     }
     public void setTPAO(double tPAO) {
+	if (tPAO >= Config.getMaxValue(Config.RANGE_TPAO)) {
+	    tPAO = Config.getMaxValue(Config.RANGE_TPAO);
+	} else if (tPAO <= Config.getMinValue(Config.RANGE_TPAO)) {
+	    tPAO = Config.getMinValue(Config.RANGE_TPAO);
+	}
 	TPAO = tPAO;
     }
     public double getInsight() {
 	return insight;
     }
     public void setInsight(double insight) {
+	if (insight >= Config.getMaxValue(Config.RANGE_INSIGHT)) {
+	    insight = Config.getMaxValue(Config.RANGE_INSIGHT);
+	} else if (insight <= Config.getMinValue(Config.RANGE_INSIGHT)) {
+	    insight = Config.getMinValue(Config.RANGE_INSIGHT);
+	}
 	this.insight = insight;
     }
     public double getInspiration() {
 	return inspiration;
     }
     public void setInspiration(double inspiration) {
+	if (inspiration >= Config.getMaxValue(Config.RANGE_INSPIRATION)) {
+	    inspiration = Config.getMaxValue(Config.RANGE_INSPIRATION);
+	} else if (inspiration <= Config.getMinValue(Config.RANGE_INSPIRATION)) {
+	    inspiration = Config.getMinValue(Config.RANGE_INSPIRATION);
+	}
 	this.inspiration = inspiration;
     }
     public double getLucky() {
 	return lucky;
     }
     public void setLucky(double lucky) {
+	if (lucky >= Config.getMaxValue(Config.RANGE_LUCKY)) {
+	    lucky = Config.getMaxValue(Config.RANGE_LUCKY);
+	} else if (lucky <= Config.getMinValue(Config.RANGE_LUCKY)) {
+	    lucky = Config.getMinValue(Config.RANGE_LUCKY);
+	}
 	this.lucky = lucky;
     }
     public double getCharm() {
 	return charm;
     }
     public void setCharm(double charm) {
+	if (charm >= Config.getMaxValue(Config.RANGE_CHARM)) {
+	    charm = Config.getMaxValue(Config.RANGE_CHARM);
+	} else if (charm <= Config.getMinValue(Config.RANGE_CHARM)) {
+	    charm = Config.getMinValue(Config.RANGE_CHARM);
+	}
 	this.charm = charm;
     }
 

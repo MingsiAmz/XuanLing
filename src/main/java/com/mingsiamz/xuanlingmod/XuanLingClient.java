@@ -1,5 +1,6 @@
 package com.mingsiamz.xuanlingmod;
 
+import com.mingsiamz.xuanlingmod.gui.DataPanel;
 import com.mingsiamz.xuanlingmod.register.RegisterKey;
 
 import net.minecraft.client.Minecraft;
@@ -30,8 +31,13 @@ public class XuanLingClient {
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Pre event) {
-	if (minecraft.screen == null && RegisterKey.KEY_R.consumeClick()) {
-	    minecraft.setScreen(new CustomGui());
+	keyVoid();
+    }
+
+    private static void keyVoid() {
+	if (minecraft.screen != null) return;
+	if (RegisterKey.KEY_R.consumeClick()) {
+	    minecraft.setScreen(new DataPanel());
 	}
     }
 }
