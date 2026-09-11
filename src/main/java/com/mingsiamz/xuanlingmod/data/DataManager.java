@@ -9,37 +9,35 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.spongepowered.include.com.google.gson.Gson;
-import org.spongepowered.include.com.google.gson.GsonBuilder;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mingsiamz.xuanlingmod.XuanLing;
 
 public class DataManager {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     private static final Path CONFIG_DIR = Paths.get(".", "config");
+    private static Path MOD_CONFIG_DIR = CONFIG_DIR.resolve(XuanLing.MODID);
 
-    public static void saveData(String data) {
+    public static void saveData(Object obj, String data) {
 	try {
-	    Path modConfigDir = CONFIG_DIR.resolve(XuanLing.MODID);
-	    if (!Files.exists(modConfigDir)) {
-		Files.createDirectories(modConfigDir);
+	    if (!Files.exists(MOD_CONFIG_DIR)) {
+		Files.createDirectories(MOD_CONFIG_DIR);
 	    }
-	    Path configFile = modConfigDir.resolve("");
+	    Path configFile = MOD_CONFIG_DIR.resolve(data + ".json");
 	    Writer writer = new FileWriter(configFile.toFile());
-	    GSON.toJson(data, writer);
+	    GSON.toJson(obj, writer);
+	    writer.flush();
+	    writer.close();
 	} catch (IOException e) {
 	    throw new Error(e);
 	}
     }
 
-    // public static void loadData(String test) {
-    // 	Path configFile = CONFIG_DIR.resolve(XuanLing.MODID).resolve("data_name.json");
-    // 	if (Files.exists(configFile)) {
-    // 	    try (Reader reader = new FileReader(configFile.toFile())) {
-    // 		return GSON.fromJson(reader, DATA.class);
-    // 	    } catch (IOException e) {
-    // 		throw new Error(e);
-    // 	    }
-    // 	}
-    // }
+    public static void loadData(Object result, String fileName) {
+	try (Reader reader = new FileReader(MOD_CONFIG_DIR.resolve(fileName + ".json").toFile())){
+	    result = GSON.fromJson(reader, result.getClass());
+	} catch (IOException e) {
+	    throw new Error(e);
+	}
+    }
 }

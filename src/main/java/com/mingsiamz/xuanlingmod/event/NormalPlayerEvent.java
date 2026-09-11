@@ -1,6 +1,7 @@
 package com.mingsiamz.xuanlingmod.event;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
 
 import net.minecraft.world.entity.Entity;
@@ -18,10 +19,10 @@ public class NormalPlayerEvent {
     @SubscribeEvent
     public static void playerJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
 	Player player = event.getEntity();
-	DefaultData defaultData = player.getData(RegisterAttachments.DEFAULT_DATA);
-	if (defaultData == null) {
-	    DefaultData targetData = DefaultData.initData();
-	    player.setData(RegisterAttachments.DEFAULT_DATA, targetData);
+	BasicData data = player.getData(RegisterAttachments.BASIC_DATA);
+	if (data == null) {
+	    BasicData targetData = BasicData.initData();
+	    player.setData(RegisterAttachments.BASIC_DATA, targetData);
 	}
     }
 
