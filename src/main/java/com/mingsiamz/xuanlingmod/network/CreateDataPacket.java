@@ -13,7 +13,7 @@ public class CreateDataPacket extends CustomPackageImp {
 	
     }
 
-    public static final CustomPacketPayload.Type<CreateDataPacket> TYPE = CustomPacketPayload.createType("create_data_packet_type");
+    public static final CustomPacketPayload.Type<CreateDataPacket> TYPE = reType("create_data_packet");
     public static final StreamCodec<RegistryFriendlyByteBuf,CreateDataPacket> CODEC = StreamCodec.ofMember(CreateDataPacket::encode, CreateDataPacket::new);
 
     private String dataType = "";
