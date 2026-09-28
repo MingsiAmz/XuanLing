@@ -55,18 +55,21 @@ public class Config {
 	.comment("魅力的最小与最大值，最大不可超过" + Double.MAX_VALUE)
 	.defineInRange("range_lucky", 0, 0, 50000.0);
 
+    public static final ModConfigSpec.DoubleValue RANGE_M_SENSE = BUILDER
+	.comment("魅力的最小与最大值，最大不可超过" + Double.MAX_VALUE)
+	.defineInRange("range_m_sense", 0, 0, 50000.0);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
-
     private static boolean validateItemName(final Object obj) {
-        return obj instanceof String itemName && BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(itemName));
+	return obj instanceof String itemName && BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(itemName));
     }
 
     public static Double getMaxValue(ModConfigSpec.DoubleValue spec) {
-	return (Double)spec.getSpec().getRange().getMax();
+	return (Double) spec.getSpec().getRange().getMax();
     }
 
     public static Double getMinValue(ModConfigSpec.DoubleValue spec) {
-	return (Double)spec.getSpec().getRange().getMin();
+	return (Double) spec.getSpec().getRange().getMin();
     }
 }

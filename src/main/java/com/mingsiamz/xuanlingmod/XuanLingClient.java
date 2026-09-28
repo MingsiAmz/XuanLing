@@ -21,25 +21,26 @@ public class XuanLingClient {
     public static Minecraft minecraft = Minecraft.getInstance();
 
     public XuanLingClient(ModContainer container) {
- 	container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
-    
+
     @SubscribeEvent
     static void onClientSetup(FMLClientSetupEvent event) {
-	XuanLing.LOGGER.info("HELLO FROM CLIENT SETUP");
-	XuanLing.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+        XuanLing.LOGGER.info("HELLO FROM CLIENT SETUP");
+        XuanLing.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
     }
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Pre event) {
-	keyVoid();
+        keyVoid();
     }
 
     private static void keyVoid() {
-	if (minecraft.screen != null) return;
-	if (RegisterKey.KEY_R.consumeClick()) {
-	    // minecraft.setScreen(new DataPanel());
-	    minecraft.setScreen(new TestGui());
-	}
+        if (minecraft.screen != null)
+            return;
+        if (RegisterKey.KEY_R.consumeClick()) {
+            // minecraft.setScreen(new DataPanel());
+            minecraft.setScreen(new TestGui());
+        }
     }
 }
