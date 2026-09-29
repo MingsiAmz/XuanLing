@@ -4,11 +4,12 @@ import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
+import com.mingsiamz.xuanlingmod.network.Networking;
+import com.mingsiamz.xuanlingmod.network.SyncDataPacket;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -16,6 +17,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 @EventBusSubscriber (modid = XuanLing.MODID)
 public class DataEvent {
@@ -57,6 +59,12 @@ public class DataEvent {
                         player.setData(RegisterAttachments.DEFAULT_DATA, data);
                         player.setData(RegisterAttachments.BASIC_DATA, basic);
                 }
+        }
+
+        @SubscribeEvent
+        public static void onPlayerTick(PlayerTickEvent.Pre event) {
+                Player player = event.getEntity();
+                
         }
 
         // @SubscribeEvent

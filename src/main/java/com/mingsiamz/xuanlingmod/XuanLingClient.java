@@ -1,7 +1,6 @@
 package com.mingsiamz.xuanlingmod;
 
-import com.mingsiamz.xuanlingmod.gui.DataPanel;
-import com.mingsiamz.xuanlingmod.gui.TestGui;
+import com.mingsiamz.xuanlingmod.gui.StateGui;
 import com.mingsiamz.xuanlingmod.register.RegisterKey;
 
 import net.minecraft.client.Minecraft;
@@ -40,7 +39,7 @@ public class XuanLingClient {
             return;
         if (RegisterKey.KEY_R.consumeClick()) {
             // minecraft.setScreen(new DataPanel());
-            minecraft.setScreen(new TestGui());
+            minecraft.setScreen(new StateGui());
         }
     }
 }

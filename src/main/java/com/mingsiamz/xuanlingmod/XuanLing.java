@@ -28,55 +28,55 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 @Mod(XuanLing.MODID)
 public class XuanLing {
-    public static final String MODID = "xuanling";
-    public static final Logger LOGGER = LogUtils.getLogger();
-    public static final Random RANDOM = new Random();
+        public static final String MODID = "xuanling";
+        public static final Logger LOGGER = LogUtils.getLogger();
+        public static final Random RANDOM = new Random();
 
-    public XuanLing(IEventBus modEventBus, ModContainer modContainer) {
-	modEventBus.addListener(this::commonSetup);
-	RegisterItems.register(modEventBus);
-	RegisterBlocks.register(modEventBus);
-	RegisterCreativeTabs.register(modEventBus);
-	NeoForge.EVENT_BUS.register(this);
-	modEventBus.addListener(this::addCreative);
-	modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC, MODID + "/" + MODID + ".toml");
+        public XuanLing(IEventBus modEventBus, ModContainer modContainer) {
+                modEventBus.addListener(this::commonSetup);
+                RegisterItems.register(modEventBus);
+                RegisterBlocks.register(modEventBus);
+                RegisterCreativeTabs.register(modEventBus);
+                NeoForge.EVENT_BUS.register(this);
+                modEventBus.addListener(this::addCreative);
+                modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC, MODID + "/" + MODID + ".toml");
 
-	RegisterAttachments.register(modEventBus);
-	modEventBus.addListener(RegisterKey::register);
-    }
+                RegisterAttachments.register(modEventBus);
+                modEventBus.addListener(RegisterKey::register);
+        }
 
-    private void commonSetup(FMLCommonSetupEvent event) {
-	// Some common setup code
-	LOGGER.info("HELLO FROM COMMON SETUP");
+        private void commonSetup(FMLCommonSetupEvent event) {
+                // Some common setup code
+                LOGGER.info("HELLO FROM COMMON SETUP");
 
-	// if (Config.LOG_DIRT_BLOCK.getAsBoolean()) {
-	// LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
-	// }
+                // if (Config.LOG_DIRT_BLOCK.getAsBoolean()) {
+                // LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
+                // }
 
-	// LOGGER.info("{}{}", Config.MAGIC_NUMBER_INTRODUCTION.get(),
-	// Config.MAGIC_NUMBER.getAsInt());
+                // LOGGER.info("{}{}", Config.MAGIC_NUMBER_INTRODUCTION.get(),
+                // Config.MAGIC_NUMBER.getAsInt());
 
-	// Config.ITEM_STRINGS.get().forEach((item) -> LOGGER.info("ITEM >> {}", item));
-    }
+                // Config.ITEM_STRINGS.get().forEach((item) -> LOGGER.info("ITEM >> {}", item));
+        }
 
-    private void addCreative(BuildCreativeModeTabContentsEvent event) {
-	if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
-	    event.accept(RegisterItems.EXAMPLE_BLOCK_ITEM);
-	}
-    }
+        private void addCreative(BuildCreativeModeTabContentsEvent event) {
+                if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+                        event.accept(RegisterItems.EXAMPLE_BLOCK_ITEM);
+                }
+        }
 
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-	// Do something when the server starts
-	LOGGER.info("HELLO from server starting");
-    }
+        @SubscribeEvent
+        public void onServerStarting(ServerStartingEvent event) {
+                // Do something when the server starts
+                LOGGER.info("HELLO from server starting");
+        }
 
-    public static ResourceLocation prefix(String name) {
-	return ResourceLocation.fromNamespaceAndPath(MODID, name);
-    }
+        public static ResourceLocation prefix(String name) {
+                return ResourceLocation.fromNamespaceAndPath(MODID, name);
+        }
 
-    public static Component literal(String name) {
-	return Component.literal(name);
-    }
+        public static Component trans(String key, String name, Object... args) {
+                return Component.translatable(key + "." + MODID + "." + name, args);
+        }
 
 }
