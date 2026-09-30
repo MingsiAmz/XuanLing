@@ -41,10 +41,6 @@ public class DefaultEnergy implements IEnergyStorage {
                 
         }
 
-        public double getEnergy() {
-                return energy;
-        }
-
         public void setEnergy(double energy) {
                 if (energy >= Config.getMaxValue(Config.RANGE_ENERGY)) {
                         energy = Config.getMaxValue(Config.RANGE_ENERGY);

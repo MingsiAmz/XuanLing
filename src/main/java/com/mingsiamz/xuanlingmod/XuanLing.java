@@ -8,6 +8,7 @@ import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.register.RegisterBlocks;
 import com.mingsiamz.xuanlingmod.register.RegisterCreativeTabs;
+import com.mingsiamz.xuanlingmod.register.RegisterEntities;
 import com.mingsiamz.xuanlingmod.register.RegisterItems;
 import com.mingsiamz.xuanlingmod.register.RegisterKey;
 import com.mojang.logging.LogUtils;
@@ -34,14 +35,16 @@ public class XuanLing {
 
         public XuanLing(IEventBus modEventBus, ModContainer modContainer) {
                 modEventBus.addListener(this::commonSetup);
+                RegisterAttachments.register(modEventBus);
                 RegisterItems.register(modEventBus);
                 RegisterBlocks.register(modEventBus);
                 RegisterCreativeTabs.register(modEventBus);
+                modEventBus.addListener(RegisterEntities::registerEntityAtb);
+                RegisterEntities.register(modEventBus);
                 NeoForge.EVENT_BUS.register(this);
                 modEventBus.addListener(this::addCreative);
                 modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC, MODID + "/" + MODID + ".toml");
 
-                RegisterAttachments.register(modEventBus);
                 modEventBus.addListener(RegisterKey::register);
         }
 
