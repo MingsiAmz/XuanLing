@@ -1,5 +1,6 @@
 package com.mingsiamz.xuanlingmod.render;
 
+import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.entities.SkillEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -16,7 +17,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-public class SkillEntityRender<E extends SkillEntity> extends EntityRenderer<E> {
+public class SkillEntityRender extends EntityRenderer<SkillEntity> {
 
         public ItemRenderer itemRenderer;
 
@@ -26,16 +27,16 @@ public class SkillEntityRender<E extends SkillEntity> extends EntityRenderer<E> 
         }
 
         @Override
-        public void render(E entity, float entityYaw, float partialTick, PoseStack poseStack,
+        public void render(SkillEntity entity, float entityYaw, float partialTick, PoseStack poseStack,
                         MultiBufferSource bufferSource, int packedLight) {
                 super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
                 poseStack.pushPose();
 
                 // 获取平滑插值位置
-                double x = Mth.lerp(partialTick, entity.xOld, entity.getX());
-                double y = Mth.lerp(partialTick, entity.yOld, entity.getY());
-                double z = Mth.lerp(partialTick, entity.zOld, entity.getZ());
-                poseStack.translate(x - entity.getX(), y - entity.getY(), z - entity.getZ());
+                // double x = Mth.lerp(partialTick, entity.xOld, entity.getX());
+                // double y = Mth.lerp(partialTick, entity.yOld, entity.getY());
+                // double z = Mth.lerp(partialTick, entity.zOld, entity.getZ());
+                // poseStack.translate(x - entity.getX(), y - entity.getY(), z - entity.getZ());
 
                 // 添加轻微浮动效果
                 float floatOffset = (float) Math.sin((entity.tickCount + partialTick) * 0.1)
@@ -56,7 +57,7 @@ public class SkillEntityRender<E extends SkillEntity> extends EntityRenderer<E> 
         }
 
         @Override
-        public ResourceLocation getTextureLocation(E entity) {
+        public ResourceLocation getTextureLocation(SkillEntity entity) {
                 return TextureAtlas.LOCATION_BLOCKS;
         }
 

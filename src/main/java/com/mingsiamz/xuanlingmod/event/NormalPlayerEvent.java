@@ -4,6 +4,7 @@ import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
+import com.mingsiamz.xuanlingmod.entities.EjectEntity;
 import com.mingsiamz.xuanlingmod.entities.SkillEntity;
 
 import net.minecraft.world.InteractionHand;
@@ -61,8 +62,7 @@ public class NormalPlayerEvent {
                         iitem.extractEnergy(toExtract, false);
                 }
                 if (item.getItem() == Items.DIAMOND) {
-                        SkillEntity entity = new SkillEntity(level, player, 0);
-                        // entity.setPos(player.position());
+                        EjectEntity entity = new EjectEntity(level, player, 0);
                         level.addFreshEntity(entity);
                 }
         }
@@ -72,11 +72,5 @@ public class NormalPlayerEvent {
                 Player player = event.getEntity();
                 Level level = player.level();
                 DefaultEnergy energy = RegisterAttachments.getDefaultEnergy(player);
-                if (level.isClientSide) {
-                        
-                } else {
-                        // if (energy == null) return;
-                        System.out.println("asdlkfjlksajdflksj");
-                }
         }
 }

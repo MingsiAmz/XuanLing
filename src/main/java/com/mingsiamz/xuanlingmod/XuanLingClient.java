@@ -36,6 +36,7 @@ public class XuanLingClient {
         @SubscribeEvent 
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
                 event.registerEntityRenderer(RegisterEntities.SKILL_ENTITY.get(), SkillEntityRender::new);
+                event.registerEntityRenderer(RegisterEntities.EJECT_ENTITY.get(), SkillEntityRender::new);
         }
 
         @SubscribeEvent
