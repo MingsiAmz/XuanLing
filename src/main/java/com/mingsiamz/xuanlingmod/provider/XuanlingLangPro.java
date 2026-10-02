@@ -36,6 +36,7 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "make_cultivation_component", "衍化神通");
                         this.add(GUI_STRING + "create_cultivation", "衍化");
                         this.add(GUI_STRING + "make_tips", "Shift+左键=删除 Ctrl+左键=连接 中建=居中");
+                        this.add(GUI_STRING + "component_lib_title", "已知组件");
                 }
 
         }
@@ -65,6 +66,8 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "make_cultivation_component", "Make Cultivation Component");
                         this.add(GUI_STRING + "create_cultivation", "Create");
                         this.add(GUI_STRING + "make_tips", "Shift+Left=delete Ctrl+Left=Connect Middle=Center");
+                        this.add(GUI_STRING + "component_lib_title", "Component Lib");
+                        this.add(GUI_STRING + "not_component", "Not Component");
                 }
         }
 }

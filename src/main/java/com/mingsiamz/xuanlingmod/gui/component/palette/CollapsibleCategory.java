@@ -69,8 +69,7 @@ public class CollapsibleCategory {
                 String arrow = expanded ? "▼" : "▶";
                 g.drawString(font, Component.literal(arrow),
                                 x + 4, y + (HEADER_H - 8) / 2, CultivationTheme.BORDER_CYAN, false);
-                g.drawString(font, Component.literal(category.getDisplay()),
-                                x + 18, y + (HEADER_H - 8) / 2,
+                g.drawString(font, category.getDisplay(), x + 18, y + (HEADER_H - 8) / 2,
                                 hoveredHeader ? CultivationTheme.TEXT_GOLD : CultivationTheme.TEXT_PRIMARY, false);
 
                 GuiRenderUtil.border(g, x, y, x + width, y + HEADER_H, CultivationTheme.BORDER_DIM);

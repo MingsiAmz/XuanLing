@@ -1,7 +1,9 @@
 package com.mingsiamz.xuanlingmod.gui.component.palette;
 
+import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.gui.component.data.ComponentCategory;
 import com.mingsiamz.xuanlingmod.gui.component.data.ComponentDef;
+import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 import net.minecraft.client.Minecraft;
@@ -80,12 +82,12 @@ public class PalettePanel {
                 GuiRenderUtil.border(g, x, y, x + width, y + height, CultivationTheme.BORDER_GOLD);
 
                 var font = Minecraft.getInstance().font;
-                g.drawString(font, Component.literal("◆ 组件库"),
-                                x + 8, y + 6, CultivationTheme.BORDER_GOLD, false);
+                Component componentLib = XuanLing.trans(XuanlingLangPro.GUI_STRING, "component_lib_title");
+                g.drawString(font, componentLib, x + 8, y + 6, CultivationTheme.BORDER_GOLD, false);
 
+                Component notComponent = XuanLing.trans(XuanlingLangPro.GUI_STRING, "not_component");
                 if (categories.isEmpty()) {
-                        g.drawString(font, Component.literal("(暂无可用组件)"),
-                                        x + 12, y + 30, CultivationTheme.TEXT_SECONDARY, false);
+                        g.drawString(font, notComponent, x + 12, y + 30, CultivationTheme.TEXT_SECONDARY, false);
                         return;
                 }
 
