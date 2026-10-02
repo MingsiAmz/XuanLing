@@ -79,7 +79,7 @@ public class XuanLing {
         }
 
         public static Component trans(String key, String name, Object... args) {
-                return Component.translatable(key + "." + MODID + "." + name, args);
+                return Component.translatable(key + name, args);
         }
 
 }

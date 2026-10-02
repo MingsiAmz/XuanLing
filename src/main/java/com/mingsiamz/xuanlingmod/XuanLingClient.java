@@ -1,12 +1,14 @@
 package com.mingsiamz.xuanlingmod;
 
 import com.mingsiamz.xuanlingmod.gui.StateGui;
+import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterEntities;
 import com.mingsiamz.xuanlingmod.register.RegisterKey;
 import com.mingsiamz.xuanlingmod.render.SkillEntityRender;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.network.chat.ClickEvent;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -17,6 +19,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 @Mod(value = XuanLing.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = XuanLing.MODID, value = Dist.CLIENT)
@@ -31,8 +34,14 @@ public class XuanLingClient {
         public static void onClientSetup(FMLClientSetupEvent event) {
                 XuanLing.LOGGER.info("HELLO FROM CLIENT SETUP");
                 XuanLing.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+                
         }
 
+        @SubscribeEvent
+        public static void onGatherData(GatherDataEvent event) {
+                event.createProvider(XuanlingLangPro.LangZh::new);
+                event.createProvider(XuanlingLangPro.LangEn::new);
+        }
         @SubscribeEvent 
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
                 event.registerEntityRenderer(RegisterEntities.SKILL_ENTITY.get(), SkillEntityRender::new);

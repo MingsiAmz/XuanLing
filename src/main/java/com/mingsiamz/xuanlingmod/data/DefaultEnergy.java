@@ -2,6 +2,7 @@ package com.mingsiamz.xuanlingmod.data;
 
 import com.mingsiamz.xuanlingmod.Config;
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -14,7 +15,7 @@ public class DefaultEnergy implements IEnergyStorage {
 
         private double energy = 0.0;
         private String name = "LingLi";
-        private Component trans = XuanLing.trans("misc", "energy");
+        private Component trans = XuanLing.trans(XuanlingLangPro.MISC_STRING, "energy");
 
         public DefaultEnergy() {
 

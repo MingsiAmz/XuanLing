@@ -43,8 +43,8 @@ public final class GuiRenderUtil {
         if (fillW <= 0) return;
 
         g.fill(x, y, x + fillW, y + height, color);
-        g.fill(x, y, x + fillW, y + 2, 0x66FFFFFF); // 顶部高光
-        g.fill(x, y + height - 2, x + fillW, y + height, 0x40000000); // 底部阴影
+        g.fill(x, y, x + fillW, y + 2, 0x66FFFFFF); 
+        g.fill(x, y + height - 2, x + fillW, y + height, 0x40000000); 
 
         if (fillW < width) {
             g.fill(x + fillW - 1, y - 1, x + fillW + 1, y + height + 1, 0xFFFFFFFF);

@@ -18,7 +18,7 @@ public interface IGuiComponent {
 
         default boolean isMouseOver(double mouseX, double mouseY) {
                 return mouseX >= getX() && mouseX < getX() + getWidth()
-                        && mouseY >= getY() && mouseY < getY() + getHeight();
+                                && mouseY >= getY() && mouseY < getY() + getHeight();
         }
 
         default boolean mouseClicked(double mouseX, double mouseY, int button) {

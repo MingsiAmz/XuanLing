@@ -2,6 +2,7 @@ package com.mingsiamz.xuanlingmod.data;
 
 import com.mingsiamz.xuanlingmod.Config;
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -16,7 +17,7 @@ public class DefaultData {
         private static String name = "normal";
         private double physicalDefense = 0.0;
         private double magicDefense = 0.0;
-        private Component literal = XuanLing.trans("misc", "default_data");
+        private Component literal = XuanLing.trans(XuanlingLangPro.MISC_STRING, "default_data");
 
         public static final Codec<DefaultData> CODEC = RecordCodecBuilder.create(builder -> builder
                                                                                  .group(

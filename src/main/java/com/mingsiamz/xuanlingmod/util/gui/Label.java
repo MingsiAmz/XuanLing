@@ -6,6 +6,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nullable;
+
+import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
+
 import java.util.List;
 
 public class Label implements IGuiComponent {
@@ -43,8 +47,8 @@ public class Label implements IGuiComponent {
         private long typewriterStart = 0L;
         private long typewriterSpeed = 40L;
 
-        public Label(String text) {
-                this(Component.literal(text));
+        public Label(String text, Object... args) {
+                this(XuanLing.trans(XuanlingLangPro.GUI_STRING, text, args));
         }
 
         public Label(Component text) {

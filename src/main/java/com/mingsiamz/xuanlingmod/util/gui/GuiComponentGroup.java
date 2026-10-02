@@ -5,23 +5,28 @@ import net.minecraft.client.gui.GuiGraphics;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiComponentGroup implements IGuiComponent {
+import com.mingsiamz.xuanlingmod.util.gui.layout.ColumnLayout;
+import com.mingsiamz.xuanlingmod.util.gui.layout.Layout;
 
-        public enum Layout {
-                VERTICAL, HORIZONTAL
-        }
+public class GuiComponentGroup implements IGuiComponent {
 
         private int x, y;
         private int padding = 0;
-        private int spacing = 8;
-        private Layout layout = Layout.VERTICAL;
+        private int fixedWidth = -1;
+        private int fixedHeight = -1;
+
+        private Layout layout = new ColumnLayout();
         private boolean enabled = true;
         private boolean visible = true;
         private final List<IGuiComponent> children = new ArrayList<>();
 
-        public GuiComponentGroup setSpacing(int spacing) {
-                this.spacing = spacing;
+        public GuiComponentGroup setLayout(Layout layout) {
+                this.layout = layout;
                 return this;
+        }
+
+        public Layout getLayout() {
+                return layout;
         }
 
         public GuiComponentGroup setPadding(int padding) {
@@ -29,28 +34,33 @@ public class GuiComponentGroup implements IGuiComponent {
                 return this;
         }
 
-        public GuiComponentGroup setLayout(Layout layout) {
-                this.layout = layout;
+        public GuiComponentGroup setFixedWidth(int w) {
+                this.fixedWidth = w;
                 return this;
         }
 
-        public GuiComponentGroup setEnabled(boolean enabled) {
-                this.enabled = enabled;
+        public GuiComponentGroup setFixedHeight(int h) {
+                this.fixedHeight = h;
                 return this;
         }
 
-        public GuiComponentGroup setVisible(boolean visible) {
-                this.visible = visible;
+        public GuiComponentGroup setEnabled(boolean e) {
+                this.enabled = e;
                 return this;
         }
 
-        public GuiComponentGroup add(IGuiComponent component) {
-                children.add(component);
+        public GuiComponentGroup setVisible(boolean v) {
+                this.visible = v;
                 return this;
         }
 
-        public GuiComponentGroup addAll(IGuiComponent... components) {
-                for (IGuiComponent c : components)
+        public GuiComponentGroup add(IGuiComponent c) {
+                children.add(c);
+                return this;
+        }
+
+        public GuiComponentGroup addAll(IGuiComponent... cs) {
+                for (var c : cs)
                         children.add(c);
                 return this;
         }
@@ -69,128 +79,86 @@ public class GuiComponentGroup implements IGuiComponent {
                 if (!visible)
                         return;
 
-                int originX = x + padding;
-                int originY = y + padding;
-                int cursor = (layout == Layout.VERTICAL) ? originY : originX;
+                int cx = x + padding;
+                int cy = y + padding;
+                int cw = getWidth() - padding * 2;
+                int ch = getHeight() - padding * 2;
 
-                for (IGuiComponent child : children) {
-                        if (layout == Layout.VERTICAL) {
-                                child.setPosition(originX, cursor);
-                                cursor += child.getHeight() + spacing;
-                        } else {
-                                child.setPosition(cursor, originY);
-                                cursor += child.getWidth() + spacing;
-                        }
-                        child.render(g, mouseX, mouseY, partialTick);
+                layout.apply(cx, cy, cw, ch, children);
+
+                for (IGuiComponent c : children) {
+                        c.render(g, mouseX, mouseY, partialTick);
                 }
         }
 
         @Override
-        public boolean mouseClicked(double mx, double my, int button) {
+        public boolean mouseClicked(double mx, double my, int b) {
                 if (!enabled || !visible)
                         return false;
-                for (int i = children.size() - 1; i >= 0; i--) {
-                        IGuiComponent child = children.get(i);
-                        if (child.isMouseOver(mx, my) && child.mouseClicked(mx, my, button)) {
+                for (int i = children.size() - 1; i >= 0; i--)
+                        if (children.get(i).isMouseOver(mx, my) && children.get(i).mouseClicked(mx, my, b))
                                 return true;
-                        }
-                }
                 return false;
         }
 
         @Override
-        public boolean mouseReleased(double mx, double my, int button) {
+        public boolean mouseReleased(double mx, double my, int b) {
                 if (!enabled || !visible)
                         return false;
-                for (int i = children.size() - 1; i >= 0; i--) {
-                        if (children.get(i).mouseReleased(mx, my, button))
+                for (int i = children.size() - 1; i >= 0; i--)
+                        if (children.get(i).mouseReleased(mx, my, b))
                                 return true;
-                }
                 return false;
         }
 
         @Override
-        public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
+        public boolean mouseDragged(double mx, double my, int b, double dx, double dy) {
                 if (!enabled || !visible)
                         return false;
-                for (int i = children.size() - 1; i >= 0; i--) {
-                        if (children.get(i).mouseDragged(mx, my, button, dx, dy))
+                for (int i = children.size() - 1; i >= 0; i--)
+                        if (children.get(i).mouseDragged(mx, my, b, dx, dy))
                                 return true;
-                }
                 return false;
         }
 
         @Override
         public boolean mouseScrolled(double mx, double my, double sx, double sy) {
-                if (!enabled || !visible)
+                if (!enabled || !visible || !isMouseOver(mx, my))
                         return false;
-                if (!isMouseOver(mx, my))
-                        return false;
-                for (int i = children.size() - 1; i >= 0; i--) {
+                for (int i = children.size() - 1; i >= 0; i--)
                         if (children.get(i).mouseScrolled(mx, my, sx, sy))
                                 return true;
-                }
                 return false;
         }
 
         @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        public boolean keyPressed(int kc, int sc, int m) {
                 if (!enabled || !visible)
                         return false;
-                for (IGuiComponent child : children) {
-                        if (child.keyPressed(keyCode, scanCode, modifiers))
+                for (var c : children)
+                        if (c.keyPressed(kc, sc, m))
                                 return true;
-                }
                 return false;
         }
 
         @Override
-        public boolean charTyped(char codePoint, int modifiers) {
+        public boolean charTyped(char cp, int m) {
                 if (!enabled || !visible)
                         return false;
-                for (IGuiComponent child : children) {
-                        if (child.charTyped(codePoint, modifiers))
+                for (var c : children)
+                        if (c.charTyped(cp, m))
                                 return true;
-                }
                 return false;
         }
 
         @Override
         public int getWidth() {
-                if (children.isEmpty())
-                        return padding * 2;
-                if (layout == Layout.HORIZONTAL) {
-                        int total = 0;
-                        for (int i = 0; i < children.size(); i++) {
-                                total += children.get(i).getWidth();
-                                if (i < children.size() - 1)
-                                        total += spacing;
-                        }
-                        return total + padding * 2;
-                }
-                int max = 0;
-                for (IGuiComponent c : children)
-                        max = Math.max(max, c.getWidth());
-                return max + padding * 2;
+                return fixedWidth >= 0 ? fixedWidth : layout.measureWidth(children) + padding * 2;
         }
 
         @Override
         public int getHeight() {
-                if (children.isEmpty())
-                        return padding * 2;
-                if (layout == Layout.VERTICAL) {
-                        int total = 0;
-                        for (int i = 0; i < children.size(); i++) {
-                                total += children.get(i).getHeight();
-                                if (i < children.size() - 1)
-                                        total += spacing;
-                        }
-                        return total + padding * 2;
-                }
-                int max = 0;
-                for (IGuiComponent c : children)
-                        max = Math.max(max, c.getHeight());
-                return max + padding * 2;
+                return fixedHeight >= 0 ? fixedHeight : layout.measureHeight(children) + padding * 2;
         }
 
         @Override
