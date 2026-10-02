@@ -1,12 +1,19 @@
 {
   "xuanling.gui.charm": "Charm:%s",
+  "xuanling.gui.create_cultivation": "Create",
   "xuanling.gui.flyspeedmof": "FlySpeed:%s",
   "xuanling.gui.insight": "Insight:%s",
   "xuanling.gui.inspiration": "Inspiration:%s",
   "xuanling.gui.lucky": "Lucky:%s",
+  "xuanling.gui.make_cultivation_component": "Make Cultivation Component",
+  "xuanling.gui.make_tips": "Shift+Left=delete Ctrl+Left=Connect Middle=Center",
   "xuanling.gui.mindsense": "Mind Sense:%s",
   "xuanling.gui.movespeedmof": "Move Speed:%s",
+  "xuanling.gui.nick_name": "Nick Name:%s",
   "xuanling.gui.normallife": "Normal Life:%s",
+  "xuanling.gui.realm": "Realm:%s",
+  "xuanling.gui.sect": "Sect:%s",
   "xuanling.gui.soullife": "Soul Life:%s",
+  "xuanling.gui.state_title": "State Title",
   "xuanling.gui.tpao": "TPAO:%s"
 }

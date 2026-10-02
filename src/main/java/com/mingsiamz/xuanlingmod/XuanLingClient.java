@@ -57,7 +57,6 @@ public class XuanLingClient {
                 if (minecraft.screen != null)
                         return;
                 if (RegisterKey.KEY_R.consumeClick()) {
-                        // minecraft.setScreen(new DataPanel());
                         minecraft.setScreen(new StateGui());
                 }
         }

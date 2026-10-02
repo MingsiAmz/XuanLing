@@ -9,7 +9,7 @@ public class StatBar implements IGuiComponent {
         private int width;
         private int current, max;
         private int barColor;
-    
+
         // custom configure
         private String label = "";
         private boolean showText = true;
@@ -23,25 +23,52 @@ public class StatBar implements IGuiComponent {
                 this.barColor = CultivationTheme.BORDER_CYAN;
         }
 
-        public StatBar setLabel(String label) { this.label = label; return this; }
-        public StatBar setColor(int color) { this.barColor = color; return this; }
-        public StatBar setValue(int current, int max) { this.current = current; this.max = max; return this; }
-        public StatBar setBarHeight(int height) { this.barHeight = height; return this; }
-        public StatBar showText(boolean show) { this.showText = show; return this; }
-        public StatBar showTicks(boolean show) { this.showTicks = show; return this; }
+        public StatBar setLabel(String label) {
+                this.label = label;
+                return this;
+        }
+
+        public StatBar setColor(int color) {
+                this.barColor = color;
+                return this;
+        }
+
+        public StatBar setValue(int current, int max) {
+                this.current = current;
+                this.max = max;
+                return this;
+        }
+
+        public StatBar setBarHeight(int height) {
+                this.barHeight = height;
+                return this;
+        }
+
+        public StatBar showText(boolean show) {
+                this.showText = show;
+                return this;
+        }
+
+        public StatBar showTicks(boolean show) {
+                this.showTicks = show;
+                return this;
+        }
+
         public StatBar setTextColors(int labelColor, int valueColor) {
-                this.textColor = labelColor; this.valueColor = valueColor; return this;
+                this.textColor = labelColor;
+                this.valueColor = valueColor;
+                return this;
         }
 
         @Override
         public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
                 Font font = net.minecraft.client.Minecraft.getInstance().font;
-        
+
                 if (showText) {
                         g.drawString(font, Component.literal(label), x, y, textColor, false);
                         String valueText = current + " / " + max;
                         g.drawString(font, Component.literal(valueText),
-                                     x + width - font.width(valueText), y, valueColor, false);
+                                        x + width - font.width(valueText), y, valueColor, false);
                 }
 
                 int barY = showText ? y + 12 : y;
@@ -55,12 +82,33 @@ public class StatBar implements IGuiComponent {
                 if (showTicks) {
                         GuiRenderUtil.ticks(g, x, barY, width, barHeight, 10, 0x30FFFFFF);
                 }
-                GuiRenderUtil.border(g, x - 1, barY - 1, x + width + 1, barY + barHeight + 1, CultivationTheme.BORDER_DIM);
+                GuiRenderUtil.border(g, x - 1, barY - 1, x + width + 1, barY + barHeight + 1,
+                                CultivationTheme.BORDER_DIM);
         }
 
-        @Override public void setPosition(int x, int y) { this.x = x; this.y = y; }
-        @Override public int getX() { return x; }
-        @Override public int getY() { return y; }
-        @Override public int getWidth() { return width; }
-        @Override public int getHeight() { return showText ? barHeight + 12 : barHeight; }
+        @Override
+        public void setPosition(int x, int y) {
+                this.x = x;
+                this.y = y;
+        }
+
+        @Override
+        public int getX() {
+                return x;
+        }
+
+        @Override
+        public int getY() {
+                return y;
+        }
+
+        @Override
+        public int getWidth() {
+                return width;
+        }
+
+        @Override
+        public int getHeight() {
+                return showText ? barHeight + 12 : barHeight;
+        }
 }
