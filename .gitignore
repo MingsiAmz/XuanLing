@@ -38,3 +38,8 @@ run/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/
+plans.org
+# Ignore Gradle build output directory
+build
+
+todo.org

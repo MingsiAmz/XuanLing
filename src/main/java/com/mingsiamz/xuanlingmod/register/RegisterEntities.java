@@ -1,0 +1,35 @@
+package com.mingsiamz.xuanlingmod.register;
+
+import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.entities.EjectEntity;
+import com.mingsiamz.xuanlingmod.entities.SkillEntity;
+
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+public class RegisterEntities {
+        public static final DeferredRegister<EntityType<?>> ENTITY_TYPE = DeferredRegister.create(Registries.ENTITY_TYPE, XuanLing.MODID);
+
+        public static final DeferredHolder<EntityType<?>, EntityType<SkillEntity>> SKILL_ENTITY = rgSimpleEntity("skill_entity", SkillEntity::new);
+
+        public static final DeferredHolder<EntityType<?>, EntityType<EjectEntity>> EJECT_ENTITY = rgSimpleEntity("eject_entity", EjectEntity::new);
+
+        public static void register(IEventBus bus) {
+                ENTITY_TYPE.register(bus);
+        }
+
+        public static void registerEntityAtb(EntityAttributeCreationEvent event) {
+                event.put(SKILL_ENTITY.get(), SkillEntity.createAttribute().build());
+                event.put(EJECT_ENTITY.get(), EjectEntity.createAttribute().build());
+        }
+
+        private static <E extends SkillEntity> DeferredHolder<EntityType<?>, EntityType<E>> rgSimpleEntity(String name, EntityType.EntityFactory<E> factory) {
+                return ENTITY_TYPE.register(name, () -> EntityType.Builder.<E>of(factory, MobCategory.MISC).sized(1f, 1f).noSummon().noSave().fireImmune().canSpawnFarFromPlayer().updateInterval(60).build(XuanLing.prefix("skill_entity").toString()));
+        }
+}

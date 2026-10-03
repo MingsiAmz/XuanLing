@@ -15,23 +15,6 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    // public static final ModConfigSpec.BooleanValue LOG_DIRT_BLOCK = BUILDER
-    // 	.comment("Whether to log the dirt block on common setup")
-    // 	.define("logDirtBlock", true);
-
-    // public static final ModConfigSpec.IntValue MAGIC_NUMBER = BUILDER
-    // 	.comment("A magic number")
-    // 	.defineInRange("magicNumber", 42, 0, Integer.MAX_VALUE);
-
-    // public static final ModConfigSpec.ConfigValue<String> MAGIC_NUMBER_INTRODUCTION = BUILDER
-    // 	.comment("What you want the introduction message to be for the magic number")
-    // 	.define("magicNumberIntroduction", "The magic number is... ");
-
-    // // a list of strings that are treated as resource locations for items
-    // public static final ModConfigSpec.ConfigValue<List<? extends String>> ITEM_STRINGS = BUILDER
-    // 	.comment("A list of items to log on common setup.")
-    // 	.defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), () -> "", Config::validateItemName);
-
     public static final ModConfigSpec.DoubleValue RANGE_NORMAL_LIFE = BUILDER
 	.comment("身寿的最小与最大值")
 	.defineInRange("range_normal_life", 0, 0, 50000.0);
@@ -72,18 +55,21 @@ public class Config {
 	.comment("魅力的最小与最大值，最大不可超过" + Double.MAX_VALUE)
 	.defineInRange("range_lucky", 0, 0, 50000.0);
 
+    public static final ModConfigSpec.DoubleValue RANGE_M_SENSE = BUILDER
+	.comment("魅力的最小与最大值，最大不可超过" + Double.MAX_VALUE)
+	.defineInRange("range_m_sense", 0, 0, 50000.0);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
-
     private static boolean validateItemName(final Object obj) {
-        return obj instanceof String itemName && BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(itemName));
+	return obj instanceof String itemName && BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(itemName));
     }
 
     public static Double getMaxValue(ModConfigSpec.DoubleValue spec) {
-	return (Double)spec.getSpec().getRange().getMax();
+	return (Double) spec.getSpec().getRange().getMax();
     }
 
     public static Double getMinValue(ModConfigSpec.DoubleValue spec) {
-	return (Double)spec.getSpec().getRange().getMin();
+	return (Double) spec.getSpec().getRange().getMin();
     }
 }
