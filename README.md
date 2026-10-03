@@ -1,25 +1,50 @@
+# 玄灵模组
 
-Installation information
-=======
+基于 Minecraft 1.21.1 NeoForge 的修仙模组，提供灵力体系、功法组件可视化编程与自定义 GUI 系统。
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+## 功能特性
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+- **修仙体系**：灵力/内力条 HUD、境界与宗门属性、灵力存储
+- **组件可视化编程**：基于画布与节点的拖拽式编辑器，支持功法/逻辑/渲染/数据分类组件
+- **自定义 GUI 框架**：修仙主题 UI 组件库，支持流式/网格/浮动等布局，含面板、状态条、按钮与打字机特效标签
+- **数据驱动**：本地 JSON 配置热重载与持久化
+- **网络同步**：客户端与服务端修仙数据包同步
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+## 技术栈
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+- **框架**: NeoForge 1.21.1
+- **语言**: Java 21
+- **构建**: Gradle
+- **序列化**: Gson, Minecraft Codec/StreamCodec
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+## 快速开始
+
+1. 确保 JDK 21 及 Gradle 已安装
+2. 克隆仓库并构建：
+   ```bash
+   git clone <repo-url>
+   cd xuanling-template-1.21.1
+   ./gradlew build
+   ```
+3. 启动客户端：
+   ```bash
+   ./gradlew runClient
+   ```
+
+## 目录结构
+
+- `src/main/java/.../xuanlingmod/`：核心源码
+  - `gui/`：编辑器、HUD 及 UI 组件（画布/调色板/布局）
+  - `data/`：数据管理、加载与默认配置
+  - `entities/` & `render/`：技能实体与渲染
+  - `event/`：玩家事件、GUI 事件与能力注册
+  - `network/`：网络包与通信
+  - `register/`：方块、物品、能力等注册表
+  - `util/gui/`：底层 UI 组件与布局引擎
+- `src/main/resources/`：资源文件（语言、纹理）
+- `src/generated/resources/`：数据生成器输出（语言键值）
+
+## 配置说明
+
+- **语言文件**: `src/generated/resources/assets/xuanling/lang/zh_cn.json`/ `en_us.json`
+- **运行时配置**: 运行后生成于 `./config/xuanling/` 目录，由 `DataManager` 与 `DataLoader` 管理读写与热重载
