@@ -31,19 +31,6 @@
    ./gradlew runClient
    ```
 
-## 目录结构
-
-- `src/main/java/.../xuanlingmod/`：核心源码
-  - `gui/`：编辑器、HUD 及 UI 组件（画布/调色板/布局）
-  - `data/`：数据管理、加载与默认配置
-  - `entities/` & `render/`：技能实体与渲染
-  - `event/`：玩家事件、GUI 事件与能力注册
-  - `network/`：网络包与通信
-  - `register/`：方块、物品、能力等注册表
-  - `util/gui/`：底层 UI 组件与布局引擎
-- `src/main/resources/`：资源文件（语言、纹理）
-- `src/generated/resources/`：数据生成器输出（语言键值）
-
 ## 配置说明
 
 - **语言文件**: `src/generated/resources/assets/xuanling/lang/zh_cn.json`/ `en_us.json`
