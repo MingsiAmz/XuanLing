@@ -16,6 +16,7 @@ import com.mingsiamz.xuanlingmod.util.gui.SectionDivider;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Justify;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Layouts;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -29,6 +30,8 @@ public class StateGui extends Screen {
 
         private CultivationPanel panel;
         private GuiComponentGroup root;
+        private static GuiButton leftButton;
+        private static GuiButton rightButton;
 
         private final String daoName = "太虚散人";
         private final String sect = "太虚剑宗";
@@ -59,7 +62,7 @@ public class StateGui extends Screen {
 
         @Override
         public boolean mouseClicked(double mx, double my, int button) {
-                if (root.mouseClicked(mx, my, button))
+                if (root.mouseClicked(mx, my, button) || leftButton.mouseClicked(mx, my, button) || rightButton.mouseClicked(mx, my, button))
                         return true;
                 return super.mouseClicked(mx, my, button);
         }
@@ -146,6 +149,8 @@ public class StateGui extends Screen {
                                                 .setDiamondSize(3))
                                 .add(buttonGroup);
                 root.setPosition(px + CultivationTheme.PADDING, py + 105);
+                
+                initSideBtn(PANEL_W, PANEL_H, px, py);
         }
 
         @Override
@@ -172,6 +177,14 @@ public class StateGui extends Screen {
                 Component realmComp = XuanLing.trans(XuanlingLangPro.GUI_STRING, "realm", this.realm);
                 g.drawString(font, realmComp, rightX - font.width(realmComp), idY, CultivationTheme.TEXT_GOLD, true);
 
+                renderPlayer(g, mouseX, mouseY);
+
+                root.render(g, mouseX, mouseY, partialTick);
+
+                renderSideBtn(g, mouseX, mouseY, partialTick);
+        }
+
+        public void renderPlayer(GuiGraphics g, int mouseX, int mouseY) {
                 int figureX = panel.getX() + PANEL_W / 2;
                 int figureY = panel.getY() + 200;
                 int figureScale = 35;
@@ -222,9 +235,7 @@ public class StateGui extends Screen {
                         minecraft.player.yHeadRot = oldYHeadRot;
                         minecraft.player.yHeadRotO = oldYHeadRotO;
                 }
-
-                root.render(g, mouseX, mouseY, partialTick);
-        }
+        } 
 
         private void drawEllipse(GuiGraphics g, int cx, int cy, int rx, int ry, int color) {
                 for (int y = -ry; y <= ry; y++) {
@@ -232,5 +243,29 @@ public class StateGui extends Screen {
                         int x = (int) (rx * Math.sqrt(1 - (double) (y * y) / (ry * ry)));
                         g.fill(cx - x, cy + y, cx + x, cy + y + 1, color);
                 }
+        }
+
+        public static void renderSideBtn(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+                leftButton.render(g, mouseX, mouseY, partialTick);
+                rightButton.render(g, mouseX, mouseY, partialTick);
+        }
+
+        public static GuiButton[] initSideBtn(int panelW, int panelH, int px, int py) {
+                int sideW = 22;
+                int sideH = 60;
+                int sideGap = 8;
+
+                leftButton = new GuiButton(sideW, sideH, "◀").onClick(()->{
+                                Minecraft.getInstance().setScreen(ChangeGui.cycle('p'));
+                });
+                rightButton = new GuiButton(sideW, sideH, "▶").onClick(()->{
+                                Minecraft.getInstance().setScreen(ChangeGui.cycle('n'));
+                                // minecraft.setScreen(new DetailDataGui());
+                });
+
+                int btnY = py + (panelH - sideH) / 2;
+                leftButton.setPosition(px - sideGap - sideW, btnY);
+                rightButton.setPosition(px + panelW + sideGap, btnY);
+                return new GuiButton[]{leftButton, rightButton};
         }
 }

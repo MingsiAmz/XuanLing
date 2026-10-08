@@ -10,6 +10,7 @@ public class XuanlingLangPro {
         public static final String GUI_STRING = XuanLing.MODID + "." + "gui" + ".";
         public static final String MISC_STRING = XuanLing.MODID + "." + "misc" + ".";
         public static final String COMPONEN_STRING = XuanLing.MODID + "." + "component" + ".";
+        public static final String REALM_STRING = XuanLing.MODID + "." + "realm" + ".";
 
         public static final class LangZh extends LanguageProvider {
 

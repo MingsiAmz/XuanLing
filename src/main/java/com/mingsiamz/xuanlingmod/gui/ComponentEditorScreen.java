@@ -65,7 +65,7 @@ public class ComponentEditorScreen extends Screen {
         }
 
         private void onCreate() {
-                DataManager.saveData(state, "skills");
+                DataManager.saveData(state, null, minecraft.player.getUUID().toString(), "skills");
                 if (minecraft != null && minecraft.player != null) {
                         minecraft.player.displayClientMessage(
                                         Component.literal("§a已导出：skills.json"), false);
