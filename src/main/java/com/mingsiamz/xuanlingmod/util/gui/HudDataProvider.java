@@ -1,13 +1,15 @@
 package com.mingsiamz.xuanlingmod.util.gui;
 
+import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
+
 import net.minecraft.client.player.LocalPlayer;
 
 public final class HudDataProvider {
         private HudDataProvider() {
         }
 
-        // TODO: 替换为从玩家 Capability/Attachment 读取
         public static int getQi(LocalPlayer player) {
+                RegisterAttachments.getDefaultEnergy(player);
                 return 3200;
         }
 

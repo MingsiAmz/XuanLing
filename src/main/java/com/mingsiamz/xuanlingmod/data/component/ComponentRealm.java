@@ -1,10 +1,10 @@
-package com.mingsiamz.xuanlingmod.data;
+package com.mingsiamz.xuanlingmod.data.component;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Builder;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder;
 
 /**
  * @param size                   小境界层数
@@ -23,29 +23,33 @@ public class ComponentRealm {
         private final int size;
         private final int level;
         private final double addHealth;
-        private final double addEnergy;
+        private final double addParrentEnergy;
+        private final double addChildEnergy;
         private final double addNormalLife;
         private final double addSoulLife;
         private final double nextLevelAddHealth;
-        private final double nextLevelAddEnergy;
+        private final double nextLevelAddParrentEnergy;
+        private final double nextLevelAddChildEnergy;
         private final double nextLevelAddNormalLife;
         private final double nextLevelAddSoulLife;
-        private final String sName;
-        private transient final Component name;
+        private final String name;
+        private boolean canTrans;
 
         private ComponentRealm(Builder builder) {
                 this.size = builder.size;
                 this.level = builder.level;
                 this.addHealth = builder.addHealth;
-                this.addEnergy = builder.addEnergy;
+                this.addParrentEnergy = builder.addParrentEnergy;
+                this.addChildEnergy = builder.addChildEnergy;
                 this.addNormalLife = builder.addNormalLife;
                 this.addSoulLife = builder.addSoulLife;
                 this.nextLevelAddHealth = builder.nextLevelAddHealth;
-                this.nextLevelAddEnergy = builder.nextLevelAddEnergy;
+                this.nextLevelAddParrentEnergy = builder.nextLevelAddParrentEnergy;
+                this.nextLevelAddChildEnergy = builder.nextLevelAddChildEnergy;
                 this.nextLevelAddNormalLife = builder.nextLevelAddNormalLife;
                 this.nextLevelAddSoulLife = builder.nextLevelAddSoulLife;
                 this.name = builder.name;
-                this.sName = this.name.getString();
+                this.canTrans = builder.canTrans;
         }
 
         public int size() {
@@ -60,8 +64,12 @@ public class ComponentRealm {
                 return addHealth;
         }
 
-        public double getAddEnergy() {
-                return addEnergy;
+        public double getAddParrentEnergy() {
+                return addParrentEnergy;
+        }
+
+        public double getAddChildEnergy() {
+                return addChildEnergy;
         }
 
         public double getAddNormalLife() {
@@ -76,8 +84,12 @@ public class ComponentRealm {
                 return nextLevelAddHealth;
         }
 
-        public double getNextLevelAddEnergy() {
-                return nextLevelAddEnergy;
+        public double getNextLevelAddParrentEnergy() {
+                return nextLevelAddParrentEnergy;
+        }
+
+        public double getNextLevelAddChildEnergy() {
+                return nextLevelAddChildEnergy;
         }
 
         public double getNextLevelAddNormalLife() {
@@ -88,29 +100,35 @@ public class ComponentRealm {
                 return nextLevelAddSoulLife;
         }
 
-        public Component getName() {
+        public boolean canTrans() {
+                return canTrans;
+        }
+
+        public String getName() {
                 return name;
         }
 
         public static Builder builder(String name) {
-                Component com = XuanLing.trans(XuanlingLangPro.REALM_STRING, name);
-                return new Builder(com);
+                return new Builder(name);
         }
 
         public static class Builder {
                 private int size = 0;
                 private int level = 0;
                 private double addHealth = 0;
-                private double addEnergy = 0;
+                private double addParrentEnergy = 0;
+                private double addChildEnergy = 0;
                 private double addNormalLife = 0;
                 private double addSoulLife = 0;
                 private double nextLevelAddHealth = 0;
-                private double nextLevelAddEnergy = 0;
+                private double nextLevelAddParrentEnergy = 0;
+                private double nextLevelAddChildEnergy = 0;
                 private double nextLevelAddNormalLife = 0;
                 private double nextLevelAddSoulLife = 0;
-                private Component name;
+                private String name;
+                private boolean canTrans = false;
 
-                public Builder(Component name) {
+                public Builder(String name) {
                         this.name = name;
                 }
 
@@ -129,8 +147,13 @@ public class ComponentRealm {
                         return this;
                 }
 
-                public Builder addEnergy(double addEnergy) {
-                        this.addEnergy = addEnergy;
+                public Builder addParrentEnergy(double addParrentEnergy) {
+                        this.addParrentEnergy = addParrentEnergy;
+                        return this;
+                }
+
+                public Builder addChildEnergy(double addChildEnergy) {
+                        this.addChildEnergy = addChildEnergy;
                         return this;
                 }
 
@@ -149,8 +172,13 @@ public class ComponentRealm {
                         return this;
                 }
 
-                public Builder nextLevelAddEnergy(double nextLevelAddEnergy) {
-                        this.nextLevelAddEnergy = nextLevelAddEnergy;
+                public Builder nextLevelAddParrentEnergy(double nextLevelAddParrentEnergy) {
+                        this.nextLevelAddParrentEnergy = nextLevelAddParrentEnergy;
+                        return this;
+                }
+
+                public Builder nextLevelAddChildEnergy(double nextLevelAddChildEnergy) {
+                        this.nextLevelAddChildEnergy = nextLevelAddChildEnergy;
                         return this;
                 }
 
@@ -161,6 +189,12 @@ public class ComponentRealm {
 
                 public Builder nextLevelAddSoulLife(double nextLevelAddSoulLife) {
                         this.nextLevelAddSoulLife = nextLevelAddSoulLife;
+                        return this;
+                }
+
+                public Builder trans() {
+                        this.canTrans = true;
+                        this.name = XuanLing.trans(XuanlingLangPro.ENERGY_STRING, this.name).getString();
                         return this;
                 }
 

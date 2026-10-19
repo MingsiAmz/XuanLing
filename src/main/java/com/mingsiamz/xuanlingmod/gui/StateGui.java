@@ -4,6 +4,9 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.data.BasicRealm;
+import com.mingsiamz.xuanlingmod.data.DefaultData;
+import com.mingsiamz.xuanlingmod.data.component.ComponentRealm;
 import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
@@ -98,16 +101,16 @@ public class StateGui extends Screen {
 
                 int innerW = PANEL_W - CultivationTheme.PADDING * 2;
                 GuiComponentGroup statGroup = new GuiComponentGroup()
-                                .setLayout(Layouts.row()
-                                                .setJustify(Justify.CENTER)
-                                                .setSpacing(10))
-                                .setFixedWidth(innerW);
+                        .setLayout(Layouts.row()
+                                   .setJustify(Justify.CENTER)
+                                   .setSpacing(10))
+                        .setFixedWidth(innerW);
 
                 GuiComponentGroup statLeft = new GuiComponentGroup()
-                                .setLayout(Layouts.column().setSpacing(6));
+                        .setLayout(Layouts.column().setSpacing(6));
 
                 GuiComponentGroup statRight = new GuiComponentGroup()
-                                .setLayout(Layouts.column().setSpacing(6));
+                        .setLayout(Layouts.column().setSpacing(6));
 
                 String[] str = RegisterAttachments.getBasicData(minecraft.player).toString().split("\n");
                 for (int i = 0; i < str.length / 2; i++) {
@@ -126,28 +129,28 @@ public class StateGui extends Screen {
                 Component make = XuanLing.trans(XuanlingLangPro.GUI_STRING, "make_cultivation_component");
 
                 GuiComponentGroup buttonGroup = new GuiComponentGroup()
-                                .setLayout(Layouts.flow(innerW)
-                                                .setSpacing(8)
-                                                .setJustify(Justify.CENTER))
-                                .setFixedWidth(innerW)
-                                .add(new GuiButton(80, 20, make.getString()).onClick(() -> {
-                                        minecraft.setScreen(new ComponentEditorScreen());
-                                }))
-                                .add(new GuiButton(80, 20, "炼丹").onClick(() -> {
-                                        // TODO
-                                }))
-                                .add(new GuiButton(80, 20, "功法").onClick(() -> {
-                                        // TODO
-                                }));
+                        .setLayout(Layouts.flow(innerW)
+                                   .setSpacing(8)
+                                   .setJustify(Justify.CENTER))
+                        .setFixedWidth(innerW)
+                        .add(new GuiButton(80, 20, make.getString()).onClick(() -> {
+                                                minecraft.setScreen(new ComponentEditorScreen());
+                        }))
+                        .add(new GuiButton(80, 20, "炼丹").onClick(() -> {
+                                                // TODO
+                        }))
+                        .add(new GuiButton(80, 20, "功法").onClick(() -> {
+                                                // TODO
+                        }));
 
                 root = new GuiComponentGroup()
-                                .setLayout(Layouts.column().setSpacing(14))
-                                .setPadding(0)
-                                .add(new SectionDivider(innerW).setColors(0x40FFFFFF, CultivationTheme.BORDER_GOLD))
-                                .add(statGroup)
-                                .add(new SectionDivider(innerW).setColors(0x40FFFFFF, CultivationTheme.BORDER_CYAN)
-                                                .setDiamondSize(3))
-                                .add(buttonGroup);
+                        .setLayout(Layouts.column().setSpacing(14))
+                        .setPadding(0)
+                        .add(new SectionDivider(innerW).setColors(0x40FFFFFF, CultivationTheme.BORDER_GOLD))
+                        .add(statGroup)
+                        .add(new SectionDivider(innerW).setColors(0x40FFFFFF, CultivationTheme.BORDER_CYAN)
+                             .setDiamondSize(3))
+                        .add(buttonGroup);
                 root.setPosition(px + CultivationTheme.PADDING, py + 105);
                 
                 initSideBtn(PANEL_W, PANEL_H, px, py);
@@ -165,23 +168,40 @@ public class StateGui extends Screen {
 
                 Component title = XuanLing.trans(XuanlingLangPro.GUI_STRING, "state_title");
                 g.drawString(font, title, cx - font.width(title) / 2,
-                                panel.getY() + 14, CultivationTheme.BORDER_GOLD, false);
+                             panel.getY() + 14, CultivationTheme.BORDER_GOLD, false);
 
                 int idY = panel.getY() + 56;
                 g.drawString(font, XuanLing.trans(XuanlingLangPro.GUI_STRING, "nick_name", this.daoName), innerX, idY,
-                                CultivationTheme.TEXT_PRIMARY, false);
+                             CultivationTheme.TEXT_PRIMARY, false);
 
                 g.drawString(font, XuanLing.trans(XuanlingLangPro.GUI_STRING, "sect", this.sect), innerX, idY + 16,
-                                CultivationTheme.TEXT_PRIMARY, false);
+                             CultivationTheme.TEXT_PRIMARY, false);
 
-                Component realmComp = XuanLing.trans(XuanlingLangPro.GUI_STRING, "realm", this.realm);
-                g.drawString(font, realmComp, rightX - font.width(realmComp), idY, CultivationTheme.TEXT_GOLD, true);
+                renderRealm(g, rightX, idY);
 
                 renderPlayer(g, mouseX, mouseY);
 
                 root.render(g, mouseX, mouseY, partialTick);
 
                 renderSideBtn(g, mouseX, mouseY, partialTick);
+        }
+
+        public void renderRealm(GuiGraphics g, int rightX, int idY) {
+                DefaultData data = RegisterAttachments.getDefaultData(minecraft.player);
+                Component realmComp = XuanLing.trans(XuanlingLangPro.GUI_STRING, "realm");
+                if (data != null) {
+                        ComponentRealm comRealm = BasicRealm.getRealm(minecraft.player.getUUID(), data.getRealmType(), data.getRealmLevel());
+                        if (comRealm != null) {
+                                g.drawString(font, realmComp, rightX - font.width(realmComp) - 20, idY, 
+                                             CultivationTheme.TEXT_GOLD, true);
+                                if (!comRealm.canTrans()) {
+                                        g.drawString(font, Component.literal(comRealm.getName()), rightX - font.width(realmComp), idY, 
+                                                     CultivationTheme.TEXT_GOLD, true);
+                                } else {
+                                        g.drawString(font, Component.translatable(comRealm.getName()), rightX - font.width(realmComp), idY, CultivationTheme.TEXT_GOLD);
+                                }
+                        }
+                }
         }
 
         public void renderPlayer(GuiGraphics g, int mouseX, int mouseY) {
@@ -223,11 +243,11 @@ public class StateGui extends Screen {
                         rotation.mul(xRotation);
 
                         InventoryScreen.renderEntityInInventory(
-                                        g, figureX, figureY, figureScale,
-                                        new Vector3f(0, 0, 0),
-                                        rotation,
-                                        null,
-                                        minecraft.player);
+                                                                g, figureX, figureY, figureScale,
+                                                                new Vector3f(0, 0, 0),
+                                                                rotation,
+                                                                null,
+                                                                minecraft.player);
 
                         minecraft.player.setYRot(oldYRot);
                         minecraft.player.setXRot(oldXRot);

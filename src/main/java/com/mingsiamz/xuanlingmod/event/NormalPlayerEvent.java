@@ -1,32 +1,27 @@
 package com.mingsiamz.xuanlingmod.event;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
-import com.mingsiamz.xuanlingmod.data.BasicData;
-import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
-import com.mingsiamz.xuanlingmod.entities.EjectEntity;
-import com.mingsiamz.xuanlingmod.entities.SkillEntity;
+import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Type;
+import com.mingsiamz.xuanlingmod.gui.ChangeGui;
+import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
+import com.mingsiamz.xuanlingmod.register.RegisterBlocks;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickEmpty;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickItem;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
-
-import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 
 @EventBusSubscriber(modid = XuanLing.MODID)
 public class NormalPlayerEvent {
@@ -54,23 +49,42 @@ public class NormalPlayerEvent {
                 InteractionHand hand = event.getHand();
                 DefaultEnergy energy = RegisterAttachments.getDefaultEnergy(player);
                 ItemStack item = player.getItemInHand(hand);
-                if (level.isClientSide) return;
-                if ((item.getItem() instanceof IEnergyStorage iitem) && energy != null) {
-                        if (!iitem.canReceive()) return; 
-                        int sum = iitem.getEnergyStored() + energy.getEnergyStored();
-                        int toExtract = sum >= iitem.getMaxEnergyStored() ? iitem.getMaxEnergyStored() : sum;
-                        iitem.extractEnergy(toExtract, false);
-                }
-                if (item.getItem() == Items.DIAMOND) {
-                        EjectEntity entity = new EjectEntity(level, player, 0);
-                        level.addFreshEntity(entity);
+                if (level.isClientSide) {
+                        
+                } else {
+                        pushEnergyItem(item, energy);
                 }
         }
 
-        @SubscribeEvent 
-        public static void test(RightClickEmpty event) {
+        @SubscribeEvent
+        public static void onRightClickBlock(RightClickBlock event) {
+                Level level = event.getLevel();
                 Player player = event.getEntity();
-                Level level = player.level();
-                DefaultEnergy energy = RegisterAttachments.getDefaultEnergy(player);
+                BlockPos blockPos = event.getPos();
+                useBodyStale(level, blockPos);
+        }
+
+        // @SubscribeEvent 
+        // public static void test(RightClickEmpty event) {
+        //         Player player = event.getEntity();
+        //         Level level = player.level();
+        //         DefaultEnergy energy = RegisterAttachments.getDefaultEnergy(player);
+        // }
+
+        private static void useBodyStale(Level level, BlockPos pos) {
+                BlockState state = level.getBlockState(pos);
+                if (state.is(RegisterBlocks.BODY_EX_STALE_BLOCK)) {
+                        if (level.isClientSide)
+                                Minecraft.getInstance().setScreen(ChangeGui.current());
+                }
+        }
+
+        private static void pushEnergyItem(ItemStack item, DefaultEnergy energy) {
+                if ((item.getItem() instanceof IEnergyStorage iitem) && energy != null) {
+                        if (!iitem.canReceive()) return; 
+                        int sum = iitem.getEnergyStored() + (int)energy.getNowValue(Type.PARRENT);
+                        int toExtract = sum >= iitem.getMaxEnergyStored() ? iitem.getMaxEnergyStored() : sum;
+                        iitem.extractEnergy(toExtract, false);
+                }
         }
 }

@@ -1,8 +1,15 @@
 package com.mingsiamz.xuanlingmod.gui;
 
+import com.mingsiamz.xuanlingmod.Config;
+import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
+import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy;
+import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Type;
+import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 import com.mingsiamz.xuanlingmod.util.gui.HudDataProvider;
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,15 +20,15 @@ public final class TopLeftQiHud {
         private TopLeftQiHud() {
         }
 
-        private static final int X = 14;
-        private static final int Y = 14;
+        private static final int X = Config.ENERGY_BAR_X_VALUE.getAsInt();
+        private static final int Y = Config.ENERGY_BAR_Y_VALUE.getAsInt();
 
-        private static final int QI_WIDTH = 180;
-        private static final int QI_HEIGHT = 8;
+        private static final int QI_WIDTH = Config.ENERGY_BAR_W_VALUE.getAsInt();
+        private static final int QI_HEIGHT = Config.ENERGY_BAR_H_VALUE.getAsInt();
 
-        private static final int NEILI_WIDTH = 140;
-        private static final int NEILI_HEIGHT = 2;
-        private static final int NEILI_GAP = 1;
+        private static final int NEILI_WIDTH = Config.NEILI_BAR_W_VALUE.getAsInt();
+        private static final int NEILI_HEIGHT = Config.NEILI_BAR_H_VALUE.getAsInt();
+        private static final int NEILI_GAP = Config.BAR_GAP_VALUE.getAsInt();
 
         private static final int C_QI = 0xFF26C6DA;
         private static final int C_QI_BRIGHT = 0xFFB2EBF2;
@@ -32,21 +39,24 @@ public final class TopLeftQiHud {
         private static float dispQi = 0f;
         private static float dispNeili = 0f;
 
+        private static Minecraft mc = Minecraft.getInstance();
+
         public static void render(GuiGraphics g, DeltaTracker delta) {
-                Minecraft mc = Minecraft.getInstance();
                 LocalPlayer p = mc.player;
                 if (p == null || mc.options.hideGui)
                         return;
-                if (p.isCreative() || p.isSpectator() || !p.isAlive())
+                if (p.isCreative() || p.isSpectator() || !p.isAlive() || !p.hasData(RegisterAttachments.DEFAULT_ENERGY))
                         return;
 
-                int qi = HudDataProvider.getQi(p);
-                int maxQi = HudDataProvider.getMaxQi(p);
-                int neili = HudDataProvider.getNeili(p);
-                int maxNeili = HudDataProvider.getMaxNeili(p);
+                DefaultEnergy energy = RegisterAttachments.getDefaultEnergy(p);
 
-                float tQi = maxQi > 0 ? (float) qi / maxQi : 0f;
-                float tNeili = maxNeili > 0 ? (float) neili / maxNeili : 0f;
+                int nowQi = (int)energy.getNowValue(Type.PARRENT);
+                int maxQi = (int)energy.getMaxValue(Type.PARRENT);
+                int nowNeili = (int)energy.getMaxValue(Type.CHILD);
+                int maxNeili = (int)energy.getMaxValue(Type.CHILD);
+
+                float tQi = maxQi > 0 ? (float) nowQi / maxQi : 0f;
+                float tNeili = maxNeili > 0 ? (float) nowNeili / maxNeili : 0f;
 
                 dispQi += (tQi - dispQi) * 0.2f;
                 dispNeili += (tNeili - dispNeili) * 0.2f;
@@ -59,7 +69,7 @@ public final class TopLeftQiHud {
         }
 
         private static void drawQiBar(GuiGraphics g, int x, int y, int w, int h, float ratio, long t) {
-                ratio = clamp01(ratio);
+                ratio = clamp(ratio);
                 int fillW = (int) (w * ratio);
 
                 GuiRenderUtil.glow(g, x, y, x + w, y + h, 0x00E5FF, 2, 10);
@@ -102,10 +112,17 @@ public final class TopLeftQiHud {
                 }
 
                 GuiRenderUtil.border(g, x, y, x + w, y + h, CultivationTheme.BORDER_CYAN);
+
+                PoseStack pose = g.pose();
+                String text = String.valueOf(HudDataProvider.getQi(mc.player)) + "/" + String.valueOf(HudDataProvider.getMaxQi(mc.player));
+                pose.pushPose();
+                pose.scale(0.5f, 0.5f, 0.5f);
+                g.drawString(mc.font, text, x + w, y, 0x00E5FF, false);
+                pose.popPose();
         }
 
         private static void drawNeiliBar(GuiGraphics g, int x, int y, int w, int h, float ratio, long t) {
-                ratio = clamp01(ratio);
+                ratio = clamp(ratio);
                 int fillW = (int) (w * ratio);
 
                 g.fill(x, y, x + w, y + h, C_BG);
@@ -132,7 +149,7 @@ public final class TopLeftQiHud {
         }
 
         private static int lerpColor(int c1, int c2, float t) {
-                t = clamp01(t);
+                t = clamp(t);
                 int a = lerp((c1 >> 24) & 0xFF, (c2 >> 24) & 0xFF, t);
                 int r = lerp((c1 >> 16) & 0xFF, (c2 >> 16) & 0xFF, t);
                 int gg = lerp((c1 >> 8) & 0xFF, (c2 >> 8) & 0xFF, t);
@@ -144,7 +161,7 @@ public final class TopLeftQiHud {
                 return (int) (a + (b - a) * t);
         }
 
-        private static float clamp01(float v) {
+        private static float clamp(float v) {
                 return Math.max(0f, Math.min(1f, v));
         }
 }

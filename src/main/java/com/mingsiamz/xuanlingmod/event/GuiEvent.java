@@ -32,8 +32,7 @@ public class GuiEvent {
         @SubscribeEvent
         public static void onPreRenderLayer(RenderGuiLayerEvent.Pre event) {
                 ResourceLocation name = event.getName();
-                if (VanillaGuiLayers.PLAYER_HEALTH.equals(name)
-                    || VanillaGuiLayers.FOOD_LEVEL.equals(name)) {
+                if (VanillaGuiLayers.PLAYER_HEALTH.equals(name) || VanillaGuiLayers.FOOD_LEVEL.equals(name)) {
                         event.setCanceled(true);
                 }
         }

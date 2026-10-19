@@ -24,20 +24,14 @@ public class DataEvent {
         @SubscribeEvent 
         public static void onPlayerJoinGame(PlayerEvent.PlayerLoggedInEvent event) {
                 Player player = event.getEntity();
-                BasicData basic = RegisterAttachments.getBasicData(player);
-                DefaultData data = RegisterAttachments.getDefaultData(player);
-                if (basic == null) {
-                        BasicData targetData = BasicData.initData();
-                        player.setData(RegisterAttachments.BASIC_DATA, targetData);
+                if (!player.hasData(RegisterAttachments.BASIC_DATA)) {
+                        RegisterAttachments.getBasicData(player);
                 }
-                if (data == null) {
-                        DefaultData targetData = DefaultData.init();
-                        player.setData(RegisterAttachments.DEFAULT_DATA, targetData);
+                if (!player.hasData(RegisterAttachments.DEFAULT_DATA)) {
+                        RegisterAttachments.getDefaultData(player);
                 }
-                DefaultEnergy oriEnergy = RegisterAttachments.getDefaultEnergy(player);
-                if (oriEnergy == null){
-                        DefaultEnergy energy = new DefaultEnergy();
-                        player.setData(RegisterAttachments.DEFAULT_ENERGY, energy);
+                if (!player.hasData(RegisterAttachments.DEFAULT_ENERGY)) {
+                        RegisterAttachments.getDefaultEnergy(player);
                 }
         }
 

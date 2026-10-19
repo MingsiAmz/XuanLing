@@ -28,6 +28,7 @@ public final class DataManager {
         public static final Path ART_CONFIG_DIR = MOD_CONFIG_DIR.resolve("skills");
         public static final Path SPELL_CONFIG_DIR = MOD_CONFIG_DIR.resolve("spells");
         public static final Path REALM_CONFIG_DIR = MOD_CONFIG_DIR.resolve("realms");
+        public static final Path ENERGY_CONFIG_DIR = MOD_CONFIG_DIR.resolve("energy");
 
         public static void saveData(Object obj, XuanLingTypeEnum type, String entityUuid, String name) {
                 try {
@@ -54,6 +55,12 @@ public final class DataManager {
                                 }
                                 case REALM -> {
                                         target = REALM_CONFIG_DIR.resolve(entityUuid);
+                                        if (!Files.exists(target))
+                                                Files.createDirectories(target);
+                                        file = target.resolve(name + ".json");
+                                }
+                                case ENERGY -> {
+                                        target = ENERGY_CONFIG_DIR.resolve(entityUuid);
                                         if (!Files.exists(target))
                                                 Files.createDirectories(target);
                                         file = target.resolve(name + ".json");
@@ -89,6 +96,10 @@ public final class DataManager {
                                         target = REALM_CONFIG_DIR.resolve(entityUuid);
                                         file = target.resolve(name + ".json");
                                 }
+                                case ENERGY -> {
+                                        target = ENERGY_CONFIG_DIR.resolve(entityUuid);
+                                        file = target.resolve(name + ".json");
+                                }
                         }
 
                         if (file == null)
@@ -110,8 +121,9 @@ public final class DataManager {
                         Files.createDirectories(ART_CONFIG_DIR);
                         Files.createDirectories(REALM_CONFIG_DIR);
                         Files.createDirectories(SPELL_CONFIG_DIR);
-                        DataManager.saveData(BasicRealm.getRealmMaps(), XuanLingTypeEnum.REALM, "000", "normal_realm");
                 }
+                DataManager.saveData(BasicRealm.getRealmMaps(), XuanLingTypeEnum.REALM, "000", "normal");
+                DataManager.saveData(BasicEnergy.getEnergyMaps(), XuanLingTypeEnum.ENERGY, "000", "normal");
         }
 
         private static boolean isExists() {

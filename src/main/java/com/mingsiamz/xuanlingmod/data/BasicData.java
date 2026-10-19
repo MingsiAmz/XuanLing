@@ -11,8 +11,8 @@ import net.minecraft.network.codec.StreamCodec;
 public class BasicData {
         private double normalLife = 100.0;
         private double soulLife = 100.0;
-        private double moveSpeedMof = 0.0;
-        private double flySpeedMof = 0.0;
+        private double moveSpeedMof = 1.0;
+        private double flySpeedMof = 1.0;
         private double lucky = 0.0;
         private double charm = 0.0;
         private double TPAO = 0.0; // The Primordial Aperture of the One -> 先天一窍
@@ -34,14 +34,24 @@ public class BasicData {
                                         Codec.DOUBLE.fieldOf("mind_sense").forGetter(d -> d.mindSense))
                         .apply(builder, BasicData::new));
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, BasicData> STREAM_CODEC = StreamCodec.ofMember(BasicData::encode, BasicData::new);
+        public static final StreamCodec<RegistryFriendlyByteBuf, BasicData> STREAM_CODEC = StreamCodec
+                        .ofMember(BasicData::encode, BasicData::new);
 
-        public BasicData() {
+        protected BasicData() {
 
         }
 
         public BasicData(RegistryFriendlyByteBuf buf) {
-                
+                this.normalLife = buf.readDouble();
+                this.soulLife = buf.readDouble();
+                this.moveSpeedMof = buf.readDouble();
+                this.flySpeedMof = buf.readDouble();
+                this.TPAO = buf.readDouble();
+                this.lucky = buf.readDouble();
+                this.charm = buf.readDouble();
+                this.insight = buf.readDouble();
+                this.inspiration = buf.readDouble();
+                this.mindSense = buf.readDouble();
         }
 
         public BasicData(
@@ -55,7 +65,15 @@ public class BasicData {
                         double insight,
                         double inspiration,
                         double mindSense) {
-
+                this.normalLife = normalLife;
+                this.soulLife = soulLife;
+                this.moveSpeedMof = moveSpeedMof;
+                this.flySpeedMof = flySpeedMof;
+                this.TPAO = TPAO;
+                this.lucky = lucky;
+                this.charm = charm;
+                this.insight = insight;
+                this.inspiration = inspiration;
         }
 
         public double getNormalLife() {
@@ -189,41 +207,66 @@ public class BasicData {
         }
 
         public void encode(RegistryFriendlyByteBuf buf) {
-                
+                buf.writeDouble(this.normalLife);
+                buf.writeDouble(this.soulLife);
+                buf.writeDouble(this.moveSpeedMof);
+                buf.writeDouble(this.flySpeedMof);
+                buf.writeDouble(this.TPAO);
+                buf.writeDouble(this.lucky);
+                buf.writeDouble(this.charm);
+                buf.writeDouble(this.insight);
+                buf.writeDouble(this.inspiration);
+                buf.writeDouble(this.mindSense);
         }
 
         public static BasicData initData() {
                 BasicData data = new BasicData();
-                double randTPAO = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_TPAO),
-                                Config.getMaxValue(Config.RANGE_TPAO));
+                double randTPAO = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_TPAO), 100);
                 data.setTPAO(randTPAO);
-                double randInsight = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_INSIGHT),
-                                Config.getMaxValue(Config.RANGE_INSIGHT));
+                double randInsight = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_INSIGHT), 100);
                 data.setInsight(randInsight);
-                double randLucky = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_LUCKY),
-                                Config.getMaxValue(Config.RANGE_LUCKY));
+                double randLucky = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_LUCKY), 100);
                 data.setLucky(randLucky);
-                double randCharm = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_CHARM),
-                                Config.getMaxValue(Config.RANGE_CHARM));
+                double randCharm = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_CHARM), 100);
                 data.setCharm(randCharm);
-                double randMSense = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_M_SENSE),
-                                Config.getMaxValue(Config.RANGE_M_SENSE));
+                double randMSense = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_M_SENSE), 100);
                 data.setMindSense(randMSense);
                 return data;
         }
 
         @Override
         public String toString() {
-                String str = "normalLife:" + normalLife + "\n" +
-                        "soulLife:" + soulLife + "\n" +
-                        "moveSpeedMof:" + moveSpeedMof + "\n" +
-                        "flySpeedMof:" + flySpeedMof + "\n" +
-                        "lucky:" + lucky + "\n" +
-                        "charm:" + charm + "\n" +
-                        "TPAO:" + TPAO + "\n" +
-                        "insight:" + insight + "\n" +
-                        "inspiration:" + inspiration + "\n" +
-                        "mindSense:" + mindSense;
+                String str = "normalLife:" + (int) normalLife + "\n" +
+                                "soulLife:" + (int) soulLife + "\n" +
+                                "moveSpeedMof:" + (int) moveSpeedMof + "\n" +
+                                "flySpeedMof:" + (int) flySpeedMof + "\n" +
+                                "lucky:" + (int) lucky + "\n" +
+                                "charm:" + (int) charm + "\n" +
+                                "TPAO:" + (int) TPAO + "\n" +
+                                "insight:" + (int) insight + "\n" +
+                                "inspiration:" + (int) inspiration + "\n" +
+                                "mindSense:" + (int) mindSense;
                 return str;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+                BasicData b = (BasicData) obj;
+                return this.normalLife == b.normalLife
+                                && this.soulLife == b.soulLife
+                                && this.moveSpeedMof == b.moveSpeedMof
+                                && this.flySpeedMof == b.flySpeedMof
+                                && this.lucky == b.lucky
+                                && this.charm == b.charm
+                                && this.TPAO == b.TPAO
+                                && this.insight == b.insight
+                                && this.inspiration == b.inspiration
+                                && this.mindSense == b.mindSense;
+        }
+
+        public static BasicData copy(BasicData data) {
+                return new BasicData(data.normalLife, data.soulLife, data.moveSpeedMof, data.flySpeedMof, data.TPAO,
+                                data.lucky, data.charm, data.insight, data.inspiration, data.mindSense);
+        }
+
 }

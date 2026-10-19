@@ -1,100 +1,163 @@
 package com.mingsiamz.xuanlingmod.data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.function.Supplier;
+
 import com.mingsiamz.xuanlingmod.Config;
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy;
+import com.mingsiamz.xuanlingmod.data.component.ComponentRealm;
+import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Type;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
+import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-public class DefaultEnergy implements IEnergyStorage {
+public class DefaultEnergy {
 
-        private double energy = 0.0;
-        private String name = "LingLi";
-        private Component trans = XuanLing.trans(XuanlingLangPro.MISC_STRING, "energy");
+        private String energyType = "normal";
+        private String parrentName = ComponentEnergy.Type.PARRENT.name();
+        private String childName = ComponentEnergy.Type.CHILD.name();
+        private double nowPValue = 0;
+        private double maxPValue = 0;
+        private double nowCValue = 0;
+        private double maxCValue = 0;
 
         public DefaultEnergy() {
 
         }
 
         public DefaultEnergy(RegistryFriendlyByteBuf buf) {
-                
+                this.energyType = buf.readUtf();
+                this.parrentName = buf.readUtf();
+                this.childName = buf.readUtf();
+                this.nowPValue = buf.readDouble();
+                this.maxPValue = buf.readDouble();
+                this.nowCValue = buf.readDouble();
+                this.maxCValue = buf.readDouble();
         }
 
-        public DefaultEnergy(double energy, String name) {
-                this.energy = energy;
-                this.name = name;
+        public DefaultEnergy(String energyType, String pName, String cName, double nowPValue, double maxPValue,
+                        double nowCValue, double maxCValue) {
+                this.energyType = energyType;
+                this.parrentName = pName;
+                this.childName = cName;
+                this.nowPValue = nowPValue;
+                this.maxPValue = maxPValue;
+                this.nowCValue = nowCValue;
+                this.maxCValue = maxCValue;
         }
 
         public static final Codec<DefaultEnergy> CODEC = RecordCodecBuilder.create(builder -> builder
                         .group(
-                                        Codec.DOUBLE.fieldOf("energy").forGetter(de -> de.energy),
-                                        Codec.STRING.fieldOf("energy_name").forGetter(de -> de.name))
+                                        Codec.STRING.fieldOf("energy_type").forGetter(d -> d.energyType),
+                                        Codec.STRING.fieldOf("parrent_energy_name").forGetter(d -> d.parrentName),
+                                        Codec.STRING.fieldOf("child_energy_name").forGetter(d -> d.childName),
+                                        Codec.DOUBLE.fieldOf("now_parrent_value").forGetter(d -> d.nowPValue),
+                                        Codec.DOUBLE.fieldOf("max_parrent_value").forGetter(d -> d.maxPValue),
+                                        Codec.DOUBLE.fieldOf("now_child_value").forGetter(d -> d.nowCValue),
+                                        Codec.DOUBLE.fieldOf("max_child_value").forGetter(d -> d.maxCValue))
                         .apply(builder, DefaultEnergy::new));
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, DefaultEnergy> STREAM_CODEC = StreamCodec.ofMember(DefaultEnergy::encode, DefaultEnergy::new);
+        public static final StreamCodec<RegistryFriendlyByteBuf, DefaultEnergy> STREAM_CODEC = StreamCodec
+                        .ofMember(DefaultEnergy::encode, DefaultEnergy::new);
 
-        public void encode(RegistryFriendlyByteBuf buf){
-                
+        public void encode(RegistryFriendlyByteBuf buf) {
+                buf.writeUtf("energy_type");
+                buf.writeUtf("parrent_energy_name");
+                buf.writeUtf("child_energy_name");
+                buf.writeDouble(this.nowPValue);
+                buf.writeDouble(this.maxPValue);
+                buf.writeDouble(this.nowCValue);
+                buf.writeDouble(this.maxCValue);
         }
 
-        public void setEnergy(double energy) {
-                if (energy >= Config.getMaxValue(Config.RANGE_ENERGY)) {
-                        energy = Config.getMaxValue(Config.RANGE_ENERGY);
-                } else if (energy <= Config.getMinValue(Config.RANGE_ENERGY)) {
-                        energy = Config.getMinValue(Config.RANGE_ENERGY);
+        public void setEnergyValue(ComponentEnergy.Type type, double energy) {
+                if (type == ComponentEnergy.Type.PARRENT) {
+                        if (energy >= this.maxPValue) {
+                                energy = this.maxPValue;
+                        } else if (energy <= 0) {
+                                energy = 0;
+                        }
+                        this.nowPValue = energy;
+                } else if (type == ComponentEnergy.Type.CHILD) {
+                        if (energy >= this.maxCValue) {
+                                energy = this.maxCValue;
+                        } else if (energy <= 0) {
+                                energy = 0;
+                        }
+                        this.nowCValue = energy;
                 }
-                this.energy = energy;
         }
 
-        @Override
-        public int receiveEnergy(int toReceive, boolean simulate) {
-                if (!simulate) {
-                        if (this.energy + toReceive >= Config.getMaxValue(Config.RANGE_ENERGY))
-                                this.energy = Config.getMaxValue(Config.RANGE_ENERGY);
-                        else
-                                this.energy += toReceive;
+        public void setMaxEnergyValue(ComponentEnergy.Type type, double energy) {
+                ComponentEnergy tmpEnergy = BasicEnergy.getEnergy(Minecraft.getInstance().player.getUUID(),
+                                this.energyType, type.name());
+                if (type == ComponentEnergy.Type.PARRENT) {
+                        if (energy >= tmpEnergy.getMaxValue()) {
+                                energy = tmpEnergy.getMaxValue();
+                        } else if (energy <= 0) {
+                                energy = 0;
+                        }
+                        this.maxPValue = energy;
+                } else if (type == ComponentEnergy.Type.CHILD) {
+                        if (energy >= tmpEnergy.getMaxValue()) {
+                                energy = tmpEnergy.getMaxValue();
+                        } else if (energy <= 0) {
+                                energy = 0;
+                        }
+                        this.maxCValue = energy;
                 }
-                return (int) this.energy;
         }
 
-        @Override
-        public int extractEnergy(int toExtract, boolean simulate) {
-                if (!simulate) {
-                        if (this.energy - toExtract <= Config.getMinValue(Config.RANGE_ENERGY))
-                                this.energy = Config.getMinValue(Config.RANGE_ENERGY);
-                        else
-                                this.energy -= toExtract;
+        public void setEnergyType(String energyType) {
+                this.energyType = energyType;
+        }
+
+        public String getEnergyType() {
+                return this.energyType;
+        }
+
+        public double getNowValue(ComponentEnergy.Type type) {
+                switch (type) {
+                        case PARRENT:
+                                return this.nowPValue;
+                        case CHILD:
+                                return this.nowCValue;
                 }
-                return (int) this.energy;
+                return 0;
         }
 
-        @Override
-        public int getEnergyStored() {
-                return (int) this.energy;
+        public double getMaxValue(ComponentEnergy.Type type){
+                switch (type) {
+                        case PARRENT:
+                                return this.maxPValue;
+                        case CHILD:
+                                return this.maxCValue;
+                }
+                return 0;
         }
 
-        @Override
-        public int getMaxEnergyStored() {
-                return Config.getMaxValue(Config.RANGE_ENERGY).intValue();
+        public void initFromTemplete(String energyTypeKey) {
+                LocalPlayer player = Minecraft.getInstance().player;
+                if (!player.hasData(RegisterAttachments.DEFAULT_DATA) || !player.hasData(RegisterAttachments.DEFAULT_ENERGY))
+                        return;
+                DefaultData defaultData = RegisterAttachments.getDefaultData(player);
+                ComponentRealm realm = BasicRealm.getRealm(player.getUUID(), defaultData.getRealmType(), defaultData.getRealmLevel());
+                if (energyTypeKey.equals(ComponentEnergy.Type.PARRENT.name())) {
+                        this.maxPValue = realm.getAddParrentEnergy();
+                } else {
+                        this.maxCValue = realm.getAddChildEnergy();
+                }
         }
-
-        @Override
-        public boolean canExtract() {
-                return true;
-        }
-
-        @Override
-        public boolean canReceive() {
-                return true;
-        }
-
-        public String getName() {
-                return name;
-        }
-
 }

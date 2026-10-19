@@ -1,48 +1,53 @@
 package com.mingsiamz.xuanlingmod;
 
 public enum XuanLingTypeEnum {
-	ART("gong_fa"),
-	SPELL("shen_tong"),
-	REALM("jing_jie");
+        ART("gong_fa"),
+        SPELL("shen_tong"),
+        REALM("jing_jie"),
+        ENERGY("neng_liang");
 
-	public String type;
+        public String type;
 
-	private XuanLingTypeEnum(String type) {
-		this.type = type;
-	}
+        private XuanLingTypeEnum(String type) {
+                this.type = type;
+        }
 
-	static enum BasicComponent {
-		PROJECTLE("projectle", 1.0f),
-		AOE("aoe", 2.0f),
-		SELF("self", 0.5f);
+        static enum RealmComponent {
+                
+        }
 
-		public String type;
-		public float consumeModify;
-		public float proficiency = 0.0f;
+        static enum BasicComponent {
+                PROJECTLE("projectle", 1.0f),
+                AOE("aoe", 2.0f),
+                SELF("self", 0.5f);
 
-		private BasicComponent(String type, float consumeModify) {
-			this.type = type;
-			this.consumeModify = consumeModify;
-		}
-	}
+                public String type;
+                public float consumeModify;
+                public float proficiency = 0.0f;
 
-	static enum SpecialComponent {
-		NORMAL,
-		CONTINUOUS,
-		PROFICIENCY;
+                private BasicComponent(String type, float consumeModify) {
+                        this.type = type;
+                        this.consumeModify = consumeModify;
+                }
+        }
 
-		public float proficiency;
-	}
+        static enum SpecialComponent {
+                NORMAL,
+                CONTINUOUS,
+                PROFICIENCY;
 
-	static enum ArtEffectComponent {
-		DAMAGE,
-		HP,
-		ENERGY_REPLY,
-		NORMAL_LIFE,
-		SOUL_LIFE
-	}
+                public float proficiency;
+        }
 
-	static enum SpellEffectComponent {
+        static enum ArtEffectComponent {
+                DAMAGE,
+                HP,
+                ENERGY_REPLY,
+                NORMAL_LIFE,
+                SOUL_LIFE
+        }
 
-	}
+        static enum SpellEffectComponent {
+
+        }
 }

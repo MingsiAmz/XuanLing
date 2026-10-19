@@ -22,7 +22,7 @@ public class RegisterAttachments {
 
         public static final DeferredHolder<AttachmentType<?>, AttachmentType<BasicData>> BASIC_DATA = ATTACHMENT_TYPES
                         .register("basic_data",
-                                        () -> AttachmentType.builder(() -> new BasicData()).serialize(BasicData.CODEC)
+                                  () -> AttachmentType.builder(() -> BasicData.initData()).serialize(BasicData.CODEC)
                                                         .sync(BasicData.STREAM_CODEC)
                                                         .build());
 
