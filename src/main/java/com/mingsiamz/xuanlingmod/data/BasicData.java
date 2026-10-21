@@ -2,10 +2,14 @@ package com.mingsiamz.xuanlingmod.data;
 
 import com.mingsiamz.xuanlingmod.Config;
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
+import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 
 public class BasicData {
@@ -15,10 +19,13 @@ public class BasicData {
         private double flySpeedMof = 1.0;
         private double lucky = 0.0;
         private double charm = 0.0;
-        private double TPAO = 0.0; // The Primordial Aperture of the One -> 先天一窍
+        private double TPAO = 0.0;
         private double insight = 0.0;
         private double inspiration = 0.0;
         private double mindSense = 0.0;
+        private boolean isMeditation = false;
+        private String sect = XuanLing.trans(XuanlingLangPro.MISC_STRING, "entity_now_sect").getString();
+        private String nickName = XuanLing.trans(XuanlingLangPro.MISC_STRING, "entity_nick_name").getString();
 
         public static final Codec<BasicData> CODEC = RecordCodecBuilder.create(builder -> builder
                         .group(
@@ -28,18 +35,19 @@ public class BasicData {
                                         Codec.DOUBLE.fieldOf("fly_speed_mof").forGetter(d -> d.flySpeedMof),
                                         Codec.DOUBLE.fieldOf("TPAO").forGetter(d -> d.TPAO),
                                         Codec.DOUBLE.fieldOf("lucky").forGetter(d -> d.lucky),
+                                        Codec.DOUBLE.fieldOf("charm").forGetter(d -> d.charm),
                                         Codec.DOUBLE.fieldOf("insight").forGetter(d -> d.insight),
                                         Codec.DOUBLE.fieldOf("inspiration").forGetter(d -> d.inspiration),
-                                        Codec.DOUBLE.fieldOf("charm").forGetter(d -> d.charm),
-                                        Codec.DOUBLE.fieldOf("mind_sense").forGetter(d -> d.mindSense))
+                                        Codec.DOUBLE.fieldOf("mind_sense").forGetter(d -> d.mindSense),
+                                        Codec.BOOL.fieldOf("is_meditation").forGetter(d -> d.isMeditation),
+                                        Codec.STRING.fieldOf("sect").forGetter(d -> d.sect),
+                                        Codec.STRING.fieldOf("nick_name").forGetter(d -> d.nickName))
                         .apply(builder, BasicData::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, BasicData> STREAM_CODEC = StreamCodec
                         .ofMember(BasicData::encode, BasicData::new);
 
-        protected BasicData() {
-
-        }
+        public BasicData() {}
 
         public BasicData(RegistryFriendlyByteBuf buf) {
                 this.normalLife = buf.readDouble();
@@ -52,6 +60,9 @@ public class BasicData {
                 this.insight = buf.readDouble();
                 this.inspiration = buf.readDouble();
                 this.mindSense = buf.readDouble();
+                this.isMeditation = buf.readBoolean();
+                this.sect = buf.readUtf();
+                this.nickName = buf.readUtf();
         }
 
         public BasicData(
@@ -64,7 +75,10 @@ public class BasicData {
                         double charm,
                         double insight,
                         double inspiration,
-                        double mindSense) {
+                        double mindSense,
+                        boolean isMeditation,
+                        String sect,
+                        String nickName) {
                 this.normalLife = normalLife;
                 this.soulLife = soulLife;
                 this.moveSpeedMof = moveSpeedMof;
@@ -74,6 +88,9 @@ public class BasicData {
                 this.charm = charm;
                 this.insight = insight;
                 this.inspiration = inspiration;
+                this.isMeditation = isMeditation;
+                this.sect = sect;
+                this.nickName = nickName;
         }
 
         public double getNormalLife() {
@@ -195,15 +212,39 @@ public class BasicData {
 
         public void setMindSense(double mindSense) {
                 if (mindSense >= Config.getMaxValue(Config.RANGE_M_SENSE)) {
-                        this.mindSense = Config.getMaxValue(Config.RANGE_M_SENSE);
+                        mindSense = Config.getMaxValue(Config.RANGE_M_SENSE);
                 } else if (mindSense <= Config.getMinValue(Config.RANGE_M_SENSE)) {
-                        this.mindSense = Config.getMinValue(Config.RANGE_M_SENSE);
+                        mindSense = Config.getMinValue(Config.RANGE_M_SENSE);
                 }
                 this.mindSense = mindSense;
         }
 
         public double getMindSense() {
                 return mindSense;
+        }
+
+        public void setMeditation(boolean isMeditation) {
+                this.isMeditation = isMeditation;
+        }
+
+        public boolean isMeditation() {
+                return isMeditation;
+        }
+
+        public void setSect(String sect) {
+                this.sect = sect;
+        }
+
+        public String getSect() {
+                return this.sect;
+        }
+
+        public void setNickName(String nickName) {
+                this.nickName = nickName;
+        }
+
+        public String getNickName() {
+                return this.nickName;
         }
 
         public void encode(RegistryFriendlyByteBuf buf) {
@@ -217,6 +258,9 @@ public class BasicData {
                 buf.writeDouble(this.insight);
                 buf.writeDouble(this.inspiration);
                 buf.writeDouble(this.mindSense);
+                buf.writeBoolean(this.isMeditation);
+                buf.writeUtf(this.sect);
+                buf.writeUtf(this.nickName);
         }
 
         public static BasicData initData() {
@@ -266,7 +310,8 @@ public class BasicData {
 
         public static BasicData copy(BasicData data) {
                 return new BasicData(data.normalLife, data.soulLife, data.moveSpeedMof, data.flySpeedMof, data.TPAO,
-                                data.lucky, data.charm, data.insight, data.inspiration, data.mindSense);
+                                data.lucky, data.charm, data.insight, data.inspiration, data.mindSense,
+                                data.isMeditation, data.sect, data.nickName);
         }
 
 }

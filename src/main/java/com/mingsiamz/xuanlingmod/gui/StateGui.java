@@ -4,6 +4,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.BasicRealm;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.data.component.ComponentRealm;
@@ -35,10 +36,6 @@ public class StateGui extends Screen {
         private GuiComponentGroup root;
         private static GuiButton leftButton;
         private static GuiButton rightButton;
-
-        private final String daoName = "太虚散人";
-        private final String sect = "太虚剑宗";
-        private final String realm = "筑基后期";
 
         public StateGui() {
                 super(Component.literal("state_gui"));
@@ -118,7 +115,7 @@ public class StateGui extends Screen {
                         statLeft.add(new Label(tmp[0].toLowerCase(), tmp[1]).setWidth(100));
                 }
 
-                for (int i = 5; i < str.length; i++) {
+                for (int i = str.length / 2; i < str.length; i++) {
                         String[] tmp = str[i].split(":");
                         statRight.add(new Label(tmp[0].toLowerCase(), tmp[1]).setWidth(100).setAlign(Align.RIGHT));
                 }
@@ -171,11 +168,18 @@ public class StateGui extends Screen {
                              panel.getY() + 14, CultivationTheme.BORDER_GOLD, false);
 
                 int idY = panel.getY() + 56;
-                g.drawString(font, XuanLing.trans(XuanlingLangPro.GUI_STRING, "nick_name", this.daoName), innerX, idY,
-                             CultivationTheme.TEXT_PRIMARY, false);
+                if (minecraft.player.hasData(RegisterAttachments.BASIC_DATA)){
+                        BasicData basicData = RegisterAttachments.getBasicData(minecraft.player);
+                        String sect = basicData.getSect();
+                        String nickName = basicData.getNickName();
 
-                g.drawString(font, XuanLing.trans(XuanlingLangPro.GUI_STRING, "sect", this.sect), innerX, idY + 16,
-                             CultivationTheme.TEXT_PRIMARY, false);
+                        g.drawString(font, XuanLing.trans(XuanlingLangPro.GUI_STRING, "nick_name", nickName), innerX, idY,
+                                     CultivationTheme.TEXT_PRIMARY, false);
+
+                        g.drawString(font, XuanLing.trans(XuanlingLangPro.GUI_STRING, "sect", sect), innerX, idY + 16,
+                                     CultivationTheme.TEXT_PRIMARY, false);
+                        
+                }
 
                 renderRealm(g, rightX, idY);
 

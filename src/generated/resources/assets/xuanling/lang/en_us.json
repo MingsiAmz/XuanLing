@@ -24,5 +24,7 @@
   "xuanling.gui.sect": "Sect:%s",
   "xuanling.gui.soullife": "Soul Life:%s",
   "xuanling.gui.state_title": "State Title",
-  "xuanling.gui.tpao": "TPAO:%s"
+  "xuanling.gui.tpao": "TPAO:%s",
+  "xuanling.misc.entity_nick_name": "None NickName",
+  "xuanling.misc.entity_now_sect": "None Sect"
 }

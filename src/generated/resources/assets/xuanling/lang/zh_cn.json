@@ -23,5 +23,7 @@
   "xuanling.gui.sect": "宗门:%s",
   "xuanling.gui.soullife": "灵寿:%s",
   "xuanling.gui.state_title": "道  枢",
-  "xuanling.gui.tpao": "先天一窍:%s"
+  "xuanling.gui.tpao": "先天一窍:%s",
+  "xuanling.misc.entity_nick_name": "无道号",
+  "xuanling.misc.entity_now_sect": "无门无派"
 }

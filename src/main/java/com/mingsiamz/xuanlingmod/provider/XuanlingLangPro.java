@@ -47,6 +47,8 @@ public class XuanlingLangPro {
                         this.add(BasicRealm.getRealms()[2].getName(), "筑基");
                         this.add(BasicRealm.getRealms()[3].getName(), "金丹");
                         this.add(BasicRealm.getRealms()[4].getName(), "元婴");
+                        this.add(MISC_STRING + "entity_now_sect", "无门无派");
+                        this.add(MISC_STRING + "entity_nick_name", "无道号");
                 }
 
         }
@@ -85,6 +87,9 @@ public class XuanlingLangPro {
                         this.add(BasicRealm.getRealms()[2].getName(), "ZhuJi");
                         this.add(BasicRealm.getRealms()[3].getName(), "JinDan");
                         this.add(BasicRealm.getRealms()[4].getName(), "YuanYing");
+                        this.add(MISC_STRING + "entity_now_sect", "None Sect");
+                        this.add(MISC_STRING + "entity_nick_name", "None NickName");
+
                 }
         }
 }

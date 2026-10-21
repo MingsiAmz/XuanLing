@@ -16,30 +16,34 @@ public class RegisterAttachments {
         public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister
                         .create(NeoForgeRegistries.ATTACHMENT_TYPES, XuanLing.MODID);
 
+        public static final DeferredHolder<AttachmentType<?>, AttachmentType<BasicData>> BASIC_DATA = ATTACHMENT_TYPES
+                        .register("basic_data", () -> AttachmentType.builder((holder) -> new BasicData())
+                                        .serialize(BasicData.CODEC).sync(BasicData.STREAM_CODEC).build());
+
         public static final DeferredHolder<AttachmentType<?>, AttachmentType<DefaultEnergy>> DEFAULT_ENERGY = ATTACHMENT_TYPES
                         .register("default_energy", () -> AttachmentType.builder(() -> new DefaultEnergy())
                                         .serialize(DefaultEnergy.CODEC).sync(DefaultEnergy.STREAM_CODEC).build());
-
-        public static final DeferredHolder<AttachmentType<?>, AttachmentType<BasicData>> BASIC_DATA = ATTACHMENT_TYPES
-                        .register("basic_data",
-                                  () -> AttachmentType.builder(() -> BasicData.initData()).serialize(BasicData.CODEC)
-                                                        .sync(BasicData.STREAM_CODEC)
-                                                        .build());
 
         public static final DeferredHolder<AttachmentType<?>, AttachmentType<DefaultData>> DEFAULT_DATA = ATTACHMENT_TYPES
                         .register("default_data", () -> AttachmentType.builder(() -> new DefaultData())
                                         .serialize(DefaultData.CODEC).sync(DefaultData.STREAM_CODEC).build());
 
         public static DefaultData getDefaultData(Entity entity) {
-                return entity.getData(DEFAULT_DATA);
+                if (entity.hasData(DEFAULT_DATA))
+                        return entity.getData(DEFAULT_DATA);
+                else return null;
         }
 
         public static BasicData getBasicData(Entity entity) {
-                return entity.getData(BASIC_DATA);
+                if (entity.hasData(BASIC_DATA))
+                        return entity.getData(BASIC_DATA);
+                else return null;
         }
 
         public static DefaultEnergy getDefaultEnergy(Entity entity) {
-                return entity.getData(DEFAULT_ENERGY);
+                if (entity.hasData(DEFAULT_ENERGY))
+                        return entity.getData(DEFAULT_ENERGY);
+                else return null;
         }
 
         public static void register(IEventBus modBus) {

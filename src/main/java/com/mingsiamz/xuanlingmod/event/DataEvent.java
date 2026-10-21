@@ -3,13 +3,8 @@ package com.mingsiamz.xuanlingmod.event;
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
-import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
-import com.mingsiamz.xuanlingmod.network.Networking;
-import com.mingsiamz.xuanlingmod.network.SyncDataPacket;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -25,7 +20,8 @@ public class DataEvent {
         public static void onPlayerJoinGame(PlayerEvent.PlayerLoggedInEvent event) {
                 Player player = event.getEntity();
                 if (!player.hasData(RegisterAttachments.BASIC_DATA)) {
-                        RegisterAttachments.getBasicData(player);
+                        BasicData basicData = BasicData.initData();
+                        player.setData(RegisterAttachments.BASIC_DATA, basicData);
                 }
                 if (!player.hasData(RegisterAttachments.DEFAULT_DATA)) {
                         RegisterAttachments.getDefaultData(player);
@@ -38,7 +34,7 @@ public class DataEvent {
         @SubscribeEvent 
         public static void onEntityWasDeath(EntityTickEvent.Post event) {
                 if (event.getEntity() instanceof LivingEntity entity) {
-                        if (entity.isAlive()) {
+                        if (!entity.isAlive()) {
                                 entity.getData(RegisterAttachments.DEFAULT_DATA);
                         }
                 }
@@ -47,12 +43,12 @@ public class DataEvent {
         @SubscribeEvent
         public static void onEntityDeath(LivingDeathEvent event){
                 LivingEntity entity = event.getEntity();
-                if ((entity instanceof Player player) && !player.isAlive()) {
-                        DefaultData data = DefaultData.init();
-                        BasicData basic = BasicData.initData();
-                        player.setData(RegisterAttachments.DEFAULT_DATA, data);
-                        player.setData(RegisterAttachments.BASIC_DATA, basic);
-                }
+                // if ((entity instanceof Player player) && !player.isAlive()) {
+                //         DefaultData data = DefaultData.init();
+                //         BasicData basic = BasicData.initData();
+                //         player.setData(RegisterAttachments.DEFAULT_DATA, data);
+                //         player.setData(RegisterAttachments.BASIC_DATA, basic);
+                // }
         }
 
         @SubscribeEvent
