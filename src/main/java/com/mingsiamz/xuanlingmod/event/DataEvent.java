@@ -3,6 +3,7 @@ package com.mingsiamz.xuanlingmod.event;
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
+import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 
 import net.minecraft.world.entity.LivingEntity;
@@ -24,10 +25,10 @@ public class DataEvent {
                         player.setData(RegisterAttachments.BASIC_DATA, basicData);
                 }
                 if (!player.hasData(RegisterAttachments.DEFAULT_DATA)) {
-                        RegisterAttachments.getDefaultData(player);
+                        player.setData(RegisterAttachments.DEFAULT_DATA, new DefaultData());
                 }
                 if (!player.hasData(RegisterAttachments.DEFAULT_ENERGY)) {
-                        RegisterAttachments.getDefaultEnergy(player);
+                        player.setData(RegisterAttachments.DEFAULT_ENERGY, new DefaultEnergy());
                 }
         }
 

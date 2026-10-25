@@ -1,14 +1,21 @@
 package com.mingsiamz.xuanlingmod;
 
+import com.mingsiamz.xuanlingmod.data.BasicData;
+import com.mingsiamz.xuanlingmod.effects.EffectMeditation;
 import com.mingsiamz.xuanlingmod.gui.StateGui;
+import com.mingsiamz.xuanlingmod.network.MeditationPacket;
+import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
+import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.register.RegisterEntities;
 import com.mingsiamz.xuanlingmod.register.RegisterKey;
 import com.mingsiamz.xuanlingmod.render.SkillEntityRender;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -58,6 +65,10 @@ public class XuanLingClient {
                         return;
                 if (RegisterKey.KEY_R.consumeClick()) {
                         minecraft.setScreen(new StateGui());
+                }
+                if (RegisterKey.KEY_MEDITATION.consumeClick()) {
+                        XuanLing.LOGGER.info("click");
+                        Networking.sendToServer(new MeditationPacket());
                 }
         }
 }

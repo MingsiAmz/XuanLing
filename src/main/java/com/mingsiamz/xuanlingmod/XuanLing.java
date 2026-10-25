@@ -5,9 +5,11 @@ import java.util.Random;
 import org.slf4j.Logger;
 
 import com.mingsiamz.xuanlingmod.data.DefaultData;
+import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.register.RegisterBlocks;
 import com.mingsiamz.xuanlingmod.register.RegisterCreativeTabs;
+import com.mingsiamz.xuanlingmod.register.RegisterEffects;
 import com.mingsiamz.xuanlingmod.register.RegisterEntities;
 import com.mingsiamz.xuanlingmod.register.RegisterItems;
 import com.mingsiamz.xuanlingmod.register.RegisterKey;
@@ -34,17 +36,19 @@ public class XuanLing {
         public static final Random RANDOM = new Random();
 
         public XuanLing(IEventBus modEventBus, ModContainer modContainer) {
-                modEventBus.addListener(this::commonSetup);
                 RegisterAttachments.register(modEventBus);
                 RegisterItems.register(modEventBus);
                 RegisterBlocks.register(modEventBus);
                 RegisterCreativeTabs.register(modEventBus);
-                modEventBus.addListener(RegisterEntities::registerEntityAtb);
+                RegisterEffects.register(modEventBus);
                 RegisterEntities.register(modEventBus);
+
+                modEventBus.addListener(this::commonSetup);
+                modEventBus.addListener(RegisterEntities::registerEntityAtb);
                 NeoForge.EVENT_BUS.register(this);
                 modEventBus.addListener(this::addCreative);
                 modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC, MODID + "/" + MODID + ".toml");
-                
+                modEventBus.register(Networking.class);
                 modEventBus.addListener(RegisterKey::register);
         }
 

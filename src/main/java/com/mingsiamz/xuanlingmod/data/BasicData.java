@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.phys.Vec3;
 
 public class BasicData {
         private double normalLife = 100.0;
@@ -26,6 +27,9 @@ public class BasicData {
         private boolean isMeditation = false;
         private String sect = XuanLing.trans(XuanlingLangPro.MISC_STRING, "entity_now_sect").getString();
         private String nickName = XuanLing.trans(XuanlingLangPro.MISC_STRING, "entity_nick_name").getString();
+        private double lastMediX = 0;
+        private double lastMediY = 0;
+        private double lastMediZ = 0;
 
         public static final Codec<BasicData> CODEC = RecordCodecBuilder.create(builder -> builder
                         .group(
@@ -41,13 +45,17 @@ public class BasicData {
                                         Codec.DOUBLE.fieldOf("mind_sense").forGetter(d -> d.mindSense),
                                         Codec.BOOL.fieldOf("is_meditation").forGetter(d -> d.isMeditation),
                                         Codec.STRING.fieldOf("sect").forGetter(d -> d.sect),
-                                        Codec.STRING.fieldOf("nick_name").forGetter(d -> d.nickName))
+                                        Codec.STRING.fieldOf("nick_name").forGetter(d -> d.nickName),
+                                        Codec.DOUBLE.fieldOf("lastmedix").forGetter(d -> d.lastMediX),
+                                        Codec.DOUBLE.fieldOf("lastmediy").forGetter(d -> d.lastMediY),
+                                        Codec.DOUBLE.fieldOf("lastmediz").forGetter(d -> d.lastMediZ))
                         .apply(builder, BasicData::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, BasicData> STREAM_CODEC = StreamCodec
                         .ofMember(BasicData::encode, BasicData::new);
 
-        public BasicData() {}
+        public BasicData() {
+        }
 
         public BasicData(RegistryFriendlyByteBuf buf) {
                 this.normalLife = buf.readDouble();
@@ -63,6 +71,9 @@ public class BasicData {
                 this.isMeditation = buf.readBoolean();
                 this.sect = buf.readUtf();
                 this.nickName = buf.readUtf();
+                this.lastMediX = buf.readDouble();
+                this.lastMediY = buf.readDouble();
+                this.lastMediZ = buf.readDouble();
         }
 
         public BasicData(
@@ -78,7 +89,10 @@ public class BasicData {
                         double mindSense,
                         boolean isMeditation,
                         String sect,
-                        String nickName) {
+                        String nickName,
+                        double lastMediX,
+                        double lastMediY,
+                        double lastMediZ) {
                 this.normalLife = normalLife;
                 this.soulLife = soulLife;
                 this.moveSpeedMof = moveSpeedMof;
@@ -91,6 +105,9 @@ public class BasicData {
                 this.isMeditation = isMeditation;
                 this.sect = sect;
                 this.nickName = nickName;
+                this.lastMediX = lastMediX;
+                this.lastMediY = lastMediY;
+                this.lastMediZ = lastMediZ;
         }
 
         public double getNormalLife() {
@@ -247,6 +264,40 @@ public class BasicData {
                 return this.nickName;
         }
 
+        public void setLastMediX(double lastMediX) {
+                this.lastMediX = lastMediX;
+        }
+
+        public double getLastMediX() {
+                return lastMediX;
+        }
+
+        public void setLastMediY(double lastMediY) {
+                this.lastMediY = lastMediY;
+        }
+
+        public double getLastMediY() {
+                return lastMediY;
+        }
+        
+        public void setLastMediZ(double lastMediZ) {
+                this.lastMediZ = lastMediZ;
+        }
+
+        public double getLastMediZ() {
+                return lastMediZ;
+        }
+
+        public void setLastPos(Vec3 vec3) {
+                this.lastMediX = vec3.x;
+                this.lastMediY = vec3.y;
+                this.lastMediZ = vec3.z;
+        }
+
+        public Vec3 getLastPos() {
+                return new Vec3(this.lastMediX, this.lastMediY, this.lastMediZ);
+        }
+
         public void encode(RegistryFriendlyByteBuf buf) {
                 buf.writeDouble(this.normalLife);
                 buf.writeDouble(this.soulLife);
@@ -261,19 +312,22 @@ public class BasicData {
                 buf.writeBoolean(this.isMeditation);
                 buf.writeUtf(this.sect);
                 buf.writeUtf(this.nickName);
+                buf.writeDouble(this.lastMediX);
+                buf.writeDouble(this.lastMediY);
+                buf.writeDouble(this.lastMediZ);
         }
 
         public static BasicData initData() {
                 BasicData data = new BasicData();
-                double randTPAO = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_TPAO), 100);
+                double randTPAO = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_TPAO), 100) + 50;
                 data.setTPAO(randTPAO);
-                double randInsight = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_INSIGHT), 100);
+                double randInsight = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_INSIGHT), 100) + 20;
                 data.setInsight(randInsight);
                 double randLucky = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_LUCKY), 100);
                 data.setLucky(randLucky);
                 double randCharm = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_CHARM), 100);
                 data.setCharm(randCharm);
-                double randMSense = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_M_SENSE), 100);
+                double randMSense = XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_M_SENSE), 100) + 10;
                 data.setMindSense(randMSense);
                 return data;
         }
@@ -311,7 +365,7 @@ public class BasicData {
         public static BasicData copy(BasicData data) {
                 return new BasicData(data.normalLife, data.soulLife, data.moveSpeedMof, data.flySpeedMof, data.TPAO,
                                 data.lucky, data.charm, data.insight, data.inspiration, data.mindSense,
-                                data.isMeditation, data.sect, data.nickName);
+                                     data.isMeditation, data.sect, data.nickName, data.lastMediX, data.lastMediY, data.lastMediZ);
         }
 
 }

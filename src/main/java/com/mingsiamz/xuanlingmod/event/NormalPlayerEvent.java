@@ -1,6 +1,10 @@
 package com.mingsiamz.xuanlingmod.event;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.UUID;
+
+import org.joml.Vector3f;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
@@ -39,7 +43,7 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 public class NormalPlayerEvent {
         @SubscribeEvent
         public static void playerJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
-
+                Player player = event.getEntity();
         }
 
         @SubscribeEvent
@@ -78,7 +82,7 @@ public class NormalPlayerEvent {
         }
 
         @SubscribeEvent
-        public static void onPlayerTick(PlayerTickEvent.Post event) {
+        public static void onPlayerTickPre(PlayerTickEvent.Pre event) {
                 Player player = event.getEntity();
                 Level level = player.level();
                 if (level.isClientSide) {
@@ -87,13 +91,6 @@ public class NormalPlayerEvent {
                         onMeditation(player);
                 }
         }
-
-        // @SubscribeEvent
-        // public static void test(RightClickEmpty event) {
-        // Player player = event.getEntity();
-        // Level level = player.level();
-        // DefaultEnergy energy = RegisterAttachments.getDefaultEnergy(player);
-        // }
 
         private static void useBodyStale(Level level, BlockPos pos) {
                 BlockState state = level.getBlockState(pos);
@@ -118,10 +115,9 @@ public class NormalPlayerEvent {
                         return;
                 BasicData basicData = RegisterAttachments.getBasicData(entity);
                 if (basicData.isMeditation()) {
-                        Vec3 deltaMovement = entity.getDeltaMovement();
                         MobEffectInstance instanceMeditation = new MobEffectInstance(RegisterEffects.EFFECT_MEDITATION, 20);
                         entity.addEffect(instanceMeditation);
-                        if (deltaMovement.x >= 0.5 || deltaMovement.y >= 0.5 || deltaMovement.z >= 0.5) {
+                        if (!basicData.getLastPos().equals(entity.position())) {
                                 basicData.setMeditation(false);
                                 if (entity.getEffect(RegisterEffects.EFFECT_MEDITATION) != null)
                                         entity.removeEffect(RegisterEffects.EFFECT_MEDITATION);

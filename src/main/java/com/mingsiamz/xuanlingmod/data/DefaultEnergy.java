@@ -1,17 +1,7 @@
 package com.mingsiamz.xuanlingmod.data;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.function.Supplier;
-
-import com.mingsiamz.xuanlingmod.Config;
-import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy;
 import com.mingsiamz.xuanlingmod.data.component.ComponentRealm;
-import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Type;
-import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -19,9 +9,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 
 public class DefaultEnergy {
 
@@ -47,8 +35,13 @@ public class DefaultEnergy {
                 this.maxCValue = buf.readDouble();
         }
 
-        public DefaultEnergy(String energyType, String pName, String cName, double nowPValue, double maxPValue,
-                        double nowCValue, double maxCValue) {
+        public DefaultEnergy(String energyType,
+                             String pName,
+                             String cName,
+                             double nowPValue,
+                             double maxPValue,
+                             double nowCValue,
+                             double maxCValue) {
                 this.energyType = energyType;
                 this.parrentName = pName;
                 this.childName = cName;
@@ -138,7 +131,7 @@ public class DefaultEnergy {
                 return 0;
         }
 
-        public double getMaxValue(ComponentEnergy.Type type){
+        public double getMaxValue(ComponentEnergy.Type type) {
                 switch (type) {
                         case PARRENT:
                                 return this.maxPValue;
@@ -148,12 +141,22 @@ public class DefaultEnergy {
                 return 0;
         }
 
+        public double getMaxPValue() {
+                return maxPValue;
+        }
+
+        public double getMaxCValue() {
+                return maxCValue;
+        }
+
         public void initFromTemplete(String energyTypeKey) {
                 LocalPlayer player = Minecraft.getInstance().player;
-                if (!player.hasData(RegisterAttachments.DEFAULT_DATA) || !player.hasData(RegisterAttachments.DEFAULT_ENERGY))
+                if (!player.hasData(RegisterAttachments.DEFAULT_DATA)
+                                || !player.hasData(RegisterAttachments.DEFAULT_ENERGY))
                         return;
                 DefaultData defaultData = RegisterAttachments.getDefaultData(player);
-                ComponentRealm realm = BasicRealm.getRealm(player.getUUID(), defaultData.getRealmType(), defaultData.getRealmLevel());
+                ComponentRealm realm = BasicRealm.getRealm(player.getUUID(), defaultData.getRealmType(),
+                                defaultData.getRealmLevel());
                 if (energyTypeKey.equals(ComponentEnergy.Type.PARRENT.name())) {
                         this.maxPValue = realm.getAddParrentEnergy();
                 } else {

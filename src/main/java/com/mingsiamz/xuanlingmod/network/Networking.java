@@ -16,6 +16,11 @@ public class Networking {
                 //                    SyncDataPacket.TYPE,
                 //                    SyncDataPacket.CODEC,
                 //                    Networking::handler);
+
+                reg.playToServer(
+                                 MeditationPacket.TYPE,
+                                 MeditationPacket.CODEC,
+                                 Networking::handler);
         }
 
         public static <T extends CustomPackageImp> void handler(T t, IPayloadContext ctx) {
