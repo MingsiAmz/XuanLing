@@ -1,6 +1,6 @@
 package com.mingsiamz.xuanlingmod.gui;
 
-import com.mingsiamz.xuanlingmod.util.gui.StatBar;
+import com.mingsiamz.xuanlingmod.util.gui.StateBar;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,11 +19,11 @@ public final class PlayerVitalsHud {
         private static final int C_HEALTH = 0xFFE53935;
         private static final int C_FOOD = 0xFFC77F3F;
 
-        private static final StatBar HEALTH = new StatBar(BAR_WIDTH)
+        private static final StateBar HEALTH = new StateBar(BAR_WIDTH)
                         .showText(false).showTicks(false)
                         .setBarHeight(BAR_HEIGHT).setColor(C_HEALTH);
 
-        private static final StatBar FOOD = new StatBar(BAR_WIDTH)
+        private static final StateBar FOOD = new StateBar(BAR_WIDTH)
                         .showText(false).showTicks(false)
                         .setBarHeight(BAR_HEIGHT).setColor(C_FOOD);
 

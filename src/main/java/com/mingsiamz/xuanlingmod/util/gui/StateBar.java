@@ -4,7 +4,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
-public class StatBar implements IGuiComponent {
+public class StateBar implements IGuiComponent {
         private int x, y;
         private int width;
         private int current, max;
@@ -18,43 +18,43 @@ public class StatBar implements IGuiComponent {
         private int textColor = CultivationTheme.TEXT_PRIMARY;
         private int valueColor = CultivationTheme.TEXT_SECONDARY;
 
-        public StatBar(int width) {
+        public StateBar(int width) {
                 this.width = width;
                 this.barColor = CultivationTheme.BORDER_CYAN;
         }
 
-        public StatBar setLabel(String label) {
+        public StateBar setLabel(String label) {
                 this.label = label;
                 return this;
         }
 
-        public StatBar setColor(int color) {
+        public StateBar setColor(int color) {
                 this.barColor = color;
                 return this;
         }
 
-        public StatBar setValue(int current, int max) {
+        public StateBar setValue(int current, int max) {
                 this.current = current;
                 this.max = max;
                 return this;
         }
 
-        public StatBar setBarHeight(int height) {
+        public StateBar setBarHeight(int height) {
                 this.barHeight = height;
                 return this;
         }
 
-        public StatBar showText(boolean show) {
+        public StateBar showText(boolean show) {
                 this.showText = show;
                 return this;
         }
 
-        public StatBar showTicks(boolean show) {
+        public StateBar showTicks(boolean show) {
                 this.showTicks = show;
                 return this;
         }
 
-        public StatBar setTextColors(int labelColor, int valueColor) {
+        public StateBar setTextColors(int labelColor, int valueColor) {
                 this.textColor = labelColor;
                 this.valueColor = valueColor;
                 return this;

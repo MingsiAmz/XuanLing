@@ -49,6 +49,7 @@ public class XuanlingLangPro {
                         this.add(BasicRealm.getRealms()[4].getName(), "元婴");
                         this.add(MISC_STRING + "entity_now_sect", "无门无派");
                         this.add(MISC_STRING + "entity_nick_name", "无道号");
+                        this.add(GUI_STRING + "cultivate_title_btn", "修炼");
                 }
 
         }
@@ -89,7 +90,7 @@ public class XuanlingLangPro {
                         this.add(BasicRealm.getRealms()[4].getName(), "YuanYing");
                         this.add(MISC_STRING + "entity_now_sect", "None Sect");
                         this.add(MISC_STRING + "entity_nick_name", "None NickName");
-
+                        this.add(GUI_STRING + "cultivate_title_btn", "Cultivate");
                 }
         }
 }
