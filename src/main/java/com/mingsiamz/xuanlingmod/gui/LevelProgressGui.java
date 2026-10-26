@@ -1,6 +1,8 @@
 package com.mingsiamz.xuanlingmod.gui;
 
+import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
+import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.util.gui.*;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Justify;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Layouts;
@@ -100,21 +102,20 @@ public class LevelProgressGui extends Screen {
                 int cx = px + panelW / 2;
                 int innerW = panelW - CultivationTheme.PADDING * 2;
 
-                Component title = Component.literal("洞 府 闭 关");
+                Component title = XuanLing.trans(XuanlingLangPro.GUI_STRING, "level_progress_gui_title");
                 g.drawString(font, title, cx - font.width(title) / 2, py + 15, CultivationTheme.BORDER_GOLD, true);
 
-                String timeText = "";
-                if (currentSelectedMonths > 12) {
-                        timeText = String.format("闭关时长: %d 年 %d 个月", currentSelectedMonths / 12,
-                                        currentSelectedMonths % 12);
-                } else {
-                        timeText = String.format("闭关时长: %d 个月", currentSelectedMonths);
-                }
-                Component timeComp = Component.literal(timeText);
+                Component yearTimeComponent = XuanLing.trans(XuanlingLangPro.GUI_STRING, "cultivate_time_year", currentSelectedMonths / 12, currentSelectedMonths % 12);
+                Component monthTimeComponent = XuanLing.trans(XuanlingLangPro.GUI_STRING, "cultivate_time_month", currentSelectedMonths);
                 int timeTextY = py + (int) (panelH * 0.25f);
-                g.drawString(font, timeComp, cx - font.width(timeComp) / 2, timeTextY, CultivationTheme.TEXT_PRIMARY,
-                                false);
+                if (currentSelectedMonths > 12) {
+                        g.drawString(font, yearTimeComponent, cx - font.width(yearTimeComponent) / 2, timeTextY, CultivationTheme.TEXT_PRIMARY,
+                                     false);
+                } else {
+                        g.drawString(font, monthTimeComponent, cx - font.width(monthTimeComponent) / 2, timeTextY, CultivationTheme.TEXT_PRIMARY,
+                                     false);
 
+                }
                 timeSlider.render(g, mouseX, mouseY, partialTick);
 
                 int inputW = 50;
@@ -122,7 +123,7 @@ public class LevelProgressGui extends Screen {
                 int inputX = cx - inputW / 2;
                 int inputY = timeSlider.getY() + 32;
 
-                Component hintText = Component.literal("输入月数");
+                Component hintText = XuanLing.trans(XuanlingLangPro.GUI_STRING, "input_time_month");
                 g.drawString(font, hintText, cx - font.width(hintText) / 2, inputY - 14,
                                 CultivationTheme.TEXT_SECONDARY, false);
 
@@ -144,14 +145,16 @@ public class LevelProgressGui extends Screen {
                                         CultivationTheme.TEXT_PRIMARY);
                 }
 
+                Component startTrain = XuanLing.trans(XuanlingLangPro.GUI_STRING, "start_train");
+                Component refining = XuanLing.trans(XuanlingLangPro.GUI_STRING, "refining");
                 GuiComponentGroup btnGroup = new GuiComponentGroup()
                                 .setLayout(Layouts.row().setJustify(Justify.CENTER).setSpacing(10))
                                 .setFixedWidth(innerW)
-                                .add(new GuiButton(80, 20, "开始修炼").onClick(() -> {
-                                        System.out.println("开始修炼: " + currentSelectedMonths + " 个月");
+                                .add(new GuiButton(80, 20, startTrain.getString()).onClick(() -> {
+                                                        // TODO
                                 }))
-                                .add(new GuiButton(80, 20, "炼化").onClick(() -> {
-                                        System.out.println("炼化");
+                                .add(new GuiButton(80, 20, refining.getString()).onClick(() -> {
+                                                        // TODO
                                 }));
 
                 btnGroup.setPosition(px + CultivationTheme.PADDING, py + panelH - 45);

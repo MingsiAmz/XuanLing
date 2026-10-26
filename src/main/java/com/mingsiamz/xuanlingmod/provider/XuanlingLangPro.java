@@ -50,8 +50,13 @@ public class XuanlingLangPro {
                         this.add(MISC_STRING + "entity_now_sect", "无门无派");
                         this.add(MISC_STRING + "entity_nick_name", "无道号");
                         this.add(GUI_STRING + "cultivate_title_btn", "修炼");
+                        this.add(GUI_STRING + "level_progress_gui_title", "闭关修炼");
+                        this.add(GUI_STRING + "cultivate_time_year", "%s年%s个月");
+                        this.add(GUI_STRING + "cultivate_time_month", "%s个月");
+                        this.add(GUI_STRING + "input_time_month", "修炼月数");
+                        this.add(GUI_STRING + "start_train", "开始修炼");
+                        this.add(GUI_STRING + "refining", "炼化");
                 }
-
         }
 
         public static final class LangEn extends LanguageProvider {
@@ -91,6 +96,12 @@ public class XuanlingLangPro {
                         this.add(MISC_STRING + "entity_now_sect", "None Sect");
                         this.add(MISC_STRING + "entity_nick_name", "None NickName");
                         this.add(GUI_STRING + "cultivate_title_btn", "Cultivate");
+                        this.add(GUI_STRING + "level_progress_gui_title", "Secluding myself for training");
+                        this.add(GUI_STRING + "cultivate_time_year", "%sYear%sMonth");
+                        this.add(GUI_STRING + "cultivate_time_month", "%sMonth");
+                        this.add(GUI_STRING + "input_time_month", "training month");
+                        this.add(GUI_STRING + "start_train", "Start Train");
+                        this.add(GUI_STRING + "refining", "Refining");
                 }
         }
 }
