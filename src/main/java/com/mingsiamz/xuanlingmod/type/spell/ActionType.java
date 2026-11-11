@@ -1,12 +1,14 @@
 package com.mingsiamz.xuanlingmod.type.spell;
 
+import java.util.LinkedHashMap;
+
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.api.IComponent;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 
 import net.minecraft.network.chat.Component;
 
-public enum ActionType implements IComponent {
+public enum ActionType implements IComponent<ActionType> {
         DAMAGE("damage", "ACTION"),
         RECOVER_HEALTH("recover_health", "ACTION"),
         RECOVER_P_ENERGY("recover_p_energy", "ACTION"),
@@ -16,6 +18,7 @@ public enum ActionType implements IComponent {
         private String name;
         private double value = 0;
         private float proficiency = 0;
+        private LinkedHashMap<String, Object> params;
 
         public Component TYPE = XuanLing.trans(XuanlingLangPro.COMPONEN_STRING, "action");
 
@@ -72,6 +75,16 @@ public enum ActionType implements IComponent {
         @Override
         public Component transType() {
                 return TYPE;
+        }
+
+        @Override
+        public ActionType withParams(LinkedHashMap<String, Object> params) {
+                return this;
+        }
+
+        @Override
+        public LinkedHashMap<String, Object> getParams() {
+                return this.params;
         }
 
 }

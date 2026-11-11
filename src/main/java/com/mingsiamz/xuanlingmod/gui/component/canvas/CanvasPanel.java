@@ -2,7 +2,6 @@ package com.mingsiamz.xuanlingmod.gui.component.canvas;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.api.IComponent;
-import com.mingsiamz.xuanlingmod.gui.component.data.ComponentDef;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
@@ -71,7 +70,15 @@ public class CanvasPanel {
         }
 
         public void addNode(IComponent def, int canvasX, int canvasY) {
-                state.nodes.add(new CanvasNode(def, canvasX, canvasY));
+                // state.nodes.add(new CanvasNode(def, canvasX, canvasY));
+                CanvasNode node = new CanvasNode(def, canvasX, canvasY);
+                // 给节点设置点击齿轮的回调
+                node.setOnConfigClick(() -> {
+                        // 弹出一个配置界面，或者在控制台打印需要配置的变量
+                        System.out.println("点击了配置按钮，准备设置参数: " + def);
+                        // 这里你可以调用 Minecraft.getInstance().setScreen(new ParamConfigScreen(def));
+                });
+                state.nodes.add(node);
         }
 
         public int toScreenX(int cx) {
@@ -168,6 +175,11 @@ public class CanvasPanel {
                         int sy = toScreenY(n.getCanvasY());
                         if (!n.hitTest(sx, sy, mx, my))
                                 continue;
+
+                        if (button == 0 && n.hitConfigButton(sx, sy, mx, my)) {
+                                n.triggerConfigClick();
+                                return true;
+                        }
 
                         if (shift) {
                                 state.nodes.remove(i);

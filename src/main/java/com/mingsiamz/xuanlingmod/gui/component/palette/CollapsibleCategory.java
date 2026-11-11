@@ -1,7 +1,6 @@
 package com.mingsiamz.xuanlingmod.gui.component.palette;
 
 import com.mingsiamz.xuanlingmod.api.IComponent;
-import com.mingsiamz.xuanlingmod.gui.component.data.ComponentCategory;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 import net.minecraft.client.Minecraft;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CollapsibleCategory {
-        // private final IComponent category;
         private Component name;
         private int x, y;
         private final int width;
@@ -25,7 +23,6 @@ public class CollapsibleCategory {
         private final List<PaletteItem> items = new ArrayList<>();
 
         public CollapsibleCategory(Component name, int width) {
-                // this.category = category;
                 this.name = name;
                 this.width = width;
         }

@@ -1,21 +1,24 @@
 package com.mingsiamz.xuanlingmod.type.spell;
 
+import java.util.LinkedHashMap;
+
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.api.IComponent;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 
 import net.minecraft.network.chat.Component;
 
-public enum SpecialType implements IComponent {
+public enum SpecialType implements IComponent<SpecialType> {
         NORMAL("normal", "SPECIAL", 0),
         CONTINUOUS("continuos", "SPECIAL", 0);
 
         private float proficiency;
         private String type;
         private String name;
+        private LinkedHashMap<String, Object> params;
 
         public Component TYPE = XuanLing.trans(XuanlingLangPro.COMPONEN_STRING, "special");
-        
+
         private SpecialType(String name, String type, float proficiency) {
                 this.type = type;
                 this.proficiency = proficiency;
@@ -60,6 +63,16 @@ public enum SpecialType implements IComponent {
         @Override
         public Component transType() {
                 return TYPE;
+        }
+
+        @Override
+        public SpecialType withParams(LinkedHashMap<String, Object> params) {
+                return this;
+        }
+
+        @Override
+        public LinkedHashMap<String, Object> getParams() {
+                return this.params;
         }
 
 }

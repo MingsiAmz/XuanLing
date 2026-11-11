@@ -12,18 +12,20 @@ import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 
 import net.minecraft.network.chat.Component;
 
-public enum BasicType implements IComponent {
+public enum BasicType implements IComponent<BasicType> {
         PROJECTLE("projectle", "BASIC", 1.0f, -1),
         AOE("aoe", "BASIC", 2.0f, -1),
         SELF("self", "BASIC", 0.5f, -1);
 
         public float consumeModify;
+
         private float weight;
         private String type;
         private String name;
         private float proficiency;
         private Component TYPE = XuanLing.trans(XuanlingLangPro.COMPONEN_STRING, "basic");
         private LinkedHashMap<String, Object> params;
+
         private static HashMap<Integer, List<BasicType>> typesMap = new LinkedHashMap<>();
 
         private BasicType(String name, String type, float consumeModify, float weight) {
@@ -32,9 +34,15 @@ public enum BasicType implements IComponent {
                 this.weight = weight;
         }
 
+        @Override 
         public BasicType withParams(LinkedHashMap<String, Object> params) {
                 this.params = params;
                 return this;
+        }
+
+        @Override
+        public LinkedHashMap<String, Object> getParams() {
+                return this.params;
         }
 
         @Override
@@ -78,13 +86,22 @@ public enum BasicType implements IComponent {
 
         @Override
         public void putComponentToPlayerByWeight() {
-                // 根据weight来生成随机获取权重，越低的权重越难获取，从10000到0
-                int weight = (int) Math.floor(Math.random() * 100);
-                BasicType[] values = values();
-                for (BasicType type : values) {
-
+                // 如果 weight == -1，说明是初始就有的组件
+                if (this.weight == -1) {
+                        // TODO: 替换为实际赋予玩家的逻辑，例如放入玩家的 Attachment 中
+                        System.out.println("[XuanLing] 初始获得组件: " + this.name());
+                        return;
                 }
 
+                // 生成 0 ~ 10000 的随机整数（包含两端）
+                int rand = java.util.concurrent.ThreadLocalRandom.current().nextInt(10001);
+                
+                // 如果随机数小于等于权重，则成功获取
+                if (rand <= this.weight) {
+                        // TODO: 替换为实际赋予玩家的逻辑
+                        System.out.println("[XuanLing] 通过权重获得组件: " + this.name() 
+                                + " (随机数: " + rand + ", 权重: " + this.weight + ")");
+                }
         }
 
         @Override
