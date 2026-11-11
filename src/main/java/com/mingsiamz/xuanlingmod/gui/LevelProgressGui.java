@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 public class LevelProgressGui extends Screen {
-
         private int panelW;
         private int panelH;
         private int px;

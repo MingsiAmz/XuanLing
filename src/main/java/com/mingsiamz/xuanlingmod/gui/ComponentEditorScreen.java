@@ -1,21 +1,22 @@
 package com.mingsiamz.xuanlingmod.gui;
 
+import java.util.List;
+
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.api.IComponent;
 import com.mingsiamz.xuanlingmod.data.DataManager;
 import com.mingsiamz.xuanlingmod.gui.component.canvas.CanvasPanel;
 import com.mingsiamz.xuanlingmod.gui.component.canvas.EditorState;
-import com.mingsiamz.xuanlingmod.gui.component.data.ComponentDef;
-import com.mingsiamz.xuanlingmod.gui.component.data.ComponentRegistry;
+import com.mingsiamz.xuanlingmod.gui.component.ComponentRegistry;
 import com.mingsiamz.xuanlingmod.gui.component.palette.PalettePanel;
 import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-
-import java.util.List;
 
 public class ComponentEditorScreen extends Screen {
 
@@ -28,11 +29,14 @@ public class ComponentEditorScreen extends Screen {
 
         private final EditorState state = new EditorState();
 
+        private int draggingW = 110;
+        private int draggingH = 46;
+
         private PalettePanel palette;
         private CanvasPanel canvas;
         private GuiButton createButton;
 
-        private ComponentDef draggingDef;
+        private IComponent draggingDef;
 
         public ComponentEditorScreen() {
                 super(Component.literal("make cultivation method"));
@@ -53,14 +57,16 @@ public class ComponentEditorScreen extends Screen {
                                 LEFT_W, BUTTON_H,
                                 XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation").getString());
                 createButton.setPosition(MARGIN, MARGIN + paletteH + BUTTON_GAP);
+
                 createButton.onClick(this::onCreate);
 
                 canvas = new CanvasPanel(state,
                                 this.width - LEFT_W - GAP - MARGIN * 2, totalH);
                 canvas.setPosition(MARGIN + LEFT_W + GAP, MARGIN);
 
-                List<ComponentDef> defs = ComponentRegistry.getAvailable(
+                List<IComponent> defs = ComponentRegistry.getAvailable(
                                 minecraft == null ? null : minecraft.player);
+
                 palette.loadComponents(defs);
         }
 
@@ -80,14 +86,14 @@ public class ComponentEditorScreen extends Screen {
                 canvas.render(g, mouseX, mouseY, partialTick);
 
                 if (draggingDef != null) {
-                        int w = draggingDef.width();
-                        int h = draggingDef.height();
+                        int w = 110;
+                        int h = 46;
                         int gx = mouseX - w / 2;
                         int gy = mouseY - h / 2;
                         g.fill(gx, gy, gx + w, gy + h,
-                                        0x80000000 | (draggingDef.color() & 0x00FFFFFF));
-                        GuiRenderUtil.border(g, gx, gy, gx + w, gy + h, draggingDef.color());
-                        g.drawString(font, Component.literal(draggingDef.displayName()),
+                                        0x80000000 | (0xFF4DD0E1 & 0x00FFFFFF));
+                        GuiRenderUtil.border(g, gx, gy, gx + w, gy + h, 0xFF4DD0E1);
+                        g.drawString(font, draggingDef.trans(),
                                         gx + 6, gy + 4, CultivationTheme.TEXT_PRIMARY, false);
                 }
 
@@ -109,6 +115,8 @@ public class ComponentEditorScreen extends Screen {
         public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
                 if (draggingDef != null)
                         return true;
+                if (palette.mouseDragged(mx, my, button, dx, dy))
+                        return true;
                 if (canvas.mouseDragged(mx, my, button, dx, dy))
                         return true;
                 return super.mouseDragged(mx, my, button, dx, dy);
@@ -116,22 +124,20 @@ public class ComponentEditorScreen extends Screen {
 
         @Override
         public boolean mouseReleased(double mx, double my, int button) {
-                if (draggingDef != null) {
-                        if (canvas.contains(mx, my)) {
-                                int cx = canvas.toCanvasX((int) mx) - draggingDef.width() / 2;
-                                int cy = canvas.toCanvasY((int) my) - draggingDef.height() / 2;
-                                canvas.addNode(draggingDef, cx, cy);
-                        } else if (palette.contains(mx, my)) {
-                                int cx = canvas.getWidth() / 2 - draggingDef.width() / 2 - canvas.getPanX();
-                                int cy = canvas.getHeight() / 2 - draggingDef.height() / 2 - canvas.getPanY();
-                                canvas.addNode(draggingDef, cx, cy);
-                        }
-                        draggingDef = null;
+                if (palette.mouseReleased(mx, my, button))
                         return true;
+                if (draggingDef != null) {
                 }
                 if (canvas.mouseReleased(mx, my, button))
                         return true;
                 return super.mouseReleased(mx, my, button);
+        }
+
+        @Override
+        public boolean mouseScrolled(double mx, double my, double sx, double sy) {
+                if (palette.mouseScrolled(mx, my, sx, sy))
+                        return true;
+                return super.mouseScrolled(mx, my, sx, sy);
         }
 
         @Override

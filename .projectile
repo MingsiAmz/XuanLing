@@ -1,6 +1,4 @@
--/bin
 -/build
--/.eclipse
--/.idea
 -/app
 -/run
+-/bin

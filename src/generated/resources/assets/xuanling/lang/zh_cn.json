@@ -24,6 +24,7 @@
   "xuanling.gui.movespeedmof": "移速:%s",
   "xuanling.gui.nick_name": "道号:%s",
   "xuanling.gui.normallife": "身寿:%s",
+  "xuanling.gui.not_use_meditation": "无法打坐，你并未入门",
   "xuanling.gui.realm": "境界: ",
   "xuanling.gui.refining": "炼化",
   "xuanling.gui.sect": "宗门:%s",

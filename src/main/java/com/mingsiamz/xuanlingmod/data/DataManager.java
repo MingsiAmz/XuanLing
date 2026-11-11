@@ -3,18 +3,16 @@ package com.mingsiamz.xuanlingmod.data;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mingsiamz.xuanlingmod.XuanLing;
-import com.mingsiamz.xuanlingmod.XuanLingTypeEnum;
+import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 public final class DataManager {
 
@@ -30,47 +28,24 @@ public final class DataManager {
         public static final Path REALM_CONFIG_DIR = MOD_CONFIG_DIR.resolve("realms");
         public static final Path ENERGY_CONFIG_DIR = MOD_CONFIG_DIR.resolve("energy");
 
+        private DataManager() {
+        }
+
+        public static Path resolveFile(XuanLingTypeEnum type, String entityUuid, String name) {
+                Path baseDir = switch (type) {
+                        case ART -> ART_CONFIG_DIR;
+                        case SPELL -> SPELL_CONFIG_DIR;
+                        case REALM -> REALM_CONFIG_DIR;
+                        case ENERGY -> ENERGY_CONFIG_DIR;
+                };
+                return baseDir.resolve(entityUuid).resolve(name + ".json");
+        }
+
         public static void saveData(Object obj, XuanLingTypeEnum type, String entityUuid, String name) {
+                Path file = resolveFile(type, entityUuid, name);
                 try {
-                        if (isExists()) {
-                                Files.createDirectories(MOD_CONFIG_DIR);
-                                Files.createDirectories(ART_CONFIG_DIR);
-                                Files.createDirectories(REALM_CONFIG_DIR);
-                                Files.createDirectories(SPELL_CONFIG_DIR);
-                        }
-                        Path file = null;
-                        Path target = null;
-                        switch (type) {
-                                case ART -> {
-                                        target = ART_CONFIG_DIR.resolve(entityUuid);
-                                        if (!Files.exists(target))
-                                                Files.createDirectories(target);
-                                        file = target.resolve(name + ".json");
-                                }
-                                case SPELL -> {
-                                        target = SPELL_CONFIG_DIR.resolve(entityUuid);
-                                        if (!Files.exists(target))
-                                                Files.createDirectories(target);
-                                        file = target.resolve(name + ".json");
-                                }
-                                case REALM -> {
-                                        target = REALM_CONFIG_DIR.resolve(entityUuid);
-                                        if (!Files.exists(target))
-                                                Files.createDirectories(target);
-                                        file = target.resolve(name + ".json");
-                                }
-                                case ENERGY -> {
-                                        target = ENERGY_CONFIG_DIR.resolve(entityUuid);
-                                        if (!Files.exists(target))
-                                                Files.createDirectories(target);
-                                        file = target.resolve(name + ".json");
-                                }
-                        }
-
-                        if (file == null)
-                                throw new RuntimeException("file data is null");
-
-                        try (Writer writer = new FileWriter(file.toFile())) {
+                        Files.createDirectories(file.getParent());
+                        try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
                                 GSON.toJson(obj, writer);
                         }
                 } catch (IOException e) {
@@ -79,36 +54,11 @@ public final class DataManager {
         }
 
         public static <T> T loadData(Type type, XuanLingTypeEnum enumType, String entityUuid, String name) {
-                try {
-                        init();
-                        Path file = null;
-                        Path target = null;
-                        switch (enumType) {
-                                case ART -> {
-                                        target = ART_CONFIG_DIR.resolve(entityUuid);
-                                        file = target.resolve(name + ".json");
-                                }
-                                case SPELL -> {
-                                        target = SPELL_CONFIG_DIR.resolve(entityUuid);
-                                        file = target.resolve(name + ".json");
-                                }
-                                case REALM -> {
-                                        target = REALM_CONFIG_DIR.resolve(entityUuid);
-                                        file = target.resolve(name + ".json");
-                                }
-                                case ENERGY -> {
-                                        target = ENERGY_CONFIG_DIR.resolve(entityUuid);
-                                        file = target.resolve(name + ".json");
-                                }
-                        }
-
-                        if (file == null)
-                                throw new RuntimeException("not data file");
-
-                        if (!Files.exists(file))
-                                return null;
-
-                        Reader reader = new FileReader(file.toFile());
+                Path file = resolveFile(enumType, entityUuid, name);
+                if (!Files.exists(file)) {
+                        return null;
+                }
+                try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
                         return GSON.fromJson(reader, type);
                 } catch (IOException e) {
                         throw new RuntimeException("Failed to load " + name, e);
@@ -116,19 +66,21 @@ public final class DataManager {
         }
 
         public static void init() throws IOException {
-                if (isExists()) {
-                        Files.createDirectories(MOD_CONFIG_DIR);
-                        Files.createDirectories(ART_CONFIG_DIR);
-                        Files.createDirectories(REALM_CONFIG_DIR);
-                        Files.createDirectories(SPELL_CONFIG_DIR);
+                Files.createDirectories(ART_CONFIG_DIR);
+                Files.createDirectories(SPELL_CONFIG_DIR);
+                Files.createDirectories(REALM_CONFIG_DIR);
+                Files.createDirectories(ENERGY_CONFIG_DIR);
+
+                if (!Files.exists(resolveFile(XuanLingTypeEnum.REALM, "000", "normal"))) {
+                        saveData(BasicRealm.getRealmMaps(), XuanLingTypeEnum.REALM, "000", "normal");
                 }
-                DataManager.saveData(BasicRealm.getRealmMaps(), XuanLingTypeEnum.REALM, "000", "normal");
-                DataManager.saveData(BasicEnergy.getEnergyMaps(), XuanLingTypeEnum.ENERGY, "000", "normal");
+                if (!Files.exists(resolveFile(XuanLingTypeEnum.ENERGY, "000", "normal"))) {
+                        saveData(BasicEnergy.getEnergyMaps(), XuanLingTypeEnum.ENERGY, "000", "normal");
+                }
         }
 
-        private static boolean isExists() {
-                return !Files.exists(MOD_CONFIG_DIR) || !Files.exists(ART_CONFIG_DIR) || !Files.exists(REALM_CONFIG_DIR)
-                                || !Files.exists(SPELL_CONFIG_DIR);
+        public static void resetDefaults() {
+                saveData(BasicRealm.getRealmMaps(), XuanLingTypeEnum.REALM, "000", "normal");
+                saveData(BasicEnergy.getEnergyMaps(), XuanLingTypeEnum.ENERGY, "000", "normal");
         }
-
 }

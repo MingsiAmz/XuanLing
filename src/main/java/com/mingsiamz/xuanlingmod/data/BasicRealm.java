@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import com.google.common.reflect.TypeToken;
 import com.mingsiamz.xuanlingmod.XuanLing;
-import com.mingsiamz.xuanlingmod.XuanLingTypeEnum;
+import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.data.component.ComponentRealm;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;

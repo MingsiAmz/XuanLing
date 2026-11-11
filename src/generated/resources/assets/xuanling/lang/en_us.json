@@ -25,6 +25,7 @@
   "xuanling.gui.nick_name": "Nick Name:%s",
   "xuanling.gui.normallife": "Normal Life:%s",
   "xuanling.gui.not_component": "Not Component",
+  "xuanling.gui.not_use_meditation": "You’re not ready to use meditation because you haven’t learned the basics yet.",
   "xuanling.gui.realm": "Realm: ",
   "xuanling.gui.refining": "Refining",
   "xuanling.gui.sect": "Sect:%s",

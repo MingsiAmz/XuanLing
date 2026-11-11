@@ -2,6 +2,7 @@ package com.mingsiamz.xuanlingmod.provider;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicRealm;
+import com.mingsiamz.xuanlingmod.type.spell.BasicType;
 
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
@@ -56,6 +57,19 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "input_time_month", "修炼月数");
                         this.add(GUI_STRING + "start_train", "开始修炼");
                         this.add(GUI_STRING + "refining", "炼化");
+                        this.add(GUI_STRING + "not_use_meditation", "无法打坐，你并未入门");
+                        this.add(COMPONEN_STRING + "basic", "基础");
+                        this.add(COMPONEN_STRING + "PROJECTLE", "弹射物");
+                        this.add(COMPONEN_STRING + "AOE", "AOE");
+                        this.add(COMPONEN_STRING + "SELF", "自身");
+                        this.add(COMPONEN_STRING + "action", "触发效果");
+                        this.add(COMPONEN_STRING + "DAMAGE", "伤害");
+                        this.add(COMPONEN_STRING + "RECOVER_HEALTH", "生命恢复");
+                        this.add(COMPONEN_STRING + "RECOVER_P_ENERGY", "主能量恢复");
+                        this.add(COMPONEN_STRING + "RECOVER_C_ENERGY", "子能量恢复");
+                        this.add(COMPONEN_STRING + "special", "特殊效果");
+                        this.add(COMPONEN_STRING + "NORMAL", "常规");
+                        this.add(COMPONEN_STRING + "CONTINUOUS", "持续");
                 }
         }
 
@@ -102,6 +116,19 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "input_time_month", "training month");
                         this.add(GUI_STRING + "start_train", "Start Train");
                         this.add(GUI_STRING + "refining", "Refining");
+                        this.add(GUI_STRING + "not_use_meditation", "You’re not ready to use meditation because you haven’t learned the basics yet.");
+                        this.add(COMPONEN_STRING + "basic", "basic");
+                        this.add(COMPONEN_STRING + "PROJECTLE", "PROJECTLE");
+                        this.add(COMPONEN_STRING + "AOE", "AOE");
+                        this.add(COMPONEN_STRING + "SELF", "SELF");
+                        this.add(COMPONEN_STRING + "action", "action");
+                        this.add(COMPONEN_STRING + "DAMAGE", "DAMAGE");
+                        this.add(COMPONEN_STRING + "RECOVER_HEALTH", "HEALTH");
+                        this.add(COMPONEN_STRING + "RECOVER_P_ENERGY", "ENERGY");
+                        this.add(COMPONEN_STRING + "RECOVER_C_ENERGY", "ENERGY");
+                        this.add(COMPONEN_STRING + "special", "special");
+                        this.add(COMPONEN_STRING + "NORMAL", "NORMAL");
+                        this.add(COMPONEN_STRING + "CONTINUOUS", "CONTINUOUS");
                 }
         }
 }

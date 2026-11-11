@@ -1,6 +1,7 @@
 package com.mingsiamz.xuanlingmod.gui.component.canvas;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.api.IComponent;
 import com.mingsiamz.xuanlingmod.gui.component.data.ComponentDef;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
@@ -69,7 +70,7 @@ public class CanvasPanel {
                 return mx >= x && mx < x + width && my >= y && my < y + height;
         }
 
-        public void addNode(ComponentDef def, int canvasX, int canvasY) {
+        public void addNode(IComponent def, int canvasX, int canvasY) {
                 state.nodes.add(new CanvasNode(def, canvasX, canvasY));
         }
 

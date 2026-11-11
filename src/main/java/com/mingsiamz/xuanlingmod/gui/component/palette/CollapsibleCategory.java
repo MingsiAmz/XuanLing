@@ -1,5 +1,6 @@
 package com.mingsiamz.xuanlingmod.gui.component.palette;
 
+import com.mingsiamz.xuanlingmod.api.IComponent;
 import com.mingsiamz.xuanlingmod.gui.component.data.ComponentCategory;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
@@ -11,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CollapsibleCategory {
-        private final ComponentCategory category;
+        // private final IComponent category;
+        private Component name;
         private int x, y;
         private final int width;
         private boolean expanded = false;
@@ -22,8 +24,9 @@ public class CollapsibleCategory {
 
         private final List<PaletteItem> items = new ArrayList<>();
 
-        public CollapsibleCategory(ComponentCategory category, int width) {
-                this.category = category;
+        public CollapsibleCategory(Component name, int width) {
+                // this.category = category;
+                this.name = name;
                 this.width = width;
         }
 
@@ -69,7 +72,7 @@ public class CollapsibleCategory {
                 String arrow = expanded ? "▼" : "▶";
                 g.drawString(font, Component.literal(arrow),
                                 x + 4, y + (HEADER_H - 8) / 2, CultivationTheme.BORDER_CYAN, false);
-                g.drawString(font, category.getDisplay(), x + 18, y + (HEADER_H - 8) / 2,
+                g.drawString(font, this.name, x + 18, y + (HEADER_H - 8) / 2,
                                 hoveredHeader ? CultivationTheme.TEXT_GOLD : CultivationTheme.TEXT_PRIMARY, false);
 
                 GuiRenderUtil.border(g, x, y, x + width, y + HEADER_H, CultivationTheme.BORDER_DIM);

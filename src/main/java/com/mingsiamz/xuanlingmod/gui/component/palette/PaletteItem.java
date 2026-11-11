@@ -1,5 +1,6 @@
 package com.mingsiamz.xuanlingmod.gui.component.palette;
 
+import com.mingsiamz.xuanlingmod.api.IComponent;
 import com.mingsiamz.xuanlingmod.gui.component.data.ComponentDef;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import net.minecraft.client.Minecraft;
@@ -7,19 +8,19 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 public class PaletteItem {
-        private final ComponentDef def;
+        private final IComponent def;
         private int x, y;
         private final int width, height;
 
         private DragStart onDragStart;
 
-        public PaletteItem(ComponentDef def, int width, int height) {
+        public PaletteItem(IComponent def, int width, int height) {
                 this.def = def;
                 this.width = width;
                 this.height = height;
         }
 
-        public ComponentDef getDef() {
+        public IComponent getDef() {
                 return def;
         }
 
@@ -52,11 +53,12 @@ public class PaletteItem {
         public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
                 boolean hovered = isMouseOver(mouseX, mouseY);
                 int bg = hovered ? 0x6000E5FF : 0x30101820;
+                int color = 0xFF4DD0E1;
                 g.fill(x, y, x + width, y + height, bg);
-                g.fill(x, y, x + 3, y + height, def.color());
+                g.fill(x, y, x + 3, y + height, color);
 
                 var font = Minecraft.getInstance().font;
-                g.drawString(font, Component.literal(def.displayName()),
+                g.drawString(font, def.trans(),
                                 x + 10, y + (height - 8) / 2,
                                 hovered ? CultivationTheme.TEXT_GOLD : CultivationTheme.TEXT_PRIMARY, false);
         }
@@ -76,6 +78,6 @@ public class PaletteItem {
 
         @FunctionalInterface
         public interface DragStart {
-                void start(ComponentDef def, int mouseX, int mouseY);
+                void start(IComponent def, int mouseX, int mouseY);
         }
 }

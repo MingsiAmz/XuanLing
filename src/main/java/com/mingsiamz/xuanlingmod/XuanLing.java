@@ -4,6 +4,8 @@ import java.util.Random;
 
 import org.slf4j.Logger;
 
+import com.mingsiamz.xuanlingmod.data.DataLoader;
+import com.mingsiamz.xuanlingmod.data.DataManager;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
@@ -35,7 +37,7 @@ public class XuanLing {
         public static final Logger LOGGER = LogUtils.getLogger();
         public static final Random RANDOM = new Random();
 
-        public XuanLing(IEventBus modEventBus, ModContainer modContainer) {
+        public XuanLing(IEventBus modEventBus, ModContainer modContainer) throws Exception {
                 RegisterAttachments.register(modEventBus);
                 RegisterItems.register(modEventBus);
                 RegisterBlocks.register(modEventBus);
@@ -50,6 +52,9 @@ public class XuanLing {
                 modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC, MODID + "/" + MODID + ".toml");
                 modEventBus.register(Networking.class);
                 modEventBus.addListener(RegisterKey::register);
+
+                DataManager.init();
+                DataLoader.init(DataManager.MOD_CONFIG_DIR);
         }
 
         private void commonSetup(FMLCommonSetupEvent event) {

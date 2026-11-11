@@ -88,6 +88,16 @@ description='''
     ordering="NONE"
     side="BOTH"
 
+# Player Animation Library - only needed on the client, where the player animations are played.
+# The client registration code in XuanLingClient links against it, so it is a hard requirement there.
+[[dependencies.${mod_id}]]
+    modId="player_animation_library"
+    type="required"
+    reason="Player animations (e.g. meditation pose) are provided by Player Animation Library."
+    versionRange="[1.1.6,)"
+    ordering="AFTER"
+    side="CLIENT"
+
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
 # stop your mod loading on the server for example.

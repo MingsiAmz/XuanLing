@@ -24,25 +24,25 @@ public class EffectMeditation extends MobEffect {
                 DefaultEnergy defaultEnergy = RegisterAttachments.getDefaultEnergy(livingEntity);
                 BasicData basicData = RegisterAttachments.getBasicData(livingEntity);
 
-                if (defaultEnergy == null || basicData == null)
-                        return false;
+                // if (defaultEnergy == null || basicData == null)
+                //         return false;
 
-                double maxPValue = defaultEnergy.getMaxValue(ComponentEnergy.Type.PARRENT);
-                double maxCValue = defaultEnergy.getMaxValue(ComponentEnergy.Type.CHILD);
-                double nowPValue = defaultEnergy.getNowValue(ComponentEnergy.Type.PARRENT);
-                double nowCValue = defaultEnergy.getNowValue(ComponentEnergy.Type.CHILD);
-                double target = 10;
+                // double maxPValue = defaultEnergy.getMaxValue(ComponentEnergy.Type.PARRENT);
+                // double maxCValue = defaultEnergy.getMaxValue(ComponentEnergy.Type.CHILD);
+                // double nowPValue = defaultEnergy.getNowValue(ComponentEnergy.Type.PARRENT);
+                // double nowCValue = defaultEnergy.getNowValue(ComponentEnergy.Type.CHILD);
+                // double target = 10;
 
-                if (maxPValue == 0 && maxCValue == 0) {
-                        basicData.setMeditation(false);
-                        return false;
-                }
+                // if (maxPValue == 0 && maxCValue == 0) {
+                //         basicData.setMeditation(false);
+                //         return false;
+                // }
 
-                if (maxPValue >= 1)
-                        defaultEnergy.setEnergyValue(ComponentEnergy.Type.PARRENT, nowPValue + target);
+                // if (maxPValue >= 1)
+                //         defaultEnergy.setEnergyValue(ComponentEnergy.Type.PARRENT, nowPValue + target);
 
-                if (maxCValue >= 1)
-                        defaultEnergy.setEnergyValue(ComponentEnergy.Type.CHILD, nowCValue + target);
+                // if (maxCValue >= 1)
+                //         defaultEnergy.setEnergyValue(ComponentEnergy.Type.CHILD, nowCValue + target);
 
                 return super.applyEffectTick(livingEntity, amplifier);
         }
