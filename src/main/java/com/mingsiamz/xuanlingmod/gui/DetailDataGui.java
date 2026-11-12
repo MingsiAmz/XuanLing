@@ -1,6 +1,8 @@
 package com.mingsiamz.xuanlingmod.gui;
 
+import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
+import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationPanel;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiComponentGroup;
@@ -53,7 +55,8 @@ public class DetailDataGui extends Screen {
                 int cx = panel.getX() + PANEL_W / 2;
                 int inX = panel.getX() + CultivationTheme.PADDING;
                 int rightX = panel.getX() + PANEL_W - CultivationTheme.PADDING;
-                g.drawString(font, "test", cx - font.width("test"), panel.getY() + 14, CultivationTheme.BORDER_GOLD, false);
+                Component title = XuanLing.trans(XuanlingLangPro.GUI_STRING, "detail_data_gui_title");
+                g.drawString(font, title, cx - font.width(title) / 2, panel.getY() + 14, CultivationTheme.BORDER_GOLD, false);
 
                 // root.render(g, mouseX, mouseY, partialTick);
                 StateGui.renderSideBtn(g, mouseX, mouseY, partialTick);

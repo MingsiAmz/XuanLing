@@ -37,7 +37,10 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "nick_name", "道号:%s");
                         this.add(GUI_STRING + "sect", "宗门:%s");
                         this.add(GUI_STRING + "realm", "境界: ");
-                        this.add(GUI_STRING + "make_cultivation_component", "衍化神通");
+                        this.add(GUI_STRING + "make_cultivation_component", "衍化");
+                        this.add(GUI_STRING + "make_cultivation_spell", "神通");
+                        this.add(GUI_STRING + "make_cultivation_art", "功法");
+                        this.add(GUI_STRING + "make_cultivation_realm", "修炼体系");
                         this.add(GUI_STRING + "create_cultivation", "衍化");
                         this.add(GUI_STRING + "make_tips", "Shift+左键=删除 Ctrl+左键=连接 中建=居中");
                         this.add(GUI_STRING + "component_lib_title", "已知组件");
@@ -71,6 +74,7 @@ public class XuanlingLangPro {
                         this.add(COMPONEN_STRING + "NORMAL", "常规");
                         this.add(COMPONEN_STRING + "CONTINUOUS", "持续");
                         this.add(GUI_STRING + "this_component_not_select_more", "该组件无法衍化更多");
+                        this.add(GUI_STRING + "detail_data_gui_title", "详细数据");
                 }
         }
 
@@ -97,6 +101,9 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "sect", "Sect:%s");
                         this.add(GUI_STRING + "realm", "Realm: ");
                         this.add(GUI_STRING + "make_cultivation_component", "Make Cultivation Component");
+                        this.add(GUI_STRING + "make_cultivation_spell", "Spell");
+                        this.add(GUI_STRING + "make_cultivation_art", "ART");
+                        this.add(GUI_STRING + "make_cultivation_realm", "Realm");
                         this.add(GUI_STRING + "create_cultivation", "Create");
                         this.add(GUI_STRING + "make_tips", "Shift+Left=delete Ctrl+Left=Connect Middle=Center");
                         this.add(GUI_STRING + "component_lib_title", "Component Lib");
@@ -131,6 +138,7 @@ public class XuanlingLangPro {
                         this.add(COMPONEN_STRING + "NORMAL", "NORMAL");
                         this.add(COMPONEN_STRING + "CONTINUOUS", "CONTINUOUS");
                         this.add(GUI_STRING + "this_component_not_select_more", "This component not select more");
+                        this.add(GUI_STRING + "detail_data_gui_title", "Detail Data");
                 }
         }
 }

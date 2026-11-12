@@ -1,28 +1,16 @@
 package com.mingsiamz.xuanlingmod;
 
 import com.mingsiamz.xuanlingmod.animations.player.AnmMeditation;
-import com.mingsiamz.xuanlingmod.data.BasicData;
-import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
-import com.mingsiamz.xuanlingmod.effects.EffectMeditation;
 import com.mingsiamz.xuanlingmod.gui.StateGui;
-import com.mingsiamz.xuanlingmod.layers.Tip;
 import com.mingsiamz.xuanlingmod.network.MeditationPacket;
 import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
-import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
-import com.mingsiamz.xuanlingmod.register.RegisterEffects;
 import com.mingsiamz.xuanlingmod.register.RegisterEntities;
 import com.mingsiamz.xuanlingmod.register.RegisterKey;
 import com.mingsiamz.xuanlingmod.render.SkillEntityRender;
-import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.zigythebird.playeranim.api.PlayerAnimationFactory;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -31,10 +19,8 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 @Mod(value = XuanLing.MODID, dist = Dist.CLIENT)
@@ -67,30 +53,6 @@ public class XuanLingClient {
         @SubscribeEvent
         public static void onClientTick(ClientTickEvent.Pre event) {
                 keyVoid();
-        }
-
-        @SubscribeEvent
-        public static void registerLayers(RegisterGuiLayersEvent event) {
-                event.registerAbove(VanillaGuiLayers.HOTBAR, XuanLing.prefix("not_use_meditation_layer"),
-                                new Tip(() -> XuanLing.trans(XuanlingLangPro.GUI_STRING, "not_use_meditation"))
-                                                .setCondition(player -> {
-                                                        if (!RegisterKey.KEY_MEDITATION.isDown()) {
-                                                                return false;
-                                                        }
-
-                                                        DefaultEnergy energy = RegisterAttachments
-                                                                        .getDefaultEnergy(player);
-
-                                                        if (energy == null || (energy.getMaxPValue() == 0
-                                                                        && energy.getMaxCValue() == 0)) {
-                                                                return true;
-                                                        }
-
-                                                        return false;
-                                                })
-                                                .setLifeTime(1000, true)
-                                                .setFadeOutDuration(200)
-                                                .setThemeColor(CultivationTheme.BORDER_CYAN));
         }
 
         private static void keyVoid() {

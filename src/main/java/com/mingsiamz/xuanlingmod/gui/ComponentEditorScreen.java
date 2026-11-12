@@ -14,6 +14,7 @@ import com.mingsiamz.xuanlingmod.gui.component.canvas.ParamPopup;
 import com.mingsiamz.xuanlingmod.gui.component.palette.PalettePanel;
 import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
+import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 
@@ -40,9 +41,11 @@ public class ComponentEditorScreen extends Screen {
         private ParamPopup activePopup = null;
 
         private DragPayload dragPayload = null;
+        private XuanLingTypeEnum type;
 
-        public ComponentEditorScreen() {
+        public ComponentEditorScreen(XuanLingTypeEnum type) {
                 super(Component.literal("make cultivation method"));
+                this.type = type;
         }
 
         @Override
@@ -65,7 +68,7 @@ public class ComponentEditorScreen extends Screen {
                 canvas = new CanvasPanel(state, this.width - LEFT_W - GAP - MARGIN * 2, totalH);
                 canvas.setPosition(MARGIN + LEFT_W + GAP, MARGIN);
 
-                List<IComponent<?>> defs = ComponentRegistry.getAvailable(minecraft == null ? null : minecraft.player);
+                List<IComponent<?>> defs = ComponentRegistry.getAvailable(this.type, minecraft == null ? null : minecraft.player);
                 palette.loadComponents(defs);
         }
 

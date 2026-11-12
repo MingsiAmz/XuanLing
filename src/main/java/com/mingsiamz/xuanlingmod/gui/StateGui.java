@@ -95,8 +95,8 @@ public class StateGui extends Screen {
 
         @Override
         protected void init() {
-                this.panelW = Math.max(340, Math.min(480, (int) (this.width * 0.45f)));
-                this.panelH = Math.max(280, Math.min(400, (int) (this.height * 0.60f)));
+                this.panelW = Math.max(340, (int) (this.width * 0.45f));
+                this.panelH = Math.max(280, (int) (this.height * 0.60f));
 
                 this.px = (this.width - this.panelW) / 2;
                 this.py = (this.height - this.panelH) / 2;
@@ -105,7 +105,7 @@ public class StateGui extends Screen {
                 panel.setPosition(this.px, this.py);
 
                 int innerW = this.panelW - CultivationTheme.PADDING * 2;
-                
+
                 GuiComponentGroup statGroup = new GuiComponentGroup()
                                 .setLayout(Layouts.row().setJustify(Justify.CENTER).setSpacing(10))
                                 .setFixedWidth(innerW);
@@ -130,10 +130,12 @@ public class StateGui extends Screen {
                 GuiComponentGroup buttonGroup = new GuiComponentGroup()
                                 .setLayout(Layouts.flow(innerW).setSpacing(8).setJustify(Justify.CENTER))
                                 .setFixedWidth(innerW)
-                                .add(new GuiButton(80, 20, make.getString()).onClick(() -> minecraft.setScreen(new ComponentEditorScreen())))
-                                .add(new GuiButton(80, 20, cultivateTitle.getString()).onClick(() -> minecraft.setScreen(new LevelProgressGui())))
+                                .add(new GuiButton(80, 20, make.getString())
+                                                .onClick(() -> minecraft.setScreen(new CreateGui())))
+                                .add(new GuiButton(80, 20, cultivateTitle.getString())
+                                                .onClick(() -> minecraft.setScreen(new LevelProgressGui())))
                                 .add(new GuiButton(80, 20, "功法").onClick(() -> {
-                                                        // TODO
+                                        // TODO
                                 }));
 
                 root = new GuiComponentGroup()
@@ -141,9 +143,10 @@ public class StateGui extends Screen {
                                 .setPadding(0)
                                 .add(new SectionDivider(innerW).setColors(0x40FFFFFF, CultivationTheme.BORDER_GOLD))
                                 .add(statGroup)
-                                .add(new SectionDivider(innerW).setColors(0x40FFFFFF, CultivationTheme.BORDER_CYAN).setDiamondSize(3))
+                                .add(new SectionDivider(innerW).setColors(0x40FFFFFF, CultivationTheme.BORDER_CYAN)
+                                                .setDiamondSize(3))
                                 .add(buttonGroup);
-                
+
                 int rootY = this.py + (int) (this.panelH * 0.375f);
                 root.setPosition(this.px + CultivationTheme.PADDING, rootY);
 
@@ -176,10 +179,12 @@ public class StateGui extends Screen {
                 int idY = this.py + (int) (this.panelH * 0.20f);
                 if (minecraft.player.hasData(RegisterAttachments.BASIC_DATA)) {
                         BasicData basicData = RegisterAttachments.getBasicData(minecraft.player);
-                        g.drawString(font, XuanLing.trans(XuanlingLangPro.GUI_STRING, "nick_name", basicData.getNickName()), 
-                                     innerX, idY, CultivationTheme.TEXT_PRIMARY, false);
-                        g.drawString(font, XuanLing.trans(XuanlingLangPro.GUI_STRING, "sect", basicData.getSect()), 
-                                     innerX, idY + 16, CultivationTheme.TEXT_PRIMARY, false);
+                        g.drawString(font,
+                                        XuanLing.trans(XuanlingLangPro.GUI_STRING, "nick_name",
+                                                        basicData.getNickName()),
+                                        innerX, idY, CultivationTheme.TEXT_PRIMARY, false);
+                        g.drawString(font, XuanLing.trans(XuanlingLangPro.GUI_STRING, "sect", basicData.getSect()),
+                                        innerX, idY + 16, CultivationTheme.TEXT_PRIMARY, false);
                 }
 
                 renderRealm(g, rightX, idY);
@@ -194,13 +199,19 @@ public class StateGui extends Screen {
                 DefaultData data = RegisterAttachments.getDefaultData(minecraft.player);
                 Component realmComp = XuanLing.trans(XuanlingLangPro.GUI_STRING, "realm");
                 if (data != null) {
-                        ComponentRealm comRealm = BasicRealm.getRealm(minecraft.player.getUUID(), data.getRealmType(), data.getRealmLevel());
+                        ComponentRealm comRealm = BasicRealm.getRealm(minecraft.player.getUUID(), data.getRealmType(),
+                                        data.getRealmLevel());
                         if (comRealm != null) {
-                                g.drawString(font, realmComp, rightX - font.width(realmComp) - 20, idY, CultivationTheme.TEXT_GOLD, true);
+                                g.drawString(font, realmComp, rightX - font.width(realmComp) - 20, idY,
+                                                CultivationTheme.TEXT_GOLD, true);
                                 if (!comRealm.canTrans()) {
-                                        g.drawString(font, Component.literal(comRealm.getName()), rightX - font.width(realmComp), idY, CultivationTheme.TEXT_GOLD, true);
+                                        g.drawString(font, Component.literal(comRealm.getName()),
+                                                        rightX - font.width(realmComp), idY, CultivationTheme.TEXT_GOLD,
+                                                        true);
                                 } else {
-                                        g.drawString(font, Component.translatable(comRealm.getName()), rightX - font.width(realmComp), idY, CultivationTheme.TEXT_GOLD);
+                                        g.drawString(font, Component.translatable(comRealm.getName()),
+                                                        rightX - font.width(realmComp), idY,
+                                                        CultivationTheme.TEXT_GOLD);
                                 }
                         }
                 }
@@ -209,17 +220,18 @@ public class StateGui extends Screen {
         public void renderPlayer(GuiGraphics g, int mouseX, int mouseY) {
                 int figureX = this.px + this.panelW / 2;
                 int figureY = this.py + (int) (this.panelH * 0.714f);
-                int figureScale = 35;
+                int figureScale = (int) (this.panelH * 0.0875f);
 
-                int haloRx = 34;
-                int haloRy = 58;
+                int haloRx = (int) (this.panelH * 0.085f);
+                int haloRy = (int) (this.panelH * 0.145f);
+
                 int haloCenterX = figureX;
-                int haloCenterY = figureY - 35;
+                int haloCenterY = figureY - figureScale;
 
-                drawEllipse(g, haloCenterX, haloCenterY, haloRx + 6, haloRy + 6, 0x0A00FFFF);
-                drawEllipse(g, haloCenterX, haloCenterY, haloRx + 3, haloRy + 3, 0x0A00FFFF);
-                drawEllipse(g, haloCenterX, haloCenterY, haloRx, haloRy, 0x0A00FFFF);
-                drawEllipse(g, haloCenterX, haloCenterY, haloRx - 4, haloRy - 4, 0x0A00FFFF);
+                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx + 6, haloRy + 6 + 16, 0x0A00FFFF);
+                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx + 3, haloRy + 3 + 14, 0x0A00FFFF);
+                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx, haloRy + 10, 0x0A00FFFF);
+                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx - 4, haloRy - 4 + 12, 0x0A00FFFF);
 
                 if (minecraft.player != null) {
                         float mouseDX = (float) mouseX - figureX;
@@ -245,7 +257,7 @@ public class StateGui extends Screen {
                         rotation.mul(xRotation);
 
                         InventoryScreen.renderEntityInInventory(
-                                        g, figureX, figureY, figureScale,
+                                        g, figureX, figureY - 9, figureScale,
                                         new Vector3f(0, 0, 0),
                                         rotation,
                                         null,

@@ -1,49 +1,46 @@
-# 玄灵模组
+# 玄灵修仙模组
 
-基于 Minecraft 1.21.1 NeoForge 的修仙模组，提供灵力体系、功法组件可视化编程与自定义 GUI 系统。
+> 一个基于 Minecraft Forge 1.21.1 开发的沉浸式修仙模组，旨在为游戏引入完整的修仙体系，包括境界突破、灵气内力系统、可视化自定义功法神通构建以及极具修仙风格的UI体验。
 
-## 功能特性
+## ✨ 核心特性
 
-- **修仙体系**：灵力/内力条 HUD、境界与宗门属性、灵力存储
-- **组件可视化编程**：基于画布与节点的拖拽式编辑器，支持功法/逻辑/渲染/数据分类组件
-- **自定义 GUI 框架**：修仙主题 UI 组件库，支持流式/网格/浮动等布局，含面板、状态条、按钮与打字机特效标签
-- **数据驱动**：本地 JSON 配置热重载与持久化
-- **网络同步**：客户端与服务端修仙数据包同步
+*   **完整的修仙体系**：包含凡人、炼气、筑基、金丹、元婴等境界，每个境界提供不同的属性加成（神识、悟性、魅力、移动速度等）与突破阈值。
+*   **可视化神通编辑器**：抛弃传统硬编码技能！模组内置节点画布系统，玩家可以通过拖拽节点和连线，自由组合基础类型（投射、AOE、自身）与动作，自定义专属神通逻辑。
+*   **自研沉浸式UI**：极具修仙风格的青色灵气与金色边框界面。包含打字机效果文本、平滑插值动画的灵气/内力HUD、以及详细的角色修仙状态面板。
+*   **打坐修炼系统**：结合按键绑定、特效、动画与网络同步，实现完整的打坐恢复灵气玩法。
+*   **安全的数据持久化**：使用 Gson 将玩家修仙数据序列化为 JSON 文件，存储在 `config/xuanlingmod/` 目录下，支持按功法、神通、境界、能量分类管理。
 
-## 技术栈
+## 🛠️ 技术栈与环境
 
-- **框架**: NeoForge 1.21.1
-- **语言**: Java 21
-- **构建**: Gradle
-- **序列化**: Gson, Minecraft Codec/StreamCodec
+*   **MC 版本**: 1.21.1
+*   **模组加载器**: Forge
+*   **开发语言**: Java 21
+*   **构建工具**: Gradle
 
-## 快速开始
+## 📦 安装指南
 
-1. 确保 JDK 21 及 Gradle 已安装
-2. 克隆仓库并构建：
-   ```bash
-   git clone <repo-url>
-   cd xuanling-template-1.21.1
-   ./gradlew build
-   ```
-3. 启动客户端：
-   ```bash
-   ./gradlew runClient
-   ```
+### 开发者构建
+1.  克隆本仓库：
+    ```bash
+    git clone <你的仓库地址>
+    ```
+2.  进入项目目录并构建：
+    ```bash
+    cd xuanlingmod
+    ./gradlew build
+    ```
+3.  构建产物将位于 `build/libs/` 目录下。
 
-## 配置说明
+## 🏗️ 架构概览
 
-- **语言文件**: `src/generated/resources/assets/xuanling/lang/zh_cn.json`/ `en_us.json`
-- **运行时配置**: 运行后生成于 `./config/xuanling/` 目录，由 `DataManager` 与 `DataLoader` 管理读写与热重载
+项目采用标准的客户端/服务端分离架构：
 
-## 开发：热重载（Remold）
+*   **数据与持久化**: `DataManager.java` 负责JSON读写；`BasicData.java` 定义基础属性；`BasicRealm.java` 硬编码境界体系。
+*   **网络同步**: `network/` 包下定义了 `CustomPackageImp` 及各类 Payload，确保服务端数据与客户端UI实时双向同步。
+*   **组件系统**: `api/IComponent.java` 定义标准行为；`data/component/SpellComponent.java` 负责神通逻辑组合。
+*   **GUI与渲染**: `util/gui/` 包含自研UI库（布局、标签、按钮）；`gui/component/` 提供可视化节点编辑器；`TopLeftQiHud.java` 负责左上角HUD渲染。
+*   **事件交互**: `event/NormalPlayerEvent.java` 处理玩家进服、死亡、交互及打坐逻辑。
 
-dev 运行已接入 [Remold](https://github.com/I-hope1/Remold) **0.2.6**：`./gradlew runClient` 开着游戏改代码，
-保存并编译后新逻辑直接生效，不用重启。
+## 📜 开源协议
 
-- 改方法体：开箱即用（任意 JVM）
-- 加字段/方法（结构变更）：需要 DCEVM 版 JVM（JBR）；`gradle.properties` 里的 `remold.jbr` 已指向本机 JBR 21.0.9，换机器记得改
-- 资源（`src/main/resources`）：Remold 不会自动重载游戏资源包，改完要 `gradlew processResources --offline`（或 `-t` 持续同步），再在游戏里按 `F3+T`（客户端）/ `/reload`（数据包）
-- 看当前配置：`./gradlew remoldInfo`；临时关闭：`-Premold.enabled=false`
-
-细节、实测结果与踩坑见 [`docs/remold-hot-reload.md`](docs/remold-hot-reload.md)。
+本项目采用 [Apache License](LICENSE) 开源协议。

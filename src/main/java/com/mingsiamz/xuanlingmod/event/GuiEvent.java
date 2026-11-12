@@ -1,8 +1,14 @@
 package com.mingsiamz.xuanlingmod.event;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
 import com.mingsiamz.xuanlingmod.gui.PlayerVitalsHud;
 import com.mingsiamz.xuanlingmod.gui.TopLeftQiHud;
+import com.mingsiamz.xuanlingmod.layers.Tip;
+import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
+import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
+import com.mingsiamz.xuanlingmod.register.RegisterKey;
+import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
@@ -17,16 +23,35 @@ public class GuiEvent {
         @SubscribeEvent
         public static void registerLayers(RegisterGuiLayersEvent event) {
                 event.registerAbove(
-                                    VanillaGuiLayers.HOTBAR,
-                                    ResourceLocation.fromNamespaceAndPath(XuanLing.MODID, "vitals"),
-                                    PlayerVitalsHud::render
-                                    );
+                                VanillaGuiLayers.HOTBAR,
+                                ResourceLocation.fromNamespaceAndPath(XuanLing.MODID, "vitals"),
+                                PlayerVitalsHud::render);
 
                 event.registerAbove(
-                                    VanillaGuiLayers.HOTBAR,
-                                    ResourceLocation.fromNamespaceAndPath(XuanLing.MODID, "top_left_qi"),
-                                    TopLeftQiHud::render
-                                    );
+                                VanillaGuiLayers.HOTBAR,
+                                ResourceLocation.fromNamespaceAndPath(XuanLing.MODID, "top_left_qi"),
+                                TopLeftQiHud::render);
+                event.registerAbove(VanillaGuiLayers.HOTBAR, XuanLing.prefix("not_use_meditation_layer"),
+                                new Tip(() -> XuanLing.trans(XuanlingLangPro.GUI_STRING, "not_use_meditation"))
+                                                .setCondition(player -> {
+                                                        if (!RegisterKey.KEY_MEDITATION.isDown()) {
+                                                                return false;
+                                                        }
+
+                                                        DefaultEnergy energy = RegisterAttachments
+                                                                        .getDefaultEnergy(player);
+
+                                                        if (energy == null || (energy.getMaxPValue() == 0
+                                                                        && energy.getMaxCValue() == 0)) {
+                                                                return true;
+                                                        }
+
+                                                        return false;
+                                                })
+                                                .setLifeTime(1000, true)
+                                                .setFadeOutDuration(200)
+                                                .setThemeColor(CultivationTheme.BORDER_CYAN));
+
         }
 
         @SubscribeEvent

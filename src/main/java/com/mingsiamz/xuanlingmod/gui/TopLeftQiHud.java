@@ -1,9 +1,8 @@
 package com.mingsiamz.xuanlingmod.gui;
 
 import com.mingsiamz.xuanlingmod.Config;
-import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
-import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy;
-import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Type;
+import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
@@ -45,15 +44,13 @@ public final class TopLeftQiHud {
                 LocalPlayer p = mc.player;
                 if (p == null || mc.options.hideGui)
                         return;
-                if (p.isCreative() || p.isSpectator() || !p.isAlive() || !p.hasData(RegisterAttachments.DEFAULT_ENERGY))
+                if (p.isSpectator() || !p.isAlive() || !p.hasData(RegisterAttachments.DEFAULT_ENERGY))
                         return;
 
-                DefaultEnergy energy = RegisterAttachments.getDefaultEnergy(p);
-
-                int nowQi = (int)energy.getNowValue(Type.PARRENT);
-                int maxQi = (int)energy.getMaxValue(Type.PARRENT);
-                int nowNeili = (int)energy.getMaxValue(Type.CHILD);
-                int maxNeili = (int)energy.getMaxValue(Type.CHILD);
+                int nowQi = (int) HudDataProvider.getQi();
+                int maxQi = (int) HudDataProvider.getMaxQi();
+                int nowNeili = (int) HudDataProvider.getNeili();
+                int maxNeili = (int) HudDataProvider.getMaxNeili();
 
                 float tQi = maxQi > 0 ? (float) nowQi / maxQi : 0f;
                 float tNeili = maxNeili > 0 ? (float) nowNeili / maxNeili : 0f;
@@ -63,9 +60,11 @@ public final class TopLeftQiHud {
 
                 long t = (mc.level != null) ? mc.level.getGameTime() : 0L;
 
-                drawQiBar(g, X, Y, QI_WIDTH, QI_HEIGHT, dispQi, t);
-                drawNeiliBar(g, X, Y + QI_HEIGHT + NEILI_GAP,
-                                NEILI_WIDTH, NEILI_HEIGHT, dispNeili, t);
+                if (!isHaveQi())
+                        drawQiBar(g, X, Y, QI_WIDTH, QI_HEIGHT, dispQi, t);
+                if (!isHaveNeili())
+                        drawNeiliBar(g, X, Y + QI_HEIGHT + NEILI_GAP,
+                                     NEILI_WIDTH, NEILI_HEIGHT, dispNeili, t);
         }
 
         private static void drawQiBar(GuiGraphics g, int x, int y, int w, int h, float ratio, long t) {
@@ -114,10 +113,13 @@ public final class TopLeftQiHud {
                 GuiRenderUtil.border(g, x, y, x + w, y + h, CultivationTheme.BORDER_CYAN);
 
                 PoseStack pose = g.pose();
-                String text = String.valueOf(HudDataProvider.getQi(mc.player)) + "/" + String.valueOf(HudDataProvider.getMaxQi(mc.player));
+                float scale = 0.5f;
+                int strX = x + w;
+                String pre = XuanLing.trans(XuanlingLangPro.ENERGY_STRING, "lingqi").getString();
+                String text = String.valueOf(pre + "：" + HudDataProvider.getQi()) + "/" + String.valueOf(HudDataProvider.getMaxQi());
                 pose.pushPose();
-                pose.scale(0.5f, 0.5f, 0.5f);
-                g.drawString(mc.font, text, x + w, y, 0x00E5FF, false);
+                pose.scale(scale, scale, scale);
+                g.drawString(mc.font, text, strX, y, 0x00E5FF, false);
                 pose.popPose();
         }
 
@@ -146,6 +148,18 @@ public final class TopLeftQiHud {
 
                 g.fill(x, y - 1, x + w, y, CultivationTheme.BORDER_DIM);
                 g.fill(x, y + h, x + w, y + h + 1, CultivationTheme.BORDER_DIM);
+
+                PoseStack pose = g.pose();
+                float scale = 0.5f;
+                int strX = (x + w);
+                int strY = !isHaveQi() ? (y + h) * 2 + 10 : y + 10;
+                String pre = XuanLing.trans(XuanlingLangPro.ENERGY_STRING, "neili").getString();
+                String text = String.valueOf(pre + "：" + HudDataProvider.getNeili() + "/" + String.valueOf(HudDataProvider.getMaxNeili()));
+                pose.pushPose();
+                pose.scale(scale, scale, scale);
+                g.drawString(mc.font, text, strX, strY, CultivationTheme.TEXT_PRIMARY, false);
+                pose.popPose();
+
         }
 
         private static int lerpColor(int c1, int c2, float t) {
@@ -163,5 +177,13 @@ public final class TopLeftQiHud {
 
         private static float clamp(float v) {
                 return Math.max(0f, Math.min(1f, v));
+        }
+
+        private static boolean isHaveQi() {
+                return HudDataProvider.getQi() == 0 && HudDataProvider.getMaxQi() == 0;
+        }
+
+        private static boolean isHaveNeili() {
+                return HudDataProvider.getNeili() == 0 && HudDataProvider.getMaxNeili() == 0;
         }
 }
