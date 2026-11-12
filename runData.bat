@@ -1,0 +1,2 @@
+cls
+gradlew runData --offline
