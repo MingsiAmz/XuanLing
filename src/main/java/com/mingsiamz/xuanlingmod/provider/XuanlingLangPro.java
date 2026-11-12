@@ -70,6 +70,7 @@ public class XuanlingLangPro {
                         this.add(COMPONEN_STRING + "special", "特殊效果");
                         this.add(COMPONEN_STRING + "NORMAL", "常规");
                         this.add(COMPONEN_STRING + "CONTINUOUS", "持续");
+                        this.add(GUI_STRING + "this_component_not_select_more", "该组件无法衍化更多");
                 }
         }
 
@@ -129,6 +130,7 @@ public class XuanlingLangPro {
                         this.add(COMPONEN_STRING + "special", "special");
                         this.add(COMPONEN_STRING + "NORMAL", "NORMAL");
                         this.add(COMPONEN_STRING + "CONTINUOUS", "CONTINUOUS");
+                        this.add(GUI_STRING + "this_component_not_select_more", "This component not select more");
                 }
         }
 }

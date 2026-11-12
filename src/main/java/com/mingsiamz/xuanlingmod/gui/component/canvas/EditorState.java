@@ -8,4 +8,5 @@ public class EditorState {
         public final List<Connection> connections = new ArrayList<>();
         public int panX = 0;
         public int panY = 0;
+        public float scale = 1f;
 }

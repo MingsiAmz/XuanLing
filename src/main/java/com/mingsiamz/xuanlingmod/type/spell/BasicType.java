@@ -34,7 +34,7 @@ public enum BasicType implements IComponent<BasicType> {
                 this.weight = weight;
         }
 
-        @Override 
+        @Override
         public BasicType withParams(LinkedHashMap<String, Object> params) {
                 this.params = params;
                 return this;
@@ -86,21 +86,18 @@ public enum BasicType implements IComponent<BasicType> {
 
         @Override
         public void putComponentToPlayerByWeight() {
-                // 如果 weight == -1，说明是初始就有的组件
                 if (this.weight == -1) {
-                        // TODO: 替换为实际赋予玩家的逻辑，例如放入玩家的 Attachment 中
+                        // TODO
                         System.out.println("[XuanLing] 初始获得组件: " + this.name());
                         return;
                 }
 
-                // 生成 0 ~ 10000 的随机整数（包含两端）
                 int rand = java.util.concurrent.ThreadLocalRandom.current().nextInt(10001);
-                
-                // 如果随机数小于等于权重，则成功获取
+
                 if (rand <= this.weight) {
-                        // TODO: 替换为实际赋予玩家的逻辑
-                        System.out.println("[XuanLing] 通过权重获得组件: " + this.name() 
-                                + " (随机数: " + rand + ", 权重: " + this.weight + ")");
+                        // TODO
+                        System.out.println("[XuanLing] 通过权重获得组件: " + this.name()
+                                        + " (随机数: " + rand + ", 权重: " + this.weight + ")");
                 }
         }
 

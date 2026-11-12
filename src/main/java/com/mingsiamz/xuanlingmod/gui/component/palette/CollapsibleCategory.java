@@ -1,6 +1,8 @@
 package com.mingsiamz.xuanlingmod.gui.component.palette;
 
 import com.mingsiamz.xuanlingmod.api.IComponent;
+import com.mingsiamz.xuanlingmod.gui.component.DragPayload;
+import com.mingsiamz.xuanlingmod.gui.component.DragPayload.Type;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 import net.minecraft.client.Minecraft;
@@ -9,6 +11,7 @@ import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class CollapsibleCategory {
         private Component name;
@@ -22,6 +25,8 @@ public class CollapsibleCategory {
 
         private final List<PaletteItem> items = new ArrayList<>();
 
+        private BiConsumer<DragPayload, int[]> onCategoryDrag;
+
         public CollapsibleCategory(Component name, int width) {
                 this.name = name;
                 this.width = width;
@@ -33,6 +38,10 @@ public class CollapsibleCategory {
 
         public List<PaletteItem> getItems() {
                 return items;
+        }
+
+        public void setOnCategoryDrag(BiConsumer<DragPayload, int[]> listener) {
+                this.onCategoryDrag = listener;
         }
 
         public void setPosition(int x, int y) {
@@ -87,6 +96,9 @@ public class CollapsibleCategory {
         public boolean mouseClicked(double mx, double my, int button) {
                 if (button == 0 && mx >= x && mx < x + width && my >= y && my < y + HEADER_H) {
                         expanded = !expanded;
+                        if (onCategoryDrag != null) {
+                                onCategoryDrag.accept(new DragPayload(Type.CATEGORY, name.getString(), null), new int[]{(int)mx,(int)my});
+                        }
                         return true;
                 }
                 if (expanded) {

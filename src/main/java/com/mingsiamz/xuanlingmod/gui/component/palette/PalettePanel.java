@@ -2,6 +2,7 @@ package com.mingsiamz.xuanlingmod.gui.component.palette;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.api.IComponent;
+import com.mingsiamz.xuanlingmod.gui.component.DragPayload;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
@@ -14,11 +15,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class PalettePanel {
         private int x, y, width, height;
         private final List<CollapsibleCategory> categories = new ArrayList<>();
-        private PaletteItem.DragStart dragStart;
+        // private PaletteItem.DragStart dragStart;
+        private BiConsumer<DragPayload, int[]> dragStart;
 
         private float scrollY = 0;
         private static final int TITLE_HEIGHT = 22;
@@ -34,27 +37,32 @@ public class PalettePanel {
                 this.height = height;
         }
 
-        public void setOnDragStart(PaletteItem.DragStart l) {
+        public void setOnDragStart(BiConsumer<DragPayload, int[]> l) {
                 this.dragStart = l;
         }
 
-        public void loadComponents(List<IComponent> cmps) {
+        public void loadComponents(List<IComponent<?>> cmps) {
                 categories.clear();
                 scrollY = 0;
                 if (cmps == null || cmps.isEmpty())
                         return;
 
-                Map<Component, List<IComponent>> byCat = new LinkedHashMap<>();
-                for (IComponent def : cmps) {
+                Map<Component, List<IComponent<?>>> byCat = new LinkedHashMap<>();
+                for (IComponent<?> def : cmps) {
                         byCat.computeIfAbsent(def.transType(), k -> new ArrayList<>()).add(def);
                 }
 
                 int itemWidth = width - 12 - (SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2);
 
-                for (var entry : byCat.entrySet()) {
+                for (Map.Entry<Component, List<IComponent<?>>> entry : byCat.entrySet()) {
                         CollapsibleCategory cat = new CollapsibleCategory(entry.getKey(), itemWidth);
-                        for (IComponent def : entry.getValue()) {
-                                cat.addItem(new PaletteItem(def, itemWidth, 18).setOnDragStart(dragStart));
+                        cat.setOnCategoryDrag(dragStart);
+                        for (IComponent<?> def : entry.getValue()) {
+                                cat.addItem(new PaletteItem(def, itemWidth, 18)
+                                                .setOnDragStart((d, mx, my) -> dragStart.accept(
+                                                                new DragPayload(DragPayload.Type.COMPONENT,
+                                                                                def.trans().getString(), d),
+                                                                new int[] { mx, my })));
                         }
                         categories.add(cat);
                 }

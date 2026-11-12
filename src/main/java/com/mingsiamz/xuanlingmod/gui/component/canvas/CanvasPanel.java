@@ -1,7 +1,6 @@
 package com.mingsiamz.xuanlingmod.gui.component.canvas;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
-import com.mingsiamz.xuanlingmod.api.IComponent;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
@@ -9,8 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-
-import java.util.List;
+import net.minecraft.util.Mth;
 
 public class CanvasPanel {
         private final EditorState state;
@@ -18,7 +16,7 @@ public class CanvasPanel {
         private int x, y, width, height;
 
         private CanvasNode draggingNode;
-        private int dragOffsetX, dragOffsetY;
+        private float dragOffsetX, dragOffsetY;
 
         private boolean panning;
         private int panStartMX, panStartMY, panStartX, panStartY;
@@ -69,32 +67,20 @@ public class CanvasPanel {
                 return mx >= x && mx < x + width && my >= y && my < y + height;
         }
 
-        public void addNode(IComponent def, int canvasX, int canvasY) {
-                // state.nodes.add(new CanvasNode(def, canvasX, canvasY));
-                CanvasNode node = new CanvasNode(def, canvasX, canvasY);
-                // 给节点设置点击齿轮的回调
-                node.setOnConfigClick(() -> {
-                        // 弹出一个配置界面，或者在控制台打印需要配置的变量
-                        System.out.println("点击了配置按钮，准备设置参数: " + def);
-                        // 这里你可以调用 Minecraft.getInstance().setScreen(new ParamConfigScreen(def));
-                });
-                state.nodes.add(node);
+        public int toScreenX(float cx) {
+                return x + (int) ((cx + state.panX) * state.scale);
         }
 
-        public int toScreenX(int cx) {
-                return x + cx + state.panX;
+        public int toScreenY(float cy) {
+                return y + (int) ((cy + state.panY) * state.scale);
         }
 
-        public int toScreenY(int cy) {
-                return y + cy + state.panY;
+        public float toCanvasX(double sx) {
+                return (float) ((sx - x) / state.scale) - state.panX;
         }
 
-        public int toCanvasX(int sx) {
-                return sx - x - state.panX;
-        }
-
-        public int toCanvasY(int sy) {
-                return sy - y - state.panY;
+        public float toCanvasY(double sy) {
+                return (float) ((sy - y) / state.scale) - state.panY;
         }
 
         public void centerOnContent() {
@@ -104,8 +90,11 @@ public class CanvasPanel {
                         return;
                 }
 
-                int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
-                int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+                int minX = Integer.MAX_VALUE;
+                int minY = Integer.MAX_VALUE;
+                int maxX = Integer.MIN_VALUE;
+                int maxY = Integer.MIN_VALUE;
+
                 for (CanvasNode n : state.nodes) {
                         minX = Math.min(minX, n.getCanvasX());
                         minY = Math.min(minY, n.getCanvasY());
@@ -113,11 +102,11 @@ public class CanvasPanel {
                         maxY = Math.max(maxY, n.getCanvasY() + n.getHeight());
                 }
 
-                int contentCenterX = (minX + maxX) / 2;
-                int contentCenterY = (minY + maxY) / 2;
+                float contentCenterX = (minX + maxX) / 2f;
+                float contentCenterY = (minY + maxY) / 2f;
 
-                state.panX = width / 2 - contentCenterX;
-                state.panY = height / 2 - contentCenterY;
+                state.panX = (int) ((width / 2f / state.scale) - contentCenterX);
+                state.panY = (int) ((height / 2f / state.scale) - contentCenterY);
         }
 
         public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
@@ -125,35 +114,36 @@ public class CanvasPanel {
 
                 g.enableScissor(x + 1, y + 1, x + width - 1, y + height - 1);
 
-                int step = 24;
-                int offX = ((state.panX % step) + step) % step;
-                int offY = ((state.panY % step) + step) % step;
-                for (int gx = x + offX; gx < x + width; gx += step)
-                        g.fill(gx, y, gx + 1, y + height, 0x1400E5FF);
-                for (int gy = y + offY; gy < y + height; gy += step)
-                        g.fill(x, gy, x + width, gy + 1, 0x1400E5FF);
+                g.pose().pushPose();
+                g.pose().translate(x, y, 0);
+                g.pose().scale(state.scale, state.scale, 1f);
+                g.pose().translate(state.panX, state.panY, 0);
+
+                float mouseCanvasX = toCanvasX(mouseX);
+                float mouseCanvasY = toCanvasY(mouseY);
 
                 for (Connection c : state.connections) {
                         CanvasNode f = c.getFrom(), t = c.getTo();
-                        int fx = toScreenX(f.getCanvasX() + f.getWidth());
-                        int fy = toScreenY(f.getCanvasY() + f.getHeight() / 2);
-                        int tx = toScreenX(t.getCanvasX());
-                        int ty = toScreenY(t.getCanvasY() + t.getHeight() / 2);
+                        int fx = f.getCanvasX() + f.getWidth();
+                        int fy = f.getCanvasY() + f.getHeight() / 2;
+                        int tx = t.getCanvasX();
+                        int ty = t.getCanvasY() + t.getHeight() / 2;
                         c.render(g, fx, fy, tx, ty);
                 }
 
                 for (CanvasNode n : state.nodes) {
-                        int sx = toScreenX(n.getCanvasX());
-                        int sy = toScreenY(n.getCanvasY());
-                        n.render(g, sx, sy, mouseX, mouseY);
+                        n.render(g, n.getCanvasX(), n.getCanvasY(), (int) mouseCanvasX, (int) mouseCanvasY, false);
                 }
 
+                g.pose().popPose();
                 g.disableScissor();
 
                 GuiRenderUtil.border(g, x, y, x + width, y + height, CultivationTheme.BORDER_CYAN);
 
                 var font = Minecraft.getInstance().font;
                 Component tips = XuanLing.trans(XuanlingLangPro.GUI_STRING, "make_tips");
+                g.drawString(font, Component.literal(String.format("Scale: %d%%", (int) (state.scale * 100))), x + 6,
+                                y + height - 22, CultivationTheme.TEXT_SECONDARY, false);
                 g.drawString(font, tips, x + 6, y + height - 12, CultivationTheme.TEXT_SECONDARY, false);
         }
 
@@ -166,58 +156,119 @@ public class CanvasPanel {
                         return true;
                 }
 
+                if (button == 1 && connectSource != null) {
+                        connectSource.setSelected(false);
+                        connectSource = null;
+                        return true;
+                }
+
                 boolean shift = Screen.hasShiftDown();
                 boolean ctrl = Screen.hasControlDown();
 
+                float cx = toCanvasX(mx);
+                float cy = toCanvasY(my);
+
                 for (int i = state.nodes.size() - 1; i >= 0; i--) {
                         CanvasNode n = state.nodes.get(i);
-                        int sx = toScreenX(n.getCanvasX());
-                        int sy = toScreenY(n.getCanvasY());
-                        if (!n.hitTest(sx, sy, mx, my))
-                                continue;
+                        int nx = n.getCanvasX();
+                        int ny = n.getCanvasY();
 
-                        if (button == 0 && n.hitConfigButton(sx, sy, mx, my)) {
-                                n.triggerConfigClick();
-                                return true;
-                        }
+                        if (n.hitTest(nx, ny, cx, cy)) {
+                                if (button == 0 && n.isGroup()) {
+                                        for (int j = n.children.size() - 1; j >= 0; j--) {
+                                                CanvasNode child = n.children.get(j);
+                                                int childSx = nx + (n.getWidth() - child.getWidth()) / 2;
+                                                int childSy = ny + 22 + getChildYOffset(n, j);
 
-                        if (shift) {
-                                state.nodes.remove(i);
-                                state.connections.removeIf(c -> c.getFrom() == n || c.getTo() == n);
-                                return true;
-                        }
-                        if (ctrl) {
-                                if (connectSource == null) {
-                                        connectSource = n;
-                                        n.setSelected(true);
-                                } else if (connectSource == n) {
-                                        n.setSelected(false);
-                                        connectSource = null;
-                                } else {
-                                        boolean exists = false;
-                                        for (Connection c : state.connections) {
-                                                if ((c.getFrom() == connectSource && c.getTo() == n)
-                                                                || (c.getFrom() == n && c.getTo() == connectSource)) {
-                                                        exists = true;
-                                                        break;
+                                                if (child.hitTest(childSx, childSy, cx, cy)
+                                                                && child.hitConfigButton(childSx, childSy, cx, cy)) {
+                                                        child.triggerConfigClick();
+                                                        return true;
                                                 }
                                         }
-                                        if (!exists)
-                                                state.connections.add(new Connection(connectSource, n, 0xFF4DD0E1));
-                                        connectSource.setSelected(false);
-                                        connectSource = null;
+                                } else if (button == 0 && !n.isGroup()) {
+                                        if (n.hitConfigButton(nx, ny, cx, cy)) {
+                                                n.triggerConfigClick();
+                                                return true;
+                                        }
                                 }
-                                return true;
-                        }
-                        if (button == 0) {
-                                draggingNode = n;
-                                dragOffsetX = (int) mx - sx;
-                                dragOffsetY = (int) my - sy;
+
+                                if (shift) {
+                                        state.nodes.remove(i);
+                                        state.connections.removeIf(c -> c.getFrom() == n || c.getTo() == n);
+                                        if (connectSource == n) {
+                                                n.setSelected(false);
+                                                connectSource = null;
+                                        }
+                                        return true;
+                                }
+
+                                if (ctrl) {
+                                        if (connectSource == null) {
+                                                connectSource = n;
+                                                n.setSelected(true);
+                                        } else {
+                                                if (connectSource != n) {
+                                                        boolean exists = false;
+                                                        for (Connection c : state.connections) {
+                                                                if ((c.getFrom() == connectSource && c.getTo() == n) ||
+                                                                                (c.getFrom() == n && c
+                                                                                                .getTo() == connectSource)) {
+                                                                        exists = true;
+                                                                        break;
+                                                                }
+                                                        }
+                                                        if (!exists) {
+                                                                state.connections.add(new Connection(connectSource, n,
+                                                                                CultivationTheme.TEXT_SECONDARY));
+                                                        }
+                                                }
+                                                connectSource.setSelected(false);
+                                                connectSource = null;
+                                        }
+                                        return true;
+                                }
+
+                                if (button == 0) {
+                                        if (connectSource != null) {
+                                                connectSource.setSelected(false);
+                                                connectSource = null;
+                                        }
+
+                                        if (n.isGroup()) {
+                                                for (int j = n.children.size() - 1; j >= 0; j--) {
+                                                        CanvasNode child = n.children.get(j);
+                                                        int childSx = nx + (n.getWidth() - child.getWidth()) / 2;
+                                                        int childSy = ny + 22 + getChildYOffset(n, j);
+
+                                                        if (child.hitTest(childSx, childSy, cx, cy)) {
+                                                                n.children.remove(j);
+                                                                child.setCanvasPosition(childSx, childSy);
+                                                                state.nodes.add(child);
+
+                                                                draggingNode = child;
+                                                                dragOffsetX = cx - childSx;
+                                                                dragOffsetY = cy - childSy;
+                                                                return true;
+                                                        }
+                                                }
+                                        }
+
+                                        draggingNode = n;
+                                        dragOffsetX = cx - nx;
+                                        dragOffsetY = cy - ny;
+                                        return true;
+                                }
                                 return true;
                         }
                 }
 
                 if (button == 0) {
+                        if (connectSource != null) {
+                                connectSource.setSelected(false);
+                                connectSource = null;
+                        }
+
                         panning = true;
                         panStartMX = (int) mx;
                         panStartMY = (int) my;
@@ -225,19 +276,22 @@ public class CanvasPanel {
                         panStartY = state.panY;
                         return true;
                 }
+
                 return true;
         }
 
         public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
                 if (draggingNode != null && button == 0) {
-                        int newSX = (int) mx - dragOffsetX;
-                        int newSY = (int) my - dragOffsetY;
-                        draggingNode.setCanvasPosition(toCanvasX(newSX), toCanvasY(newSY));
+                        float cx = toCanvasX(mx);
+                        float cy = toCanvasY(my);
+                        draggingNode.setCanvasPosition((int) (cx - dragOffsetX), (int) (cy - dragOffsetY));
                         return true;
                 }
                 if (panning && button == 0) {
-                        state.panX = panStartX + ((int) mx - panStartMX);
-                        state.panY = panStartY + ((int) my - panStartMY);
+                        float panDeltaX = (float) ((mx - panStartMX) / state.scale);
+                        float panDeltaY = (float) ((my - panStartMY) / state.scale);
+                        state.panX = (int) (panStartX + panDeltaX);
+                        state.panY = (int) (panStartY + panDeltaY);
                         return true;
                 }
                 return false;
@@ -245,13 +299,118 @@ public class CanvasPanel {
 
         public boolean mouseReleased(double mx, double my, int button) {
                 if (draggingNode != null) {
+                        if (!contains(mx, my)) {
+                                state.nodes.remove(draggingNode);
+                                state.connections.removeIf(
+                                                c -> c.getFrom() == draggingNode || c.getTo() == draggingNode);
+                        } else {
+                                float cx = toCanvasX(mx);
+                                float cy = toCanvasY(my);
+                                CanvasNode targetGroup = null;
+                                int magnet = 20;
+
+                                for (int i = state.nodes.size() - 1; i >= 0; i--) {
+                                        CanvasNode n = state.nodes.get(i);
+                                        if (n == draggingNode || !n.isGroup())
+                                                continue;
+
+                                        int nx = n.getCanvasX();
+                                        int ny = n.getCanvasY();
+                                        int expandW = n.getWidth() + magnet * 2;
+                                        int expandH = n.getHeight() + magnet * 2;
+
+                                        if (n.hitTest(nx, ny, cx, cy) ||
+                                                        intersects((int) cx - 55, (int) cy - 23, 110, 46, nx - magnet,
+                                                                        ny - magnet, expandW, expandH)) {
+                                                targetGroup = n;
+                                                break;
+                                        }
+                                }
+
+                                if (targetGroup != null && draggingNode.getDef() != null) {
+                                        String groupType = targetGroup.getGroupName();
+                                        String compType = draggingNode.getDef().transType().getString();
+
+                                        if (groupType.equals(compType)) {
+                                                state.nodes.remove(draggingNode);
+                                                draggingNode.setCanvasPosition(0, 0);
+                                                targetGroup.children.add(draggingNode);
+
+                                                for (int i = 0; i < state.connections.size(); i++) {
+                                                        Connection c = state.connections.get(i);
+                                                        CanvasNode newFrom = c.getFrom() == draggingNode ? targetGroup
+                                                                        : c.getFrom();
+                                                        CanvasNode newTo = c.getTo() == draggingNode ? targetGroup
+                                                                        : c.getTo();
+
+                                                        if (newFrom != c.getFrom() || newTo != c.getTo()) {
+                                                                if (newFrom != newTo) {
+                                                                        boolean exists = false;
+                                                                        for (Connection oldC : state.connections) {
+                                                                                if (oldC != c && ((oldC
+                                                                                                .getFrom() == newFrom
+                                                                                                && oldC.getTo() == newTo)
+                                                                                                ||
+                                                                                                (oldC.getFrom() == newTo
+                                                                                                                && oldC.getTo() == newFrom))) {
+                                                                                        exists = true;
+                                                                                        break;
+                                                                                }
+                                                                        }
+                                                                        if (exists) {
+                                                                                state.connections.remove(i);
+                                                                                i--;
+                                                                        } else {
+                                                                                state.connections.set(i, new Connection(
+                                                                                                newFrom, newTo,
+                                                                                                CultivationTheme.TEXT_SECONDARY));
+                                                                        }
+                                                                } else {
+                                                                        state.connections.remove(i);
+                                                                        i--;
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
                         draggingNode = null;
                         return true;
                 }
+
                 if (panning) {
                         panning = false;
                         return true;
                 }
                 return false;
+        }
+
+        public boolean mouseScrolled(double mx, double my, double sx, double sy) {
+                if (!contains(mx, my))
+                        return false;
+
+                float oldScale = state.scale;
+                state.scale = Mth.clamp(state.scale + (float) sy * 0.1f, 0.5f, 2.5f);
+
+                if (state.scale != oldScale) {
+                        float oldCx = (float) ((mx - x) / oldScale) - state.panX;
+                        float oldCy = (float) ((my - y) / oldScale) - state.panY;
+
+                        state.panX = (int) (((mx - x) / state.scale) - oldCx);
+                        state.panY = (int) (((my - y) / state.scale) - oldCy);
+                }
+                return true;
+        }
+
+        private int getChildYOffset(CanvasNode parent, int index) {
+                int offset = 0;
+                for (int i = 0; i < index; i++) {
+                        offset += parent.children.get(i).getHeight() + 5;
+                }
+                return offset;
+        }
+
+        private boolean intersects(int ax, int ay, int aw, int ah, int bx, int by, int bw, int bh) {
+                return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
         }
 }
