@@ -1,4 +1,4 @@
-# XuanLing Cultivation Mod
+# XuanLing
 
 > An immersive cultivation mod developed for Minecraft Forge 1.21.1. It aims to introduce a complete cultivation system into the game, including realm breakthroughs, Qi/Mana systems, a visual custom skill/spell builder, and a highly stylized cultivation UI experience.
 
