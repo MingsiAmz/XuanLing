@@ -22,7 +22,10 @@ public class DataEvent {
                 Player player = event.getEntity();
                 if (!player.hasData(RegisterAttachments.BASIC_DATA)) {
                         BasicData basicData = BasicData.initData();
+                        basicData.setNormalLife(90);
+                        basicData.setSoulLife(90);
                         player.setData(RegisterAttachments.BASIC_DATA, basicData);
+                        
                 }
                 if (!player.hasData(RegisterAttachments.DEFAULT_DATA)) {
                         player.setData(RegisterAttachments.DEFAULT_DATA, new DefaultData());

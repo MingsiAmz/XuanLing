@@ -264,6 +264,11 @@ public class ComponentEditorScreen extends Screen {
                 return false;
         }
 
+        @Override
+        public void onClose() {
+                minecraft.setScreen(new CreateGui());
+        }
+
         private void setupNodeClick(CanvasNode node) {
                 node.setOnConfigClick(() -> {
                         if (node.getDef() == null)

@@ -55,6 +55,10 @@ public class Label implements IGuiComponent {
                 this.text = text;
         }
 
+        public Label(String text) {
+                this.text = Component.literal(text);
+        }
+
         public Label setText(String text) {
                 this.text = Component.literal(text);
                 return this;

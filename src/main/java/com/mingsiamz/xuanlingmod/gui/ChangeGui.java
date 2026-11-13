@@ -40,6 +40,7 @@ public class ChangeGui {
 
         public static Screen cycle(char c) {
                 switch (c) {
+                case '0' -> {index = 0;}
                 case 'n' -> {if (!next()) index = 0;}
                 case 'p' -> {if (!previous()) index = length() - 1;}
                 }

@@ -1,16 +1,23 @@
 package com.mingsiamz.xuanlingmod.gui;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
+import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.util.gui.*;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Justify;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Layouts;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class LevelProgressGui extends Screen {
         private int panelW;
@@ -22,7 +29,7 @@ public class LevelProgressGui extends Screen {
         private CultivationSlider timeSlider;
         private EditBox timeInput;
 
-        private static int MAX_MONTHS = 1000;
+        private static Minecraft minecraft = Minecraft.getInstance();
         private int currentSelectedMonths = 0;
 
         private boolean isSyncing = false;
@@ -44,8 +51,12 @@ public class LevelProgressGui extends Screen {
                 panel.setPosition(px, py);
 
                 int innerW = panelW - CultivationTheme.PADDING * 2;
-
                 int sliderY = py + (int) (panelH * 0.40f);
+
+                Player player = minecraft.player;
+                BasicData basicData = RegisterAttachments.getBasicData(player);
+                int maxMonth = basicData.getNormalLife() > basicData.getSoulLife() ? (int)(basicData.getNormalLife() * 12) : (int)(basicData.getSoulLife() * 12);
+
                 timeSlider = new CultivationSlider(innerW, 10);
                 timeSlider.setPosition(px + CultivationTheme.PADDING, sliderY);
 
@@ -53,7 +64,7 @@ public class LevelProgressGui extends Screen {
                         if (isSyncing)
                                 return;
                         isSyncing = true;
-                        currentSelectedMonths = (int) (val * MAX_MONTHS);
+                        currentSelectedMonths = (int) (val * maxMonth);
                         updateInputBox(currentSelectedMonths);
                         isSyncing = false;
                 });
@@ -77,10 +88,10 @@ public class LevelProgressGui extends Screen {
                                 return;
                         }
                         if (!text.isEmpty()) {
-                                int months = Mth.clamp(Integer.parseInt(text), 0, MAX_MONTHS);
+                               int months = Mth.clamp(Integer.parseInt(text), 0, maxMonth);
                                 currentSelectedMonths = months;
                                 isSyncing = true;
-                                timeSlider.setValue((float) months / MAX_MONTHS);
+                               timeSlider.setValue((float) months / maxMonth);
                                 isSyncing = false;
                         }
                 });
@@ -222,5 +233,10 @@ public class LevelProgressGui extends Screen {
         @Override
         public boolean isPauseScreen() {
                 return false;
+        }
+
+        @Override
+        public void onClose() {
+                minecraft.setScreen(ChangeGui.cycle('0'));
         }
 }

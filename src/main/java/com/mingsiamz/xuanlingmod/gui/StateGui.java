@@ -127,6 +127,7 @@ public class StateGui extends Screen {
 
                 Component make = XuanLing.trans(XuanlingLangPro.GUI_STRING, "make_cultivation_component");
                 Component cultivateTitle = XuanLing.trans(XuanlingLangPro.GUI_STRING, "cultivate_title_btn");
+                Component arcaneMastery = XuanLing.trans(XuanlingLangPro.GUI_STRING, "arcane_mastery");
                 GuiComponentGroup buttonGroup = new GuiComponentGroup()
                                 .setLayout(Layouts.flow(innerW).setSpacing(8).setJustify(Justify.CENTER))
                                 .setFixedWidth(innerW)
@@ -134,9 +135,7 @@ public class StateGui extends Screen {
                                                 .onClick(() -> minecraft.setScreen(new CreateGui())))
                                 .add(new GuiButton(80, 20, cultivateTitle.getString())
                                                 .onClick(() -> minecraft.setScreen(new LevelProgressGui())))
-                                .add(new GuiButton(80, 20, "功法").onClick(() -> {
-                                        // TODO
-                                }));
+                                .add(new GuiButton(80, 20, arcaneMastery.getString()).onClick(() -> minecraft.setScreen(new ArcaneMasteryGui())));
 
                 root = new GuiComponentGroup()
                                 .setLayout(Layouts.column().setSpacing(14))

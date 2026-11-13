@@ -1,2 +1,3 @@
+@echo off
 cls
-gradlew runData --offline
+call gradlew daemon --stop && call gradlew runData --offline

@@ -33,6 +33,8 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "insight", "悟性:%s");
                         this.add(GUI_STRING + "inspiration", "灵感:%s");
                         this.add(GUI_STRING + "mindsense", "神识:%s");
+                        this.add(GUI_STRING + "body_age", "身体年龄:%s");
+                        this.add(GUI_STRING + "mental_age", "心智年龄:%s");
                         this.add(GUI_STRING + "state_title", "道  枢");
                         this.add(GUI_STRING + "nick_name", "道号:%s");
                         this.add(GUI_STRING + "sect", "宗门:%s");
@@ -55,8 +57,7 @@ public class XuanlingLangPro {
                         this.add(MISC_STRING + "entity_nick_name", "无道号");
                         this.add(GUI_STRING + "cultivate_title_btn", "修炼");
                         this.add(GUI_STRING + "level_progress_gui_title", "闭关修炼");
-                        this.add(GUI_STRING + "cultivate_time_year", "%s年%s个月");
-                        this.add(GUI_STRING + "cultivate_time_month", "%s个月");
+                        this.add(GUI_STRING + "cultivate_time_year", "%s岁");
                         this.add(GUI_STRING + "input_time_month", "修炼月数");
                         this.add(GUI_STRING + "start_train", "开始修炼");
                         this.add(GUI_STRING + "refining", "炼化");
@@ -73,8 +74,15 @@ public class XuanlingLangPro {
                         this.add(COMPONEN_STRING + "special", "特殊效果");
                         this.add(COMPONEN_STRING + "NORMAL", "常规");
                         this.add(COMPONEN_STRING + "CONTINUOUS", "持续");
+                        this.add(GUI_STRING + "cultivate_time_month", "%s 月");
                         this.add(GUI_STRING + "this_component_not_select_more", "该组件无法衍化更多");
                         this.add(GUI_STRING + "detail_data_gui_title", "详细数据");
+                        this.add(GUI_STRING + "physical_defense", "体防:%s");
+                        this.add(GUI_STRING + "magic_defense", "法防:%s");
+                        this.add(GUI_STRING + "arcane_mastery", "通玄");
+                        this.add(GUI_STRING + "tongxuan_gui_title", "通玄");
+                        this.add(GUI_STRING + "tongxuan_back", "返回");
+                        this.add(GUI_STRING + "tongxuan_empty_slot", "空");
                 }
         }
 
@@ -96,6 +104,8 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "insight", "Insight:%s");
                         this.add(GUI_STRING + "inspiration", "Inspiration:%s");
                         this.add(GUI_STRING + "mindsense", "Mind Sense:%s");
+                        this.add(GUI_STRING + "body_age", "Body Age:%s");
+                        this.add(GUI_STRING + "mental_age", "Mental Age:%s");
                         this.add(GUI_STRING + "state_title", "State Title");
                         this.add(GUI_STRING + "nick_name", "Nick Name:%s");
                         this.add(GUI_STRING + "sect", "Sect:%s");
@@ -119,12 +129,12 @@ public class XuanlingLangPro {
                         this.add(MISC_STRING + "entity_nick_name", "None NickName");
                         this.add(GUI_STRING + "cultivate_title_btn", "Cultivate");
                         this.add(GUI_STRING + "level_progress_gui_title", "Secluding myself for training");
-                        this.add(GUI_STRING + "cultivate_time_year", "%sYear%sMonth");
-                        this.add(GUI_STRING + "cultivate_time_month", "%sMonth");
+                        this.add(GUI_STRING + "cultivate_time_year", "%sYear");
                         this.add(GUI_STRING + "input_time_month", "training month");
                         this.add(GUI_STRING + "start_train", "Start Train");
                         this.add(GUI_STRING + "refining", "Refining");
-                        this.add(GUI_STRING + "not_use_meditation", "You’re not ready to use meditation because you haven’t learned the basics yet.");
+                        this.add(GUI_STRING + "not_use_meditation",
+                                        "You’re not ready to use meditation because you haven’t learned the basics yet.");
                         this.add(COMPONEN_STRING + "basic", "basic");
                         this.add(COMPONEN_STRING + "PROJECTLE", "PROJECTLE");
                         this.add(COMPONEN_STRING + "AOE", "AOE");
@@ -139,6 +149,13 @@ public class XuanlingLangPro {
                         this.add(COMPONEN_STRING + "CONTINUOUS", "CONTINUOUS");
                         this.add(GUI_STRING + "this_component_not_select_more", "This component not select more");
                         this.add(GUI_STRING + "detail_data_gui_title", "Detail Data");
+                        this.add(GUI_STRING + "cultivate_time_month", "%s months");
+                        this.add(GUI_STRING + "arcane_mastery", "Arcane Mastery");
+                        this.add(GUI_STRING + "tongxuan_gui_title", "TongXuan");
+                        this.add(GUI_STRING + "tongxuan_art_title", "Art Collection");
+                        this.add(GUI_STRING + "tongxuan_spell_title", "Spell Collection");
+                        this.add(GUI_STRING + "tongxuan_back", "Back");
+                        this.add(GUI_STRING + "tongxuan_empty_slot", "Empty");
                 }
         }
 }
