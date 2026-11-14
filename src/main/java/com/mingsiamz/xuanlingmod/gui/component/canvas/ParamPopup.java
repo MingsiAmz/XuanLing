@@ -1,6 +1,8 @@
 package com.mingsiamz.xuanlingmod.gui.component.canvas;
 
 import com.mingsiamz.xuanlingmod.api.IComponent;
+import com.mingsiamz.xuanlingmod.type.ImpComponent;
+import com.mingsiamz.xuanlingmod.type.spell.ParamType;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 import net.minecraft.client.Minecraft;
@@ -11,26 +13,26 @@ import java.util.List;
 import java.util.Map;
 
 public class ParamPopup {
-        private final IComponent<?> target;
+        private final ImpComponent target;
         private final int x, y;
         private final int width = 160;
         private final int height;
 
         private final List<RowData> rows = new ArrayList<>();
 
-        public ParamPopup(IComponent<?> target, int x, int y) {
+        public ParamPopup(ImpComponent target, int x, int y) {
                 this.target = target;
                 this.x = x;
                 this.y = y;
 
-                Map<String, Object> params = target != null ? target.getParams() : null;
+                Map<ParamType, Object> params = target != null ? target.getParams() : null;
                 int rowCount = params != null ? params.size() : 0;
 
                 this.height = 30 + rowCount * 22 + 10;
 
                 if (params != null) {
                         int cy = this.y + 25;
-                        for (Map.Entry<String, Object> entry : params.entrySet()) {
+                        for (Map.Entry<ParamType, Object> entry : params.entrySet()) {
                                 rows.add(new RowData(entry.getKey(), cy));
                                 cy += 22;
                         }
@@ -70,12 +72,12 @@ public class ParamPopup {
                                 false);
                 g.fill(x + 6, y + 18, x + width - 6, y + 19, 0x40FFFFFF);
 
-                Map<String, Object> params = target.getParams();
+                Map<ParamType, Object> params = target.getParams();
                 if (params == null)
                         return;
 
                 for (RowData row : rows) {
-                        g.drawString(font, row.key, x + 8, row.y + 4, CultivationTheme.TEXT_PRIMARY, false);
+                        g.drawString(font, row.key.name, x + 8, row.y + 4, CultivationTheme.TEXT_PRIMARY, false);
 
                         int minusX = x + width - 65;
                         boolean hoverMinus = mouseX >= minusX && mouseX < minusX + 12 && mouseY >= row.y
@@ -101,7 +103,7 @@ public class ParamPopup {
                 if (!isMouseOver(mx, my))
                         return false;
 
-                Map<String, Object> params = target.getParams();
+                Map<ParamType, Object> params = target.getParams();
                 if (params == null)
                         return true;
 
@@ -134,10 +136,10 @@ public class ParamPopup {
         }
 
         private static class RowData {
-                String key;
+                ParamType key;
                 int y;
 
-                public RowData(String key, int y) {
+                public RowData(ParamType key, int y) {
                         this.key = key;
                         this.y = y;
                 }

@@ -4,6 +4,10 @@ import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.api.IComponent;
 import com.mingsiamz.xuanlingmod.gui.component.DragPayload;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
+import com.mingsiamz.xuanlingmod.type.ImpComponent;
+import com.mingsiamz.xuanlingmod.type.spell.ActionType;
+import com.mingsiamz.xuanlingmod.type.spell.BasicType;
+import com.mingsiamz.xuanlingmod.type.spell.SpecialType;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 import net.minecraft.client.Minecraft;
@@ -41,23 +45,36 @@ public class PalettePanel {
                 this.dragStart = l;
         }
 
-        public void loadComponents(List<IComponent<?>> cmps) {
+        public void loadComponents(List<ImpComponent> cmps) {
                 categories.clear();
                 scrollY = 0;
                 if (cmps == null || cmps.isEmpty())
                         return;
 
-                Map<Component, List<IComponent<?>>> byCat = new LinkedHashMap<>();
-                for (IComponent<?> def : cmps) {
-                        byCat.computeIfAbsent(def.transType(), k -> new ArrayList<>()).add(def);
+                Map<Component, List<ImpComponent>> byCat = new LinkedHashMap<>();
+                for (ImpComponent def : cmps) {
+                        String packageName = def.getClass().getPackageName();
+                        if (packageName.contains("basic"))
+                                byCat.computeIfAbsent(BasicType.TYPE, k -> new ArrayList<>()).add(def);
+                        else if (packageName.contains("special"))
+                                byCat.computeIfAbsent(SpecialType.TYPE, k -> new ArrayList<>()).add(def);
+                        else if (packageName.contains("action"))
+                                byCat.computeIfAbsent(ActionType.TYPE, k -> new ArrayList<>()).add(def);
+
+                        // if (def instanceof BasicType)
+                        // byCat.computeIfAbsent(BasicType.TYPE, k -> new ArrayList<>()).add(def);
+                        // else if (def instanceof ActionType)
+                        // byCat.computeIfAbsent(ActionType.TYPE, k -> new ArrayList<>()).add(def);
+                        // else if (def instanceof SpecialType)
+                        // byCat.computeIfAbsent(SpecialType.TYPE, k -> new ArrayList<>()).add(def);
                 }
 
                 int itemWidth = width - 12 - (SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2);
 
-                for (Map.Entry<Component, List<IComponent<?>>> entry : byCat.entrySet()) {
+                for (Map.Entry<Component, List<ImpComponent>> entry : byCat.entrySet()) {
                         CollapsibleCategory cat = new CollapsibleCategory(entry.getKey(), itemWidth);
                         cat.setOnCategoryDrag(dragStart);
-                        for (IComponent<?> def : entry.getValue()) {
+                        for (ImpComponent def : entry.getValue()) {
                                 cat.addItem(new PaletteItem(def, itemWidth, 18)
                                                 .setOnDragStart((d, mx, my) -> dragStart.accept(
                                                                 new DragPayload(DragPayload.Type.COMPONENT,

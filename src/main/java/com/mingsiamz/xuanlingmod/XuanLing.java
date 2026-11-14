@@ -4,8 +4,8 @@ import java.util.Random;
 
 import org.slf4j.Logger;
 
-import com.mingsiamz.xuanlingmod.data.DataLoader;
-import com.mingsiamz.xuanlingmod.data.DataManager;
+import com.mingsiamz.xuanlingmod.data.controller.DataLoader;
+import com.mingsiamz.xuanlingmod.data.controller.DataManager;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;

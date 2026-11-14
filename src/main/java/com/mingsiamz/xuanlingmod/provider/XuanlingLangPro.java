@@ -2,7 +2,6 @@ package com.mingsiamz.xuanlingmod.provider;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicRealm;
-import com.mingsiamz.xuanlingmod.type.spell.BasicType;
 
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
@@ -33,8 +32,8 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "insight", "悟性:%s");
                         this.add(GUI_STRING + "inspiration", "灵感:%s");
                         this.add(GUI_STRING + "mindsense", "神识:%s");
-                        this.add(GUI_STRING + "body_age", "身体年龄:%s");
-                        this.add(GUI_STRING + "mental_age", "心智年龄:%s");
+                        this.add(GUI_STRING + "body_age", "身龄:%s");
+                        this.add(GUI_STRING + "mental_age", "心龄:%s");
                         this.add(GUI_STRING + "state_title", "道  枢");
                         this.add(GUI_STRING + "nick_name", "道号:%s");
                         this.add(GUI_STRING + "sect", "宗门:%s");
@@ -57,32 +56,35 @@ public class XuanlingLangPro {
                         this.add(MISC_STRING + "entity_nick_name", "无道号");
                         this.add(GUI_STRING + "cultivate_title_btn", "修炼");
                         this.add(GUI_STRING + "level_progress_gui_title", "闭关修炼");
-                        this.add(GUI_STRING + "cultivate_time_year", "%s岁");
+                        this.add(GUI_STRING + "cultivate_time_year", "%s年%s月");
+                        this.add(GUI_STRING + "player_time_year", "%s岁");
                         this.add(GUI_STRING + "input_time_month", "修炼月数");
                         this.add(GUI_STRING + "start_train", "开始修炼");
                         this.add(GUI_STRING + "refining", "炼化");
                         this.add(GUI_STRING + "not_use_meditation", "无法打坐，你并未入门");
-                        this.add(COMPONEN_STRING + "basic", "基础");
-                        this.add(COMPONEN_STRING + "PROJECTLE", "弹射物");
-                        this.add(COMPONEN_STRING + "AOE", "AOE");
-                        this.add(COMPONEN_STRING + "SELF", "自身");
+                        this.add(COMPONEN_STRING + "basic_type", "基础");
+                        this.add(COMPONEN_STRING + "projectle", "弹射物");
+                        this.add(COMPONEN_STRING + "aoe", "AOE");
+                        this.add(COMPONEN_STRING + "self", "自身");
                         this.add(COMPONEN_STRING + "action", "触发效果");
-                        this.add(COMPONEN_STRING + "DAMAGE", "伤害");
-                        this.add(COMPONEN_STRING + "RECOVER_HEALTH", "生命恢复");
-                        this.add(COMPONEN_STRING + "RECOVER_P_ENERGY", "主能量恢复");
-                        this.add(COMPONEN_STRING + "RECOVER_C_ENERGY", "子能量恢复");
+                        this.add(COMPONEN_STRING + "damage", "伤害");
+                        this.add(COMPONEN_STRING + "recover_health", "生命恢复");
+                        this.add(COMPONEN_STRING + "recover_p_energy", "主能量恢复");
+                        this.add(COMPONEN_STRING + "recover_c_energy", "子能量恢复");
                         this.add(COMPONEN_STRING + "special", "特殊效果");
-                        this.add(COMPONEN_STRING + "NORMAL", "常规");
-                        this.add(COMPONEN_STRING + "CONTINUOUS", "持续");
+                        this.add(COMPONEN_STRING + "normal", "常规");
+                        this.add(COMPONEN_STRING + "continuos", "持续");
                         this.add(GUI_STRING + "cultivate_time_month", "%s 月");
                         this.add(GUI_STRING + "this_component_not_select_more", "该组件无法衍化更多");
                         this.add(GUI_STRING + "detail_data_gui_title", "详细数据");
                         this.add(GUI_STRING + "physical_defense", "体防:%s");
                         this.add(GUI_STRING + "magic_defense", "法防:%s");
                         this.add(GUI_STRING + "arcane_mastery", "通玄");
-                        this.add(GUI_STRING + "tongxuan_gui_title", "通玄");
-                        this.add(GUI_STRING + "tongxuan_back", "返回");
-                        this.add(GUI_STRING + "tongxuan_empty_slot", "空");
+                        this.add(GUI_STRING + "arcane_mastery_gui_title", "通玄");
+                        this.add(GUI_STRING + "arcane_mastery_back", "返回");
+                        this.add(GUI_STRING + "arcane_mastery_art_title", "功法");
+                        this.add(GUI_STRING + "arcane_mastery_spell_title", "神通");
+                        this.add(GUI_STRING + "arcane_mastery_empty_slot", "空");
                 }
         }
 
@@ -135,27 +137,27 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "refining", "Refining");
                         this.add(GUI_STRING + "not_use_meditation",
                                         "You’re not ready to use meditation because you haven’t learned the basics yet.");
-                        this.add(COMPONEN_STRING + "basic", "basic");
-                        this.add(COMPONEN_STRING + "PROJECTLE", "PROJECTLE");
-                        this.add(COMPONEN_STRING + "AOE", "AOE");
-                        this.add(COMPONEN_STRING + "SELF", "SELF");
+                        this.add(COMPONEN_STRING + "basic_type", "basic");
+                        this.add(COMPONEN_STRING + "projectle", "Projectle");
+                        this.add(COMPONEN_STRING + "aoe", "Aoe");
+                        this.add(COMPONEN_STRING + "self", "Self");
                         this.add(COMPONEN_STRING + "action", "action");
-                        this.add(COMPONEN_STRING + "DAMAGE", "DAMAGE");
-                        this.add(COMPONEN_STRING + "RECOVER_HEALTH", "HEALTH");
-                        this.add(COMPONEN_STRING + "RECOVER_P_ENERGY", "ENERGY");
-                        this.add(COMPONEN_STRING + "RECOVER_C_ENERGY", "ENERGY");
+                        this.add(COMPONEN_STRING + "damage", "Damage");
+                        this.add(COMPONEN_STRING + "recover_health", "Health");
+                        this.add(COMPONEN_STRING + "recover_p_energy", "Parrent Energy");
+                        this.add(COMPONEN_STRING + "recover_c_energy", "Children Energy");
                         this.add(COMPONEN_STRING + "special", "special");
-                        this.add(COMPONEN_STRING + "NORMAL", "NORMAL");
-                        this.add(COMPONEN_STRING + "CONTINUOUS", "CONTINUOUS");
+                        this.add(COMPONEN_STRING + "normal", "Normal");
+                        this.add(COMPONEN_STRING + "continuous", "Continuous");
                         this.add(GUI_STRING + "this_component_not_select_more", "This component not select more");
                         this.add(GUI_STRING + "detail_data_gui_title", "Detail Data");
                         this.add(GUI_STRING + "cultivate_time_month", "%s months");
                         this.add(GUI_STRING + "arcane_mastery", "Arcane Mastery");
-                        this.add(GUI_STRING + "tongxuan_gui_title", "TongXuan");
-                        this.add(GUI_STRING + "tongxuan_art_title", "Art Collection");
-                        this.add(GUI_STRING + "tongxuan_spell_title", "Spell Collection");
-                        this.add(GUI_STRING + "tongxuan_back", "Back");
-                        this.add(GUI_STRING + "tongxuan_empty_slot", "Empty");
+                        this.add(GUI_STRING + "arcane_mastery_gui_title", "Arcane_Mastery");
+                        this.add(GUI_STRING + "arcane_mastery_art_title", "Art Collection");
+                        this.add(GUI_STRING + "arcane_mastery_spell_title", "Spell Collection");
+                        this.add(GUI_STRING + "arcane_mastery_back", "Back");
+                        this.add(GUI_STRING + "arcane_mastery_empty_slot", "Empty");
                 }
         }
 }

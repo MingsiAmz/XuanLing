@@ -7,11 +7,10 @@ import java.util.UUID;
 
 import com.google.common.reflect.TypeToken;
 import com.mingsiamz.xuanlingmod.Config;
-import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy;
 import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Type;
-
-import net.minecraft.world.entity.LivingEntity;
+import com.mingsiamz.xuanlingmod.data.controller.DataManager;
+import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
 public class BasicEnergy {
         private static HashMap<String, ComponentEnergy> energyMap = new LinkedHashMap<>();

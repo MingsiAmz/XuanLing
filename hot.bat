@@ -1,5 +1,5 @@
 @echo off
-call runData.bat
+call gradlew daemon --stop
 cls
 rem Auto hot-reload: launches the client, then starts a Gradle compile watcher.
 rem Save any .java file -> Gradle recompiles automatically -> Remold swaps it in.

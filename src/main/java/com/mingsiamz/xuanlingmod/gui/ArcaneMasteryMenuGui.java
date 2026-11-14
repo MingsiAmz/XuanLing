@@ -49,7 +49,7 @@ public class ArcaneMasteryMenuGui extends Screen {
         private List<ArtSlot> slots;
 
         public ArcaneMasteryMenuGui(XuanLingTypeEnum type) {
-                super(Component.literal("tongxuan_menu_gui"));
+                super(Component.literal("arcane_mastery_menu_gui"));
                 this.type = type;
         }
 
@@ -76,7 +76,7 @@ public class ArcaneMasteryMenuGui extends Screen {
 
                 slots = buildHardcodedSlots();
 
-                Component backComp = XuanLing.trans(XuanlingLangPro.GUI_STRING, "tongxuan_back");
+                Component backComp = XuanLing.trans(XuanlingLangPro.GUI_STRING, "arcane_mastery_back");
                 backButton = new GuiButton(60, 20, backComp.getString())
                                 .onClick(() -> minecraft.setScreen(new ArcaneMasteryGui()));
 
@@ -155,7 +155,7 @@ public class ArcaneMasteryMenuGui extends Screen {
                 panel.render(g, mouseX, mouseY, partialTick);
 
                 int cx = panel.getX() + this.panelW / 2;
-                String titleKey = (this.type == XuanLingTypeEnum.ART) ? "tongxuan_art_title" : "tongxuan_spell_title";
+                String titleKey = (this.type == XuanLingTypeEnum.ART) ? "arcane_mastery_art_title" : "arcane_mastery_spell_title";
                 Component title = XuanLing.trans(XuanlingLangPro.GUI_STRING, titleKey);
                 g.drawString(font, title, cx - font.width(title) / 2,
                                 panel.getY() + (int) (this.panelH * 0.06f), CultivationTheme.BORDER_GOLD, false);
@@ -364,7 +364,7 @@ public class ArcaneMasteryMenuGui extends Screen {
                                                         CultivationTheme.TEXT_PRIMARY, false);
                                 }
                         } else {
-                                Component empty = XuanLing.trans(XuanlingLangPro.GUI_STRING, "tongxuan_empty_slot");
+                                Component empty = XuanLing.trans(XuanlingLangPro.GUI_STRING, "arcane_mastery_empty_slot");
                                 int textX = x + (width - font.width(empty)) / 2;
                                 g.drawString(font, empty, textX, y + height / 2 - 4, CultivationTheme.TEXT_SECONDARY,
                                                 false);

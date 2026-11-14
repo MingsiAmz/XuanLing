@@ -1,25 +1,28 @@
 package com.mingsiamz.xuanlingmod.gui.component.palette;
 
-import com.mingsiamz.xuanlingmod.api.IComponent;
+import com.mingsiamz.xuanlingmod.type.ImpComponent;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
 
 public class PaletteItem {
-        private final IComponent<?> def;
+        // private final IComponent<?> def;
+        private ImpComponent def;
         private int x, y;
         private final int width, height;
 
         private DragStart onDragStart;
 
-        public PaletteItem(IComponent<?> def, int width, int height) {
+        // public PaletteItem(IComponent<?> def, int width, int height) {
+        public PaletteItem(ImpComponent def, int width, int height) {
                 this.def = def;
                 this.width = width;
                 this.height = height;
         }
 
-        public IComponent<?> getDef() {
+        // public IComponent<?> getDef() {
+        public Object getDef() {
                 return def;
         }
 
@@ -77,6 +80,7 @@ public class PaletteItem {
 
         @FunctionalInterface
         public interface DragStart {
-                void start(IComponent<?> def, int mouseX, int mouseY);
+                // void start(IComponent<?> def, int mouseX, int mouseY);
+                void start(ImpComponent def, int mouseX, int mouseY);
         }
 }

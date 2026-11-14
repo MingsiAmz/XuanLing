@@ -27,7 +27,7 @@ public class ArcaneMasteryGui extends Screen {
         private GuiComponentGroup root;
 
         public ArcaneMasteryGui() {
-                super(Component.literal("tongxuan_gui"));
+                super(Component.literal("arcane_mastery_gui"));
         }
 
         @Override
@@ -89,7 +89,7 @@ public class ArcaneMasteryGui extends Screen {
                 panel.render(g, mouseX, mouseY, partialTick);
 
                 int cx = panel.getX() + this.panelW / 2;
-                Component title = XuanLing.trans(XuanlingLangPro.GUI_STRING, "tongxuan_gui_title");
+                Component title = XuanLing.trans(XuanlingLangPro.GUI_STRING, "arcane_mastery_gui_title");
                 g.drawString(font, title, cx - font.width(title) / 2,
                                 panel.getY() + (int) (this.panelH * 0.10f), CultivationTheme.BORDER_GOLD, false);
 

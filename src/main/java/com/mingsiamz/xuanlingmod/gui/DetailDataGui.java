@@ -11,6 +11,7 @@ import com.mingsiamz.xuanlingmod.util.gui.CultivationPanel;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiComponentGroup;
 import com.mingsiamz.xuanlingmod.util.gui.Label;
+import com.mingsiamz.xuanlingmod.util.gui.Label.Align;
 import com.mingsiamz.xuanlingmod.util.gui.SectionDivider;
 import com.mingsiamz.xuanlingmod.util.gui.StateBar;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Justify;
@@ -35,6 +36,7 @@ public class DetailDataGui extends Screen {
         private GuiButton rightButton;
         private StateBar progressBar;
         private Label realmLabel;
+        private Component realmText;
 
         public DetailDataGui() {
                 super(Component.literal("detail_data_gui"));
@@ -62,10 +64,8 @@ public class DetailDataGui extends Screen {
                                 ? RegisterAttachments.getDefaultData(minecraft.player)
                                 : null;
 
-                if (basicData == null)
-                        basicData = new BasicData();
-                if (defaultData == null)
-                        defaultData = DefaultData.init();
+                if (basicData == null) basicData = new BasicData();
+                if (defaultData == null) defaultData = DefaultData.init();
 
                 double bodyAge = BASE_AGE + (BASE_NORMAL_LIFE - basicData.getNormalLife());
                 double mentalAge = BASE_AGE + (BASE_SOUL_LIFE - basicData.getSoulLife());
@@ -80,23 +80,22 @@ public class DetailDataGui extends Screen {
                 GuiComponentGroup rightCol = new GuiComponentGroup().setLayout(Layouts.column().setSpacing(5));
 
                 leftCol.add(new Label("normallife", (int) basicData.getNormalLife()).setWidth(140));
-                leftCol.add(new Label("soullife", (int) basicData.getSoulLife()).setWidth(140));
-                leftCol.add(new Label("body_age", bodyAgeText.getString()).setWidth(140));
-                leftCol.add(new Label("mental_age", mentalAgeText.getString()).setWidth(140));
-                leftCol.add(new Label("movespeedmof", String.format("%.2f", basicData.getMoveSpeedMof()))
-                                .setWidth(140));
-                leftCol.add(new Label("flyspeedmof", String.format("%.2f", basicData.getFlySpeedMof())).setWidth(140));
-                leftCol.add(new Label("physical_defense", String.format("%.1f", defaultData.getPhysicalDefense()))
-                                .setWidth(140));
+                rightCol.add(new Label("soullife", (int) basicData.getSoulLife()).setWidth(140));
 
-                rightCol.add(new Label("lucky", (int) basicData.getLucky()).setWidth(140));
+                leftCol.add(new Label("body_age", bodyAgeText.getString()).setWidth(140));
+                rightCol.add(new Label("mental_age", mentalAgeText.getString()).setWidth(140));
+
+                leftCol.add(new Label("movespeedmof", String.format("%.2f", basicData.getMoveSpeedMof())).setWidth(140));
+                rightCol.add(new Label("flyspeedmof", String.format("%.2f", basicData.getFlySpeedMof())).setWidth(140));
+
+                leftCol.add(new Label("physical_defense", String.format("%.1f", defaultData.getPhysicalDefense())).setWidth(140));
+                rightCol.add(new Label("magic_defense", String.format("%.1f", defaultData.getMagicDefense())).setWidth(140));
+
+                leftCol.add(new Label("lucky", (int) basicData.getLucky()).setWidth(140));
                 rightCol.add(new Label("charm", (int) basicData.getCharm()).setWidth(140));
-                rightCol.add(new Label("tpao", (int) basicData.getTPAO()).setWidth(140));
-                rightCol.add(new Label("insight", (int) basicData.getInsight()).setWidth(140));
-                rightCol.add(new Label("inspiration", (int) basicData.getInspiration()).setWidth(140));
+
+                leftCol.add(new Label("tpao", (int) basicData.getTPAO()).setWidth(140));
                 rightCol.add(new Label("mindsense", (int) basicData.getMindSense()).setWidth(140));
-                rightCol.add(new Label("magic_defense", String.format("%.1f", defaultData.getMagicDefense()))
-                                .setWidth(140));
 
                 statsGroup.add(leftCol);
                 statsGroup.add(rightCol);
@@ -104,9 +103,13 @@ public class DetailDataGui extends Screen {
                 Component realm = XuanLing.trans(XuanlingLangPro.GUI_STRING, "realm");
                 String curRealm = BasicRealm.getRealm(minecraft.player.getUUID(), defaultData.getRealmType(),
                                 defaultData.getRealmLevel()).getName();
-                Component text = Component.literal(realm.getString() + Component.translatable(curRealm).getString());
-                realmLabel = new Label(text).setWidth(140).setColor(CultivationTheme.TEXT_SECONDARY);
-                realmLabel.setPosition(PANEL_W / 2 + font.width(text) + 10, (int) (PANEL_H / 1.4));
+                
+                realmText = Component.literal(realm.getString() + Component.translatable(curRealm).getString());
+                
+                realmLabel = new Label(realmText)
+                                .setWidth(innerW)
+                                .setAlign(Align.CENTER)
+                                .setColor(CultivationTheme.TEXT_GOLD);
 
                 root = new GuiComponentGroup()
                                 .setLayout(Layouts.column().setSpacing(8))
@@ -135,17 +138,15 @@ public class DetailDataGui extends Screen {
         }
 
         private Component formatAge(double age) {
-                if (age < 0)
-                        age = 0;
+                if (age < 0) age = 0;
                 int years = (int) Math.floor(age);
                 int months = (int) Math.round((age - years) * 12.0);
                 if (months >= 12) {
                         years += 1;
                         months -= 12;
                 }
-                if (months < 0)
-                        months = 0;
-                return XuanLing.trans(XuanlingLangPro.GUI_STRING, "cultivate_time_year", years);
+                if (months < 0) months = 0;
+                return XuanLing.trans(XuanlingLangPro.GUI_STRING, "player_time_year", years);
         }
 
         @Override
@@ -157,25 +158,24 @@ public class DetailDataGui extends Screen {
                 int cx = panel.getX() + PANEL_W / 2;
                 int inX = panel.getX() + CultivationTheme.PADDING;
                 Component title = XuanLing.trans(XuanlingLangPro.GUI_STRING, "detail_data_gui_title");
-                g.drawString(font, title, cx - font.width(title) / 2, panel.getY() + 14, CultivationTheme.BORDER_GOLD,
-                                false);
+                g.drawString(font, title, cx - font.width(title) / 2, panel.getY() + 14, CultivationTheme.BORDER_GOLD, false);
 
-                if (minecraft != null && minecraft.player != null
-                                && minecraft.player.hasData(RegisterAttachments.BASIC_DATA)) {
+                if (minecraft != null && minecraft.player != null && minecraft.player.hasData(RegisterAttachments.BASIC_DATA)) {
                         BasicData basicData = RegisterAttachments.getBasicData(minecraft.player);
                         int idY = panel.getY() + 34;
-                        Component nickName = XuanLing.trans(XuanlingLangPro.GUI_STRING, "nick_name",
-                                        basicData.getNickName());
+                        Component nickName = XuanLing.trans(XuanlingLangPro.GUI_STRING, "nick_name", basicData.getNickName());
                         Component sect = XuanLing.trans(XuanlingLangPro.GUI_STRING, "sect", basicData.getSect());
-                        g.drawString(font, nickName, inX + font.width(nickName), idY, CultivationTheme.TEXT_GOLD,
-                                        false);
-                        g.drawString(font, sect, inX + 150 + font.width(sect), idY, CultivationTheme.TEXT_GOLD,
-                                        false);
+                        g.drawString(font, nickName, inX + font.width(nickName), idY, CultivationTheme.TEXT_GOLD, false);
+                        g.drawString(font, sect, inX + 150 + font.width(sect), idY, CultivationTheme.TEXT_GOLD, false);
                 }
 
                 root.render(g, mouseX, mouseY, partialTick);
                 StateGui.renderSideBtn(g, mouseX, mouseY, partialTick);
+
+                int realmY = progressBar.getY() - 26; 
+                realmLabel.setPosition(inX, realmY);
                 realmLabel.render(g, mouseX, mouseY, partialTick);
+
                 progressBar.render(g, mouseX, mouseY, partialTick);
         }
 
@@ -185,5 +185,4 @@ public class DetailDataGui extends Screen {
                         return true;
                 return super.mouseClicked(mouseX, mouseY, button);
         }
-
 }

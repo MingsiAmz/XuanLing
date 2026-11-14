@@ -1,9 +1,4 @@
-package com.mingsiamz.xuanlingmod.data;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.mingsiamz.xuanlingmod.XuanLing;
-import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
+package com.mingsiamz.xuanlingmod.data.controller;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -13,6 +8,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.data.BasicEnergy;
+import com.mingsiamz.xuanlingmod.data.BasicRealm;
+import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
 public final class DataManager {
 

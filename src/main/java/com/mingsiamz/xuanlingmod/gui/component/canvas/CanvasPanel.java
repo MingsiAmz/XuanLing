@@ -329,7 +329,7 @@ public class CanvasPanel {
 
                                 if (targetGroup != null && draggingNode.getDef() != null) {
                                         String groupType = targetGroup.getGroupName();
-                                        String compType = draggingNode.getDef().transType().getString();
+                                        String compType = draggingNode.getDef().trans().getString();
 
                                         if (groupType.equals(compType)) {
                                                 state.nodes.remove(draggingNode);

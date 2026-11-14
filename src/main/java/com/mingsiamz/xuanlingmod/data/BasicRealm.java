@@ -7,14 +7,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.google.common.reflect.TypeToken;
-import com.mingsiamz.xuanlingmod.XuanLing;
-import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.data.component.ComponentRealm;
-import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
-import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
-
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.LivingEntity;
+import com.mingsiamz.xuanlingmod.data.controller.DataManager;
+import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
 public class BasicRealm {
         private static HashMap<Integer, ComponentRealm> maps = new LinkedHashMap<>();
@@ -89,8 +84,7 @@ public class BasicRealm {
         }
 
         public static ComponentRealm getRealm(UUID uuid, String name, int level) {
-                Type type = new TypeToken<LinkedHashMap<Integer, ComponentRealm>>() {
-                }.getType();
+                Type type = new TypeToken<LinkedHashMap<Integer, ComponentRealm>>() {}.getType();
                 LinkedHashMap<Integer, ComponentRealm> data = null;
                 if (name.equals("normal")) {
                         data = DataManager.loadData(type, XuanLingTypeEnum.REALM, "000", name);

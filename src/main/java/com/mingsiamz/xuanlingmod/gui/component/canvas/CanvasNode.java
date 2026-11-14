@@ -3,16 +3,17 @@ package com.mingsiamz.xuanlingmod.gui.component.canvas;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mingsiamz.xuanlingmod.api.IComponent;
+import com.mingsiamz.xuanlingmod.type.ImpComponent;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 public class CanvasNode {
-        private final IComponent<?> def;
+        private final ImpComponent def;
         private final String groupName;
         private int canvasX, canvasY;
         private boolean selected;
@@ -27,7 +28,7 @@ public class CanvasNode {
                 this.canvasY = y;
         }
 
-        public CanvasNode(IComponent<?> def, int x, int y) {
+        public CanvasNode(ImpComponent def, int x, int y) {
                 this.def = def;
                 this.groupName = null;
                 this.canvasX = x;
@@ -38,7 +39,7 @@ public class CanvasNode {
                 return groupName != null;
         }
 
-        public IComponent<?> getDef() {
+        public ImpComponent getDef() {
                 return def;
         }
 

@@ -1,4 +1,4 @@
-package com.mingsiamz.xuanlingmod.data;
+package com.mingsiamz.xuanlingmod.data.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
