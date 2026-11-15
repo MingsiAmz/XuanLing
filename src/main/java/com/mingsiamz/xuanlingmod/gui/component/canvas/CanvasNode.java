@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mingsiamz.xuanlingmod.type.ImpComponent;
+import com.mingsiamz.xuanlingmod.type.spell.ActionType;
+import com.mingsiamz.xuanlingmod.type.spell.BasicType;
+import com.mingsiamz.xuanlingmod.type.spell.SpecialType;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 
@@ -14,7 +17,7 @@ import net.minecraft.network.chat.Component;
 
 public class CanvasNode {
         private final ImpComponent def;
-        private final String groupName;
+        private String groupName;
         private int canvasX, canvasY;
         private boolean selected;
         private Runnable onConfigClick;
@@ -167,6 +170,28 @@ public class CanvasNode {
         }
 
         public String getGroupName() {
-                return groupName;
+                return this.groupName;
+        }
+
+        public void setGroupName(String groupName) {
+                this.groupName = groupName;
+        }
+
+        public static boolean canJoinGroup(CanvasNode group, ImpComponent component) {
+                if (group == null || component == null || !group.isGroup())
+                        return false;
+                String key = component.type();
+                String name = group.getGroupName();
+                return name.equals(key) || name.equals(categoryDisplayName(key));
+        }
+
+        public static String categoryDisplayName(String groupKey) {
+                if (BasicType.GROUP.equals(groupKey))
+                        return BasicType.TYPE.getString();
+                if (ActionType.GROUP.equals(groupKey))
+                        return ActionType.TYPE.getString();
+                if (SpecialType.GROUP.equals(groupKey))
+                        return SpecialType.TYPE.getString();
+                return groupKey;
         }
 }

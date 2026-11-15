@@ -10,12 +10,14 @@ import com.mingsiamz.xuanlingmod.type.spell.ParamType;
 import net.minecraft.network.chat.Component;
 
 public abstract class ImpComponent implements IComponent<ImpComponent> {
+        protected String name;
         protected String type;
         protected float proficiency;
         protected ConcurrentHashMap<ParamType, Object> params = new ConcurrentHashMap<>();
 
-        protected ImpComponent(String type, float proficiency) {
+        protected ImpComponent(String type, String name, float proficiency) {
                 this.type = type;
+                this.name = name;
                 this.proficiency = proficiency;
         }
 
@@ -26,12 +28,12 @@ public abstract class ImpComponent implements IComponent<ImpComponent> {
 
         @Override
         public String name() {
-                return this.type;
+                return this.name;
         }
 
         @Override
         public Component trans() {
-                return XuanLing.trans(XuanlingLangPro.COMPONEN_STRING, this.type);
+                return XuanLing.trans(XuanlingLangPro.COMPONEN_STRING, this.name);
         }
 
         @Override

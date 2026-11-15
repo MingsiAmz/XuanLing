@@ -5,12 +5,12 @@ import com.mingsiamz.xuanlingmod.type.spell.ActionType;
 
 public class RecoverPE extends ImpComponent {
 
-        protected RecoverPE(String type, float proficiency) {
-                super(type, proficiency);
+        protected RecoverPE(String type, String name, float proficiency) {
+                super(type, name, proficiency);
         }
 
         public RecoverPE() {
-                this(ActionType.RECOVER_P_ENERGY.name, 0);
+                this(ActionType.GROUP, ActionType.RECOVER_C_ENERGY.name, 0);
         }
 
         @Override

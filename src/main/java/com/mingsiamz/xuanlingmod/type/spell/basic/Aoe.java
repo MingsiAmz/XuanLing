@@ -5,12 +5,12 @@ import com.mingsiamz.xuanlingmod.type.spell.BasicType;
 
 public class Aoe extends ImpComponent {
 
-        protected Aoe(String type, float proficiency) {
-                super(type, proficiency);
+        protected Aoe(String type, String name, float proficiency) {
+                super(type, name, proficiency);
         }
 
         public Aoe() {
-                this(BasicType.AOE.name, 0);
+                this(BasicType.GROUP, BasicType.AOE.name, 0);
         }
 
         @Override

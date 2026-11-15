@@ -1,5 +1,7 @@
 package com.mingsiamz.xuanlingmod;
 
+import java.util.function.Supplier;
+
 import com.mingsiamz.xuanlingmod.animations.player.AnmMeditation;
 import com.mingsiamz.xuanlingmod.gui.StateGui;
 import com.mingsiamz.xuanlingmod.network.MeditationPacket;
@@ -52,10 +54,14 @@ public class XuanLingClient {
 
         @SubscribeEvent
         public static void onClientTick(ClientTickEvent.Pre event) {
-                keyVoid();
+                try {
+                        keyVoid();
+                } catch (Throwable e) {
+                        XuanLing.LOGGER.error("[dev] failed to open screen, restart the client if this class was newly added", e);
+                }
         }
 
-        private static void keyVoid() {
+        private static void keyVoid() throws Throwable {
                 if (minecraft.screen != null)
                         return;
                 if (RegisterKey.KEY_R.consumeClick()) {

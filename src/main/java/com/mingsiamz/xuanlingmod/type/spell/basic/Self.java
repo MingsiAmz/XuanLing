@@ -5,12 +5,12 @@ import com.mingsiamz.xuanlingmod.type.spell.BasicType;
 
 public class Self extends ImpComponent {
 
-        protected Self(String type, float proficiency) {
-                super(type, proficiency);
+        protected Self(String type, String name, float proficiency) {
+                super(type, name, proficiency);
         }
 
         public Self() {
-                this(BasicType.SELF.name, 0);
+                this(BasicType.GROUP, BasicType.SELF.name, 0);
         }
 
         @Override

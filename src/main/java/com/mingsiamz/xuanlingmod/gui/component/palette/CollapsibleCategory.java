@@ -97,7 +97,7 @@ public class CollapsibleCategory {
                 if (button == 0 && mx >= x && mx < x + width && my >= y && my < y + HEADER_H) {
                         expanded = !expanded;
                         if (onCategoryDrag != null) {
-                                onCategoryDrag.accept(new DragPayload(Type.CATEGORY, name.getString(), null), new int[]{(int)mx,(int)my});
+                                onCategoryDrag.accept(new DragPayload(Type.CATEGORY, name.getString(), "", null), new int[]{(int)mx,(int)my});
                         }
                         return true;
                 }

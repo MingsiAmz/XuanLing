@@ -13,6 +13,7 @@ public enum SpecialType {
         CONTINUOUS("continuos", "SPECIAL", 0);
 
         public static final Component TYPE = XuanLing.trans(XuanlingLangPro.COMPONEN_STRING, "special");
+        public static final String GROUP = "SPECIAL";
         
         public String type;
         public String name;

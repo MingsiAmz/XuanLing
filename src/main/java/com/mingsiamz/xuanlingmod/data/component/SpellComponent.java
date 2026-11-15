@@ -33,7 +33,7 @@ public class SpellComponent {
         }
 
         public static class Builder {
-                private ComponentGroup group = new ComponentGroup(XuanLingTypeEnum.SPELL);
+                private ComponentGroup group = new ComponentGroup();
                 private String name;
 
                 public Builder(String name) {
@@ -41,7 +41,7 @@ public class SpellComponent {
                 }
 
                 public Builder addComponent(String name, ImpComponent component) {
-                        this.group.addComponent(name, component);
+                        this.group.addComponent(XuanLingTypeEnum.SPELL, name, component);
                         return this;
                 }
         }

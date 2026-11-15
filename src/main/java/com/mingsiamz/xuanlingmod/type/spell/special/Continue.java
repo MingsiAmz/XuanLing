@@ -5,12 +5,12 @@ import com.mingsiamz.xuanlingmod.type.spell.SpecialType;
 
 public class Continue extends ImpComponent {
 
-        protected Continue(String type, float proficiency) {
-                super(type, proficiency);
+        protected Continue(String type, String name, float proficiency) {
+                super(type, name, proficiency);
         }
 
         public Continue() {
-                this(SpecialType.CONTINUOUS.name, 0);
+                this(SpecialType.GROUP, SpecialType.NORMAL.name, 0);
         }
 
         @Override

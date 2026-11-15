@@ -5,12 +5,12 @@ import com.mingsiamz.xuanlingmod.type.spell.ActionType;
 
 public class Damage extends ImpComponent {
 
-        protected Damage(String type, float proficiency) {
-                super(type, proficiency);
+        protected Damage(String type, String name, float proficiency) {
+                super(type, name, proficiency);
         }
 
         public Damage() {
-                this(ActionType.DAMAGE.name, 0);
+                this(ActionType.GROUP, ActionType.DAMAGE.name, 0);
         }
 
         @Override

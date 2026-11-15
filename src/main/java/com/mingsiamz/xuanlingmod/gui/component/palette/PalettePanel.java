@@ -78,7 +78,7 @@ public class PalettePanel {
                                 cat.addItem(new PaletteItem(def, itemWidth, 18)
                                                 .setOnDragStart((d, mx, my) -> dragStart.accept(
                                                                 new DragPayload(DragPayload.Type.COMPONENT,
-                                                                                def.trans().getString(), d),
+                                                                                def.trans().getString(), d.type(), d),
                                                                 new int[] { mx, my })));
                         }
                         categories.add(cat);

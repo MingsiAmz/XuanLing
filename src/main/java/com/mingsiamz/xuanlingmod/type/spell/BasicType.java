@@ -21,6 +21,7 @@ public enum BasicType {
         SELF("self", "BASIC", -1);
 
         public static final Component TYPE = XuanLing.trans(XuanlingLangPro.COMPONEN_STRING, "basic_type");
+        public static final String GROUP = "BASIC";
 
         public float weight;
         public String type;

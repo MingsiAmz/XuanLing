@@ -1,4 +1,5 @@
 @echo off
+chcp | findstr /C:"65001" > nul && echo is utf-8 || chcp 65001
 call gradlew daemon --stop
 cls
 rem Auto hot-reload: launches the client, then starts a Gradle compile watcher.

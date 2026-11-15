@@ -1,15 +1,10 @@
 package com.mingsiamz.xuanlingmod.gui;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
-import com.mingsiamz.xuanlingmod.api.IComponent;
-import com.mingsiamz.xuanlingmod.data.controller.DataManager;
 import com.mingsiamz.xuanlingmod.data.ComponentGroup;
+import com.mingsiamz.xuanlingmod.data.controller.DataManager;
 import com.mingsiamz.xuanlingmod.gui.component.DragPayload;
 import com.mingsiamz.xuanlingmod.gui.component.canvas.CanvasNode;
 import com.mingsiamz.xuanlingmod.gui.component.canvas.CanvasPanel;
@@ -21,7 +16,6 @@ import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.type.ImpComponent;
 import com.mingsiamz.xuanlingmod.type.RegistryComponent;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
-import com.mingsiamz.xuanlingmod.type.spell.SpecialType;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 
@@ -49,8 +43,8 @@ public class ComponentEditorScreen extends Screen {
 
         private DragPayload dragPayload = null;
         private XuanLingTypeEnum type;
-        // private Map<DragPayload.Type, HashMap<String, IComponent<?>>> components = new LinkedHashMap<>();
-        private Map<SpecialType, ComponentGroup> componentGroup = new ConcurrentHashMap<>();
+
+        private static ComponentGroup componentGroup = new ComponentGroup();
 
         public ComponentEditorScreen(XuanLingTypeEnum type) {
                 super(Component.literal("make cultivation method"));
@@ -77,7 +71,8 @@ public class ComponentEditorScreen extends Screen {
                 canvas = new CanvasPanel(state, this.width - LEFT_W - GAP - MARGIN * 2, totalH);
                 canvas.setPosition(MARGIN + LEFT_W + GAP, MARGIN);
 
-                List<ImpComponent> defs = RegistryComponent.getAvailable(this.type, minecraft == null ? null : minecraft.player);
+                List<ImpComponent> defs = RegistryComponent.getAvailable(this.type,
+                                minecraft == null ? null : minecraft.player);
                 palette.loadComponents(defs);
         }
 
@@ -184,8 +179,7 @@ public class ComponentEditorScreen extends Screen {
         public boolean mouseReleased(double mx, double my, int button) {
                 boolean paletteHandled = palette.mouseReleased(mx, my, button);
                 boolean canvasHandled = canvas.mouseReleased(mx, my, button);
-                
-                // TODO: add component and group logic
+
                 if (dragPayload != null) {
                         if (canvas.contains(mx, my)) {
                                 float cx = canvas.toCanvasX(mx);
@@ -194,7 +188,6 @@ public class ComponentEditorScreen extends Screen {
                                 if (dragPayload.type == DragPayload.Type.CATEGORY) {
                                         state.nodes.add(new CanvasNode(dragPayload.categoryName, (int) cx - 70,
                                                         (int) cy - 20));
-                                        // components.get
                                 } else {
                                         int dragW = 110;
                                         int dragH = 46;
@@ -222,14 +215,15 @@ public class ComponentEditorScreen extends Screen {
                                                 }
                                         }
 
+                                        // TODO: add component and group logic
                                         if (targetGroup != null) {
                                                 String groupType = targetGroup.getGroupName();
-                                                String compType = dragPayload.component.trans().getString();
+                                                String compType = dragPayload.component.type();
 
-                                                if (!groupType.equals(compType)) {
-                                                        this.toastMessage = Component.literal("§c该组件无法放入此分类！");
+                                                if (!CanvasNode.canJoinGroup(targetGroup, dragPayload.component)) {
+                                                        this.toastMessage = XuanLing.trans(XuanlingLangPro.GUI_STRING,
+                                                                        "the_component_not_join_group");
                                                         this.toastTime = System.currentTimeMillis();
-
                                                         CanvasNode normalNode = new CanvasNode(dragPayload.component,
                                                                         (int) cx - 55, (int) cy - 23);
                                                         setupNodeClick(normalNode);

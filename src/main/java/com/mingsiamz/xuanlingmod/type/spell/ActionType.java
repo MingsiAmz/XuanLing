@@ -15,6 +15,7 @@ public enum ActionType {
         RECOVER_C_ENERGY("recover_c_energy", "ACTION");
 
         public static final Component TYPE = XuanLing.trans(XuanlingLangPro.COMPONEN_STRING, "action");
+        public static final String GROUP = "ACTION";
 
         public String type;
         public String name;

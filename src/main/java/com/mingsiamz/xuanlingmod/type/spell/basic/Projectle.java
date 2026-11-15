@@ -5,12 +5,12 @@ import com.mingsiamz.xuanlingmod.type.spell.BasicType;
 
 public class Projectle extends ImpComponent {
 
-        protected Projectle(String type, float proficiency) {
-                super(type, proficiency);
+        protected Projectle(String type, String name, float proficiency) {
+                super(type, name, proficiency);
         }
 
         public Projectle() {
-                this(BasicType.PROJECTLE.name, 0);
+                this(BasicType.GROUP, BasicType.PROJECTLE.name, 0);
         }
 
         @Override

@@ -85,6 +85,7 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "arcane_mastery_art_title", "功法");
                         this.add(GUI_STRING + "arcane_mastery_spell_title", "神通");
                         this.add(GUI_STRING + "arcane_mastery_empty_slot", "空");
+                        this.add(GUI_STRING + "the_component_not_join_group", "§c该组件无法放入此分类！");
                 }
         }
 
@@ -158,6 +159,7 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "arcane_mastery_spell_title", "Spell Collection");
                         this.add(GUI_STRING + "arcane_mastery_back", "Back");
                         this.add(GUI_STRING + "arcane_mastery_empty_slot", "Empty");
+                        this.add(GUI_STRING + "the_component_not_join_group", "§cThe component not join group！");
                 }
         }
 }
