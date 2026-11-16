@@ -39,6 +39,8 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "sect", "宗门:%s");
                         this.add(GUI_STRING + "realm", "境界: ");
                         this.add(GUI_STRING + "make_cultivation_component", "衍化");
+                        this.add(GUI_STRING + "input_cultivation_name", "请输入名称");
+                        this.add(GUI_STRING + "give_up", "放弃");
                         this.add(GUI_STRING + "make_cultivation_spell", "神通");
                         this.add(GUI_STRING + "make_cultivation_art", "功法");
                         this.add(GUI_STRING + "make_cultivation_realm", "修炼体系");
@@ -114,6 +116,8 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "sect", "Sect:%s");
                         this.add(GUI_STRING + "realm", "Realm: ");
                         this.add(GUI_STRING + "make_cultivation_component", "Make Cultivation Component");
+                        this.add(GUI_STRING + "input_cultivation_name", "Input name");
+                        this.add(GUI_STRING + "give_up", "Give up");
                         this.add(GUI_STRING + "make_cultivation_spell", "Spell");
                         this.add(GUI_STRING + "make_cultivation_art", "ART");
                         this.add(GUI_STRING + "make_cultivation_realm", "Realm");

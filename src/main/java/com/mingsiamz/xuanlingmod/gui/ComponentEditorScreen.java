@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.ComponentGroup;
+import com.mingsiamz.xuanlingmod.data.component.SpellComponent;
 import com.mingsiamz.xuanlingmod.data.controller.DataManager;
 import com.mingsiamz.xuanlingmod.gui.component.DragPayload;
 import com.mingsiamz.xuanlingmod.gui.component.canvas.CanvasNode;
@@ -20,7 +21,10 @@ import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 
 public class ComponentEditorScreen extends Screen {
@@ -43,8 +47,22 @@ public class ComponentEditorScreen extends Screen {
 
         private DragPayload dragPayload = null;
         private XuanLingTypeEnum type;
+        private String name = "";
+        private ComponentGroup componentGroup = new ComponentGroup();
 
-        private static ComponentGroup componentGroup = new ComponentGroup();
+        private boolean showNamePopup = false;
+        private EditBox nameInput;
+        private GuiButton confirmButton;
+        private GuiButton cancelButton;
+
+        private int popupX;
+        private int popupY;
+        private final int popupW = 240;
+        private final int popupH = 110;
+        private int inputX;
+        private int inputY;
+        private int inputW;
+        private static final int INPUT_H = 18;
 
         public ComponentEditorScreen(XuanLingTypeEnum type) {
                 super(Component.literal("make cultivation method"));
@@ -66,7 +84,8 @@ public class ComponentEditorScreen extends Screen {
                                 LEFT_W, BUTTON_H,
                                 XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation").getString());
                 createButton.setPosition(MARGIN, MARGIN + paletteH + BUTTON_GAP);
-                createButton.onClick(this::onCreate);
+                // createButton.onClick(this::onCreate);
+                createButton.onClick(this::openNamePopup);
 
                 canvas = new CanvasPanel(state, this.width - LEFT_W - GAP - MARGIN * 2, totalH);
                 canvas.setPosition(MARGIN + LEFT_W + GAP, MARGIN);
@@ -74,12 +93,46 @@ public class ComponentEditorScreen extends Screen {
                 List<ImpComponent> defs = RegistryComponent.getAvailable(this.type,
                                 minecraft == null ? null : minecraft.player);
                 palette.loadComponents(defs);
+
+                computePopupLayout();
+                nameInput = new EditBox(this.font, inputX, inputY, inputW, INPUT_H, Component.literal("name"));
+                nameInput.setMaxLength(64);
+                nameInput.setBordered(false);
+                nameInput.setVisible(false);
+                nameInput.setValue("");
+
+                confirmButton = new GuiButton(80, 20,
+                                XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation").getString());
+                cancelButton = new GuiButton(80, 20,
+                                XuanLing.trans(XuanlingLangPro.GUI_STRING, "give_up").getString());
+                confirmButton.onClick(this::confirmName);
+                cancelButton.onClick(this::closeNamePopup);
+
+                int btnY = popupY + popupH - 32;
+                int spacing = 10;
+                int startX = popupX + (popupW - (80 * 2 + spacing)) / 2;
+                confirmButton.setPosition(startX, btnY);
+                cancelButton.setPosition(startX + 80 + spacing, btnY);
         }
 
         private void onCreate() {
-                DataManager.saveData(state, null, minecraft.player.getUUID().toString(), "skills");
-                if (minecraft != null && minecraft.player != null) {
-                        minecraft.player.displayClientMessage(Component.literal("§a已导出：skills.json"), false);
+                if (this.componentGroup == null || this.componentGroup.isEmpty())
+                        return;
+                LocalPlayer player = minecraft.player;
+                if (minecraft != null && player != null) {
+                        switch (this.type) {
+                                case SPELL:
+                                        SpellComponent spell = new SpellComponent(this.name, this.componentGroup);
+                                        spell.toJson(player);
+                                        break;
+
+                                default:
+                                        break;
+                        }
+                        player.displayClientMessage(Component
+                                        .literal(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation") + ":"
+                                                        + this.name),
+                                        false);
                 }
         }
 
@@ -112,6 +165,9 @@ public class ComponentEditorScreen extends Screen {
 
                 if (activePopup != null)
                         activePopup.render(g, mouseX, mouseY);
+
+                if (showNamePopup)
+                        renderNamePopup(g, mouseX, mouseY, partialTick);
 
                 renderToast(g, mouseX, mouseY);
         }
@@ -148,6 +204,20 @@ public class ComponentEditorScreen extends Screen {
 
         @Override
         public boolean mouseClicked(double mx, double my, int button) {
+                if (showNamePopup) {
+                        if (confirmButton.mouseClicked(mx, my, button))
+                                return true;
+                        if (cancelButton.mouseClicked(mx, my, button))
+                                return true;
+                        if (mx >= inputX - 2 && mx <= inputX + inputW + 2
+                                        && my >= inputY - 2 && my <= inputY + INPUT_H + 2) {
+                                nameInput.setFocused(true);
+                        } else {
+                                nameInput.setFocused(false);
+                        }
+                        return true;
+                }
+
                 if (activePopup != null) {
                         if (activePopup.isMouseOver(mx, my)) {
                                 activePopup.mouseClicked(mx, my, button);
@@ -215,7 +285,6 @@ public class ComponentEditorScreen extends Screen {
                                                 }
                                         }
 
-                                        // TODO: add component and group logic
                                         if (targetGroup != null) {
                                                 String groupType = targetGroup.getGroupName();
                                                 String compType = dragPayload.component.type();
@@ -234,6 +303,7 @@ public class ComponentEditorScreen extends Screen {
                                                         setupNodeClick(childNode);
                                                         targetGroup.children.add(childNode);
                                                 }
+                                                componentGroup.addComponent(this.type, compType, dragPayload.component);
                                         } else {
                                                 CanvasNode normalNode = new CanvasNode(dragPayload.component,
                                                                 (int) cx - 55, (int) cy - 23);
@@ -247,6 +317,28 @@ public class ComponentEditorScreen extends Screen {
                 }
 
                 return paletteHandled || canvasHandled || super.mouseReleased(mx, my, button);
+        }
+
+        @Override
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+                if (keyCode == 257 || keyCode == 335) {
+                        confirmName();
+                        return true;
+                }
+                if (keyCode == 1) {
+                        closeNamePopup();
+                        return true;
+                }
+                if (nameInput.keyPressed(keyCode, scanCode, modifiers))
+                        return true;
+                return super.keyPressed(keyCode, scanCode, modifiers);
+        }
+
+        @Override
+        public boolean charTyped(char codePoint, int modifiers) {
+                if (showNamePopup && nameInput.charTyped(codePoint, modifiers))
+                        return true;
+                return super.charTyped(codePoint, modifiers);
         }
 
         private boolean intersects(int ax, int ay, int aw, int ah, int bx, int by, int bw, int bh) {
@@ -293,5 +385,62 @@ public class ComponentEditorScreen extends Screen {
 
                         activePopup = new ParamPopup(node.getDef(), popupX, popupY);
                 });
+        }
+
+        private void computePopupLayout() {
+                this.popupX = (this.width - popupW) / 2;
+                this.popupY = (this.height - popupH) / 2;
+                this.inputW = popupW - 40;
+                this.inputX = popupX + 20;
+                this.inputY = popupY + 40;
+        }
+
+        private void openNamePopup() {
+                this.showNamePopup = true;
+                this.nameInput.setValue(this.name == null ? "" : this.name);
+                this.nameInput.setVisible(true);
+                this.nameInput.setFocused(true);
+        }
+
+        private void closeNamePopup() {
+                this.showNamePopup = false;
+                this.nameInput.setVisible(false);
+                this.nameInput.setFocused(false);
+        }
+
+        private void confirmName() {
+                this.name = this.nameInput.getValue().trim();
+                closeNamePopup();
+                onCreate();
+        }
+
+        private void renderNamePopup(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+                g.fill(0, 0, this.width, this.height, CultivationTheme.BG_MASK);
+
+                g.fill(popupX, popupY, popupX + popupW, popupY + popupH, CultivationTheme.PANEL_BG);
+                GuiRenderUtil.border(g, popupX, popupY, popupX + popupW, popupY + popupH, CultivationTheme.BORDER_GOLD);
+
+                Component title = XuanLing.trans(XuanlingLangPro.GUI_STRING, "input_cultivation_name");
+                g.drawString(font, title, popupX + (popupW - font.width(title)) / 2, popupY + 14,
+                                CultivationTheme.TEXT_GOLD, true);
+
+                g.fill(inputX - 2, inputY - 2, inputX + inputW + 2, inputY + INPUT_H + 2,
+                                CultivationTheme.PANEL_BG_DARK);
+                GuiRenderUtil.border(g, inputX - 2, inputY - 2, inputX + inputW + 2, inputY + INPUT_H + 2,
+                                CultivationTheme.BORDER_CYAN);
+
+                String text = nameInput.getValue();
+                int textW = font.width(text);
+                int textX = inputX + (inputW - textW) / 2;
+                int textY = inputY + (INPUT_H - 8) / 2;
+                g.drawString(font, text, textX, textY, CultivationTheme.TEXT_PRIMARY, false);
+
+                if (nameInput.isFocused() && (System.currentTimeMillis() / 500) % 2 == 0) {
+                        g.fill(textX + textW + 1, textY - 1, textX + textW + 2, textY + 9,
+                                        CultivationTheme.TEXT_PRIMARY);
+                }
+
+                confirmButton.render(g, mouseX, mouseY, partialTick);
+                cancelButton.render(g, mouseX, mouseY, partialTick);
         }
 }

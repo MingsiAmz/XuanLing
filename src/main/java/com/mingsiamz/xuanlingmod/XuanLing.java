@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 
 import com.mingsiamz.xuanlingmod.data.controller.DataLoader;
 import com.mingsiamz.xuanlingmod.data.controller.DataManager;
-import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.register.RegisterBlocks;
@@ -19,7 +18,6 @@ import com.mojang.logging.LogUtils;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;

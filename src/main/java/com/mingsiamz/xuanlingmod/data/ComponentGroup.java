@@ -46,4 +46,8 @@ public class ComponentGroup {
                 this.maps.values().forEach(
                                 map -> map.values().forEach(list -> list.forEach(component -> component.run())));
         }
+
+        public boolean isEmpty() {
+                return this.maps == null || this.maps.isEmpty();
+        }
 }
