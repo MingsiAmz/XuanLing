@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
-import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationPanel;
@@ -12,6 +11,7 @@ import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 import com.mingsiamz.xuanlingmod.util.gui.IGuiComponent;
 import com.mingsiamz.xuanlingmod.util.gui.SectionDivider;
+import com.mingsiamz.xuanlingmod.util.gui.component.GuiButton;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;

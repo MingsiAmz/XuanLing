@@ -1,4 +1,4 @@
-package com.mingsiamz.xuanlingmod.gui.component.canvas;
+package com.mingsiamz.xuanlingmod.util.gui.component.canvas;
 
 import java.util.ArrayList;
 import java.util.List;

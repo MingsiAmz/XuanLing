@@ -1,12 +1,6 @@
-package com.mingsiamz.xuanlingmod.data.component;
+package com.mingsiamz.xuanlingmod.data;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import com.google.gson.Gson;
-import com.mingsiamz.xuanlingmod.data.ComponentGroup;
 import com.mingsiamz.xuanlingmod.data.controller.DataManager;
-import com.mingsiamz.xuanlingmod.type.ImpComponent;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.type.spell.ActionType;
 import com.mingsiamz.xuanlingmod.type.spell.special.Normal;

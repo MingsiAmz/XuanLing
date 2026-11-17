@@ -1,13 +1,13 @@
 package com.mingsiamz.xuanlingmod.gui;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
-import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationPanel;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiComponentGroup;
 import com.mingsiamz.xuanlingmod.util.gui.SectionDivider;
+import com.mingsiamz.xuanlingmod.util.gui.component.GuiButton;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Align;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Justify;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Layouts;
@@ -87,7 +87,7 @@ public class CreateGui extends Screen {
                                 panel.getY() + (int) (this.panelH * 0.10f), CultivationTheme.BORDER_GOLD, false);
 
                 SectionDivider divider = new SectionDivider(panel.getInnerWidth())
-                                .setColors(0x40FFFFFF, CultivationTheme.BORDER_CYAN);
+                                .setColors(CultivationTheme.SUBTLE_LINE, CultivationTheme.BORDER_CYAN);
                 divider.setPosition(panel.getInnerX(), panel.getY() + (int) (this.panelH * 0.18f));
                 divider.render(g, mouseX, mouseY, partialTick);
 

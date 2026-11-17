@@ -33,6 +33,8 @@
   "xuanling.gui.cultivate_title_btn": "修炼",
   "xuanling.gui.detail_data_gui_title": "详细数据",
   "xuanling.gui.flyspeedmof": "飞速:%s",
+  "xuanling.gui.give_up": "放弃",
+  "xuanling.gui.input_cultivation_name": "请输入名称",
   "xuanling.gui.input_time_month": "修炼月数",
   "xuanling.gui.insight": "悟性:%s",
   "xuanling.gui.inspiration": "灵感:%s",

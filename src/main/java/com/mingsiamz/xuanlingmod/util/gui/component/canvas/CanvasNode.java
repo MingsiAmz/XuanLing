@@ -1,4 +1,4 @@
-package com.mingsiamz.xuanlingmod.gui.component.canvas;
+package com.mingsiamz.xuanlingmod.util.gui.component.canvas;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,19 +92,19 @@ public class CanvasNode {
         public void render(GuiGraphics g, int sx, int sy, int mouseX, int mouseY, boolean isInsideGroup) {
                 int w = getWidth(), h = getHeight();
 
-                int highlightColor = 0xFFFFE082;
+                int highlightColor = CultivationTheme.NODE_HIGHLIGHT;
                 if (selected) {
                         float pulse = (float) (Math.sin(System.currentTimeMillis() / 150.0) * 0.3f + 0.7f);
                         int alpha = (int) (pulse * 255) << 24;
-                        highlightColor = alpha | (0xFFFFE082 & 0x00FFFFFF);
+                        highlightColor = alpha | (CultivationTheme.NODE_HIGHLIGHT & 0x00FFFFFF);
                 }
 
                 if (isGroup()) {
-                        g.fill(sx, sy, sx + w, sy + h, 0x800A1218);
+                        g.fill(sx, sy, sx + w, sy + h, CultivationTheme.NODE_GROUP_BG);
                         GuiRenderUtil.border(g, sx, sy, sx + w, sy + h, CultivationTheme.BORDER_GOLD);
 
                         Font font = Minecraft.getInstance().font;
-                        g.fill(sx, sy, sx + w, sy + 16, 0x40FFC94D);
+                        g.fill(sx, sy, sx + w, sy + 16, CultivationTheme.NODE_GROUP_HEADER);
                         g.drawString(font, groupName, sx + 6, sy + 4, CultivationTheme.TEXT_GOLD, false);
 
                         GuiRenderUtil.diamond(g, sx + 5, sy + h / 2, 2, CultivationTheme.BORDER_GOLD);
@@ -124,9 +124,9 @@ public class CanvasNode {
                         return;
                 }
 
-                g.fill(sx + 2, sy + 2, sx + w + 2, sy + h + 2, 0x40000000);
-                g.fill(sx, sy, sx + w, sy + h, 0xF0101820);
-                g.fill(sx, sy, sx + w, sy + 12, 0x5000E5FF);
+                g.fill(sx + 2, sy + 2, sx + w + 2, sy + h + 2, CultivationTheme.NODE_SHADOW);
+                g.fill(sx, sy, sx + w, sy + h, CultivationTheme.NODE_BG);
+                g.fill(sx, sy, sx + w, sy + 12, CultivationTheme.NODE_HEADER);
                 GuiRenderUtil.border(g, sx, sy, sx + w, sy + h, CultivationTheme.BORDER_CYAN);
 
                 Font font = Minecraft.getInstance().font;
@@ -137,8 +137,9 @@ public class CanvasNode {
                 int btnX = sx + w - 14;
                 int btnY = sy + 2;
                 boolean hoverBtn = mouseX >= btnX && mouseX <= btnX + 12 && mouseY >= btnY && mouseY <= btnY + 10;
-                g.fill(btnX, btnY, btnX + 12, btnY + 10, hoverBtn ? 0xCC00E5FF : 0x4000E5FF);
-                g.drawString(font, Component.literal("⚙"), btnX + 3, btnY + 1, 0xFFFFFFFF, false);
+                g.fill(btnX, btnY, btnX + 12, btnY + 10,
+                                hoverBtn ? CultivationTheme.GEAR_HOVER : CultivationTheme.GEAR_BG);
+                g.drawString(font, Component.literal("⚙"), btnX + 3, btnY + 1, CultivationTheme.WHITE, false);
 
                 if (!isInsideGroup) {
                         GuiRenderUtil.diamond(g, sx + 5, sy + h / 2, 2, CultivationTheme.BORDER_CYAN);

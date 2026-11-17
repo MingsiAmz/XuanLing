@@ -1,5 +1,6 @@
 package com.mingsiamz.xuanlingmod.gui;
 
+import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.StateBar;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -16,8 +17,8 @@ public final class PlayerVitalsHud {
         private static final int CENTER_GAP = 14;
         private static final int BOTTOM = 42;
 
-        private static final int C_HEALTH = 0xFFE53935;
-        private static final int C_FOOD = 0xFFC77F3F;
+        private static final int C_HEALTH = CultivationTheme.HEALTH;
+        private static final int C_FOOD = CultivationTheme.FOOD;
 
         private static final StateBar HEALTH = new StateBar(BAR_WIDTH)
                         .showText(false).showTicks(false)
@@ -60,6 +61,6 @@ public final class PlayerVitalsHud {
                 g.drawString(font, txt,
                                 x + (BAR_WIDTH - font.width(txt)) / 2,
                                 y + (BAR_HEIGHT - 8) / 2 + 1,
-                                0xFFFFFFFF, true);
+                                CultivationTheme.WHITE, true);
         }
 }

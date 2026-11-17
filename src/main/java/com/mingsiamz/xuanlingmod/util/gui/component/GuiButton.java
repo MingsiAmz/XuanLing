@@ -1,4 +1,4 @@
-package com.mingsiamz.xuanlingmod.gui.weight;
+package com.mingsiamz.xuanlingmod.util.gui.component;
 
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
@@ -16,8 +16,8 @@ public class GuiButton implements IGuiComponent {
         private Runnable onClick;
         private boolean hovered;
 
-        private int bgColor = 0x3000E5FF;
-        private int hoverBgColor = 0x7000E5FF;
+        private int bgColor = CultivationTheme.BUTTON_BG;
+        private int hoverBgColor = CultivationTheme.BUTTON_HOVER_BG;
         private int borderColor = CultivationTheme.BORDER_CYAN;
         private int hoverBorder = CultivationTheme.BORDER_GOLD;
         private int textColor = CultivationTheme.TEXT_PRIMARY;

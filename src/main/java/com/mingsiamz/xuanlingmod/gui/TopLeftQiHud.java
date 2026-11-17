@@ -29,9 +29,9 @@ public final class TopLeftQiHud {
         private static final int NEILI_HEIGHT = Config.NEILI_BAR_H_VALUE.getAsInt();
         private static final int NEILI_GAP = Config.BAR_GAP_VALUE.getAsInt();
 
-        private static final int C_QI = 0xFF26C6DA;
+        private static final int C_QI = CultivationTheme.QI;
         private static final int C_QI_BRIGHT = 0xFFB2EBF2;
-        private static final int C_NEILI = 0xFF9C27B0;
+        private static final int C_NEILI = CultivationTheme.NEILI;
         private static final int C_NEILI_HI = 0xFFE1BEE7;
         private static final int C_BG = 0xFF061018;
 
@@ -101,7 +101,7 @@ public final class TopLeftQiHud {
                         }
 
                         if (fillW < w) {
-                                g.fill(x + fillW - 1, y - 1, x + fillW + 1, y + h + 1, 0xFFFFFFFF);
+                                g.fill(x + fillW - 1, y - 1, x + fillW + 1, y + h + 1, CultivationTheme.WHITE);
                         }
                 }
 

@@ -2,10 +2,14 @@ package com.mingsiamz.xuanlingmod.gui;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
-import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
-import com.mingsiamz.xuanlingmod.util.gui.*;
+import com.mingsiamz.xuanlingmod.util.gui.CultivationPanel;
+import com.mingsiamz.xuanlingmod.util.gui.CultivationSlider;
+import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
+import com.mingsiamz.xuanlingmod.util.gui.GuiComponentGroup;
+import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
+import com.mingsiamz.xuanlingmod.util.gui.component.GuiButton;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Justify;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Layouts;
 
@@ -13,10 +17,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
 public class LevelProgressGui extends Screen {

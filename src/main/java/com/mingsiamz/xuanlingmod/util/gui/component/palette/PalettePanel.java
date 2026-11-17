@@ -1,7 +1,12 @@
-package com.mingsiamz.xuanlingmod.gui.component.palette;
+package com.mingsiamz.xuanlingmod.util.gui.component.palette;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
-import com.mingsiamz.xuanlingmod.api.IComponent;
 import com.mingsiamz.xuanlingmod.gui.component.DragPayload;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.type.ImpComponent;
@@ -10,16 +15,11 @@ import com.mingsiamz.xuanlingmod.type.spell.BasicType;
 import com.mingsiamz.xuanlingmod.type.spell.SpecialType;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
 
 public class PalettePanel {
         private int x, y, width, height;
@@ -132,7 +132,7 @@ public class PalettePanel {
         }
 
         public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-                g.fill(x, y, x + width, y + height, 0xF0101820);
+                g.fill(x, y, x + width, y + height, CultivationTheme.PANEL_BG);
                 GuiRenderUtil.border(g, x, y, x + width, y + height, CultivationTheme.BORDER_GOLD);
 
                 var font = Minecraft.getInstance().font;
@@ -164,7 +164,7 @@ public class PalettePanel {
                         int scrollbarX = x + width - SCROLLBAR_WIDTH - SCROLLBAR_MARGIN;
                         int viewHeight = getViewHeight();
 
-                        g.fill(scrollbarX, y + TITLE_HEIGHT, scrollbarX + SCROLLBAR_WIDTH, y + height, 0x30000000);
+                        g.fill(scrollbarX, y + TITLE_HEIGHT, scrollbarX + SCROLLBAR_WIDTH, y + height, CultivationTheme.SCROLL_TRACK);
 
                         int barHeight = Math.max(20, (int) ((float) viewHeight / getContentHeight() * viewHeight));
                         int barY = y + TITLE_HEIGHT + (int) ((viewHeight - barHeight) * (scrollY / maxScroll));

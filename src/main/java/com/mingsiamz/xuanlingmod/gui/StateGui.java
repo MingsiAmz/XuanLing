@@ -8,7 +8,6 @@ import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.BasicRealm;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.data.component.ComponentRealm;
-import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationPanel;
@@ -18,6 +17,7 @@ import com.mingsiamz.xuanlingmod.util.gui.Label;
 import com.mingsiamz.xuanlingmod.util.gui.Label.Align;
 import com.mingsiamz.xuanlingmod.util.gui.SectionDivider;
 import com.mingsiamz.xuanlingmod.util.gui.StateBar;
+import com.mingsiamz.xuanlingmod.util.gui.component.GuiButton;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Justify;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Layouts;
 
@@ -140,9 +140,9 @@ public class StateGui extends Screen {
                 root = new GuiComponentGroup()
                                 .setLayout(Layouts.column().setSpacing(14))
                                 .setPadding(0)
-                                .add(new SectionDivider(innerW).setColors(0x40FFFFFF, CultivationTheme.BORDER_GOLD))
+                                .add(new SectionDivider(innerW).setColors(CultivationTheme.SUBTLE_LINE, CultivationTheme.BORDER_GOLD))
                                 .add(statGroup)
-                                .add(new SectionDivider(innerW).setColors(0x40FFFFFF, CultivationTheme.BORDER_CYAN)
+                                .add(new SectionDivider(innerW).setColors(CultivationTheme.SUBTLE_LINE, CultivationTheme.BORDER_CYAN)
                                                 .setDiamondSize(3))
                                 .add(buttonGroup);
 
@@ -227,10 +227,10 @@ public class StateGui extends Screen {
                 int haloCenterX = figureX;
                 int haloCenterY = figureY - figureScale;
 
-                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx + 6, haloRy + 6 + 16, 0x0A00FFFF);
-                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx + 3, haloRy + 3 + 14, 0x0A00FFFF);
-                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx, haloRy + 10, 0x0A00FFFF);
-                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx - 4, haloRy - 4 + 12, 0x0A00FFFF);
+                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx + 6, haloRy + 6 + 16, CultivationTheme.HALO);
+                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx + 3, haloRy + 3 + 14, CultivationTheme.HALO);
+                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx, haloRy + 10, CultivationTheme.HALO);
+                drawEllipse(g, haloCenterX, haloCenterY - 9, haloRx - 4, haloRy - 4 + 12, CultivationTheme.HALO);
 
                 if (minecraft.player != null) {
                         float mouseDX = (float) mouseX - figureX;

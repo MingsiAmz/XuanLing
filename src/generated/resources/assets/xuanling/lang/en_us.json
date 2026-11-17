@@ -33,6 +33,8 @@
   "xuanling.gui.cultivate_title_btn": "Cultivate",
   "xuanling.gui.detail_data_gui_title": "Detail Data",
   "xuanling.gui.flyspeedmof": "FlySpeed:%s",
+  "xuanling.gui.give_up": "Give up",
+  "xuanling.gui.input_cultivation_name": "Input name",
   "xuanling.gui.input_time_month": "training month",
   "xuanling.gui.insight": "Insight:%s",
   "xuanling.gui.inspiration": "Inspiration:%s",

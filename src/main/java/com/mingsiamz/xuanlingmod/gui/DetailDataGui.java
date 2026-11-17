@@ -4,7 +4,6 @@ import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.BasicRealm;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
-import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationPanel;
@@ -14,6 +13,7 @@ import com.mingsiamz.xuanlingmod.util.gui.Label;
 import com.mingsiamz.xuanlingmod.util.gui.Label.Align;
 import com.mingsiamz.xuanlingmod.util.gui.SectionDivider;
 import com.mingsiamz.xuanlingmod.util.gui.StateBar;
+import com.mingsiamz.xuanlingmod.util.gui.component.GuiButton;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Justify;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Layouts;
 
@@ -114,9 +114,9 @@ public class DetailDataGui extends Screen {
                 root = new GuiComponentGroup()
                                 .setLayout(Layouts.column().setSpacing(8))
                                 .setPadding(0)
-                                .add(new SectionDivider(innerW).setColors(0x40FFFFFF, CultivationTheme.BORDER_GOLD))
+                                .add(new SectionDivider(innerW).setColors(CultivationTheme.SUBTLE_LINE, CultivationTheme.BORDER_GOLD))
                                 .add(statsGroup)
-                                .add(new SectionDivider(innerW).setColors(0x40FFFFFF, CultivationTheme.BORDER_CYAN)
+                                .add(new SectionDivider(innerW).setColors(CultivationTheme.SUBTLE_LINE, CultivationTheme.BORDER_CYAN)
                                                 .setDiamondSize(3));
 
                 int rootY = py + (int) (PANEL_H * 0.20f);

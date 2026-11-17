@@ -1,4 +1,4 @@
-package com.mingsiamz.xuanlingmod.gui.component.palette;
+package com.mingsiamz.xuanlingmod.util.gui.component.palette;
 
 import com.mingsiamz.xuanlingmod.type.ImpComponent;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
@@ -7,21 +7,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
 public class PaletteItem {
-        // private final IComponent<?> def;
         private ImpComponent def;
         private int x, y;
         private final int width, height;
 
         private DragStart onDragStart;
 
-        // public PaletteItem(IComponent<?> def, int width, int height) {
         public PaletteItem(ImpComponent def, int width, int height) {
                 this.def = def;
                 this.width = width;
                 this.height = height;
         }
 
-        // public IComponent<?> getDef() {
         public Object getDef() {
                 return def;
         }
@@ -54,8 +51,8 @@ public class PaletteItem {
 
         public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
                 boolean hovered = isMouseOver(mouseX, mouseY);
-                int bg = hovered ? 0x6000E5FF : 0x30101820;
-                int color = 0xFF4DD0E1;
+                int bg = hovered ? CultivationTheme.HOVER_CYAN : CultivationTheme.PALETTE_ITEM_BG;
+                int color = CultivationTheme.TEXT_INFO;
                 g.fill(x, y, x + width, y + height, bg);
                 g.fill(x, y, x + 3, y + height, color);
 
@@ -80,7 +77,6 @@ public class PaletteItem {
 
         @FunctionalInterface
         public interface DragStart {
-                // void start(IComponent<?> def, int mouseX, int mouseY);
                 void start(ImpComponent def, int mouseX, int mouseY);
         }
 }

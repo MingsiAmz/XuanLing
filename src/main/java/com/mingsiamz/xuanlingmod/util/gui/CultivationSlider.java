@@ -42,7 +42,7 @@ public class CultivationSlider implements IGuiComponent {
 
                 int handleX = x + fillW - 4;
                 g.fill(handleX, y, handleX + 8, y + height, CultivationTheme.BORDER_GOLD);
-                GuiRenderUtil.border(g, handleX, y, handleX + 8, y + height, 0xFFFFFFFF);
+                GuiRenderUtil.border(g, handleX, y, handleX + 8, y + height, CultivationTheme.WHITE);
         }
 
         @Override

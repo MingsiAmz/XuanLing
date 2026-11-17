@@ -14,7 +14,7 @@ public final class GuiRenderUtil {
                             int rgb, int layers, int baseAlpha) {
         for (int i = layers; i >= 1; i--) {
             int alpha = Math.min(255, baseAlpha + (layers - i) * 10);
-            g.fill(x1 - i, y1 - i, x2 + i, y2 + i, (alpha << 24) | (rgb & 0xFFFFFF));
+            g.fill(x1 - i, y1 - i, x2 + i, y2 + i, (alpha << 24) | (rgb & CultivationTheme.WHITE));
         }
     }
 
@@ -43,11 +43,11 @@ public final class GuiRenderUtil {
         if (fillW <= 0) return;
 
         g.fill(x, y, x + fillW, y + height, color);
-        g.fill(x, y, x + fillW, y + 2, 0x66FFFFFF); 
-        g.fill(x, y + height - 2, x + fillW, y + height, 0x40000000); 
+        g.fill(x, y, x + fillW, y + 2, CultivationTheme.PROGRESS_HILITE); 
+        g.fill(x, y + height - 2, x + fillW, y + height, CultivationTheme.PROGRESS_SHADOW);
 
         if (fillW < width) {
-            g.fill(x + fillW - 1, y - 1, x + fillW + 1, y + height + 1, 0xFFFFFFFF);
+            g.fill(x + fillW - 1, y - 1, x + fillW + 1, y + height + 1, CultivationTheme.WHITE);
             g.fill(x + fillW, y, x + fillW + 1, y + height, color);
         }
     }

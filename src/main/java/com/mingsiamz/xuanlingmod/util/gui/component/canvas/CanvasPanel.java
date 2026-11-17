@@ -1,4 +1,4 @@
-package com.mingsiamz.xuanlingmod.gui.component.canvas;
+package com.mingsiamz.xuanlingmod.util.gui.component.canvas;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
@@ -110,7 +110,7 @@ public class CanvasPanel {
         }
 
         public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-                g.fill(x, y, x + width, y + height, 0xF005080C);
+                g.fill(x, y, x + width, y + height, CultivationTheme.CANVAS_BG);
 
                 g.enableScissor(x + 1, y + 1, x + width - 1, y + height - 1);
 

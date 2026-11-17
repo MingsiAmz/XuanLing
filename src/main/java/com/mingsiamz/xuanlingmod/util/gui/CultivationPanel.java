@@ -43,7 +43,7 @@ public class CultivationPanel implements IGuiComponent {
                 g.fill(x1, y1, x2, y2, bgColor);
 
                 if (enableGrid) {
-                        GuiRenderUtil.grid(g, x1 + 3, y1 + 6, x2 - 3, y2 - 6, 10, 0x0800E5FF);
+                        GuiRenderUtil.grid(g, x1 + 3, y1 + 6, x2 - 3, y2 - 6, 10, CultivationTheme.GRID_LINE);
                 }
 
                 GuiRenderUtil.border(g, x1, y1, x2, y2, borderOuterColor);

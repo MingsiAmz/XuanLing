@@ -4,26 +4,25 @@ import java.util.List;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.ComponentGroup;
-import com.mingsiamz.xuanlingmod.data.component.SpellComponent;
-import com.mingsiamz.xuanlingmod.data.controller.DataManager;
+import com.mingsiamz.xuanlingmod.data.SpellComponent;
 import com.mingsiamz.xuanlingmod.gui.component.DragPayload;
-import com.mingsiamz.xuanlingmod.gui.component.canvas.CanvasNode;
-import com.mingsiamz.xuanlingmod.gui.component.canvas.CanvasPanel;
-import com.mingsiamz.xuanlingmod.gui.component.canvas.EditorState;
-import com.mingsiamz.xuanlingmod.gui.component.canvas.ParamPopup;
-import com.mingsiamz.xuanlingmod.gui.component.palette.PalettePanel;
-import com.mingsiamz.xuanlingmod.gui.weight.GuiButton;
+import com.mingsiamz.xuanlingmod.gui.component.ParamPopup;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.type.ImpComponent;
 import com.mingsiamz.xuanlingmod.type.RegistryComponent;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
+import com.mingsiamz.xuanlingmod.util.gui.component.GuiButton;
+import com.mingsiamz.xuanlingmod.util.gui.component.ModalDialog;
+import com.mingsiamz.xuanlingmod.util.gui.component.canvas.CanvasNode;
+import com.mingsiamz.xuanlingmod.util.gui.component.canvas.CanvasPanel;
+import com.mingsiamz.xuanlingmod.util.gui.component.canvas.EditorState;
+import com.mingsiamz.xuanlingmod.util.gui.component.palette.PalettePanel;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 
@@ -49,6 +48,7 @@ public class ComponentEditorScreen extends Screen {
         private XuanLingTypeEnum type;
         private String name = "";
         private ComponentGroup componentGroup = new ComponentGroup();
+        private ModalDialog nameDialog;
 
         private boolean showNamePopup = false;
         private EditBox nameInput;
@@ -84,7 +84,6 @@ public class ComponentEditorScreen extends Screen {
                                 LEFT_W, BUTTON_H,
                                 XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation").getString());
                 createButton.setPosition(MARGIN, MARGIN + paletteH + BUTTON_GAP);
-                // createButton.onClick(this::onCreate);
                 createButton.onClick(this::openNamePopup);
 
                 canvas = new CanvasPanel(state, this.width - LEFT_W - GAP - MARGIN * 2, totalH);
@@ -121,13 +120,18 @@ public class ComponentEditorScreen extends Screen {
                 LocalPlayer player = minecraft.player;
                 if (minecraft != null && player != null) {
                         switch (this.type) {
-                                case SPELL:
+                                case REALM -> {
+
+                                }
+                                case SPELL -> {
                                         SpellComponent spell = new SpellComponent(this.name, this.componentGroup);
                                         spell.toJson(player);
-                                        break;
+                                }
+                                case ART -> {
 
-                                default:
-                                        break;
+                                }
+                                default -> throw new IllegalArgumentException("Unexpected value: " + this.type);
+
                         }
                         player.displayClientMessage(Component
                                         .literal(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation") + ":"
@@ -149,13 +153,15 @@ public class ComponentEditorScreen extends Screen {
                         int gx = mouseX - w / 2;
                         int gy = mouseY - h / 2;
                         if (dragPayload.type == DragPayload.Type.CATEGORY) {
-                                g.fill(gx, gy, gx + w, gy + h, 0x80000000 | (0xFFFFC94D & 0x00FFFFFF));
-                                GuiRenderUtil.border(g, gx, gy, gx + w, gy + h, 0xFFFFC94D);
+                                g.fill(gx, gy, gx + w, gy + h, CultivationTheme.BAR_OUTLINE
+                                                | (CultivationTheme.BORDER_GOLD & 0x00FFFFFF));
+                                GuiRenderUtil.border(g, gx, gy, gx + w, gy + h, CultivationTheme.BORDER_GOLD);
                                 g.drawString(font, dragPayload.categoryName, gx + 6, gy + 11,
                                                 CultivationTheme.TEXT_GOLD, false);
                         } else {
-                                g.fill(gx, gy, gx + w, gy + h, 0x80000000 | (0xFF4DD0E1 & 0x00FFFFFF));
-                                GuiRenderUtil.border(g, gx, gy, gx + w, gy + h, 0xFF4DD0E1);
+                                g.fill(gx, gy, gx + w, gy + h, CultivationTheme.BAR_OUTLINE
+                                                | (CultivationTheme.TEXT_INFO & 0x00FFFFFF));
+                                GuiRenderUtil.border(g, gx, gy, gx + w, gy + h, CultivationTheme.TEXT_INFO);
                                 g.drawString(font, dragPayload.component.trans(), gx + 6, gy + 11,
                                                 CultivationTheme.TEXT_PRIMARY, false);
                         }
@@ -193,9 +199,9 @@ public class ComponentEditorScreen extends Screen {
                 int boxX = Math.max(5, Math.min(this.width - boxW - 5, mouseX - boxW / 2));
                 int boxY = (mouseY - 25 < 5) ? mouseY + 15 : mouseY - 25;
 
-                int bgColor = (0xE0101820 & 0x00FFFFFF) | alphaInt;
-                int borderColor = (0xFFFF5555 & 0x00FFFFFF) | alphaInt;
-                int textColor = (0xFFFF5555 & 0x00FFFFFF) | alphaInt;
+                int bgColor = (CultivationTheme.TOAST_BG & 0x00FFFFFF) | alphaInt;
+                int borderColor = (CultivationTheme.DANGER & 0x00FFFFFF) | alphaInt;
+                int textColor = (CultivationTheme.DANGER & 0x00FFFFFF) | alphaInt;
 
                 g.fill(boxX, boxY, boxX + boxW, boxY + boxH, bgColor);
                 GuiRenderUtil.border(g, boxX, boxY, boxX + boxW, boxY + boxH, borderColor);

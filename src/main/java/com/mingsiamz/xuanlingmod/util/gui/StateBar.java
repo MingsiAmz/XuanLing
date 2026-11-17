@@ -73,14 +73,14 @@ public class StateBar implements IGuiComponent {
 
                 int barY = showText ? y + 12 : y;
 
-                g.fill(x - 1, barY - 1, x + width + 1, barY + barHeight + 1, 0x80000000);
+                g.fill(x - 1, barY - 1, x + width + 1, barY + barHeight + 1, CultivationTheme.BAR_OUTLINE);
                 g.fill(x, barY, x + width, barY + barHeight, CultivationTheme.PANEL_BG_DARK);
 
                 float ratio = max <= 0 ? 0f : (float) current / max;
                 GuiRenderUtil.progressFill(g, x, barY, width, barHeight, ratio, barColor);
 
                 if (showTicks) {
-                        GuiRenderUtil.ticks(g, x, barY, width, barHeight, 10, 0x30FFFFFF);
+                        GuiRenderUtil.ticks(g, x, barY, width, barHeight, 10, CultivationTheme.TICK_LINE);
                 }
                 GuiRenderUtil.border(g, x - 1, barY - 1, x + width + 1, barY + barHeight + 1,
                                 CultivationTheme.BORDER_DIM);

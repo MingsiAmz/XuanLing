@@ -1,4 +1,4 @@
-package com.mingsiamz.xuanlingmod.gui.component.palette;
+package com.mingsiamz.xuanlingmod.util.gui.component.palette;
 
 import com.mingsiamz.xuanlingmod.api.IComponent;
 import com.mingsiamz.xuanlingmod.gui.component.DragPayload;
@@ -71,7 +71,7 @@ public class CollapsibleCategory {
                 boolean hoveredHeader = mouseX >= x && mouseX < x + width
                                 && mouseY >= y && mouseY < y + HEADER_H;
 
-                int headerBg = hoveredHeader ? 0x6000E5FF : 0x30101820;
+                int headerBg = hoveredHeader ? CultivationTheme.HOVER_CYAN : CultivationTheme.PALETTE_ITEM_BG;
                 g.fill(x, y, x + width, y + HEADER_H, headerBg);
 
                 var font = Minecraft.getInstance().font;
