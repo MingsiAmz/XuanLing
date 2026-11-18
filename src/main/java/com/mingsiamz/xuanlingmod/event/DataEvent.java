@@ -85,7 +85,7 @@ public class DataEvent {
     }
 
     /**
-     * Issue 07：玩家死亡时全部移除自定义 buff（走火入魔、重伤等）。
+     * Issue 10：玩家死亡时重置并随机所有属性；全部移除自定义 buff。
      */
     @SubscribeEvent
     public static void onEntityDeath(LivingDeathEvent event) {
@@ -101,18 +101,13 @@ public class DataEvent {
             return;
         }
 
-        // 移除走火入魔
-        if (data.isDeviating()) {
-            player.removeEffect(RegisterEffects.EFFECT_DEVIATION);
-            data.setDeviating(false);
-            data.setDeviationTick(0);
-        }
-        // 移除重伤
-        if (data.isCriticalInjured()) {
-            player.removeEffect(RegisterEffects.EFFECT_CRITICAL_INJURY);
-            data.setCriticalInjured(false);
-            data.setCriticalInjuryTick(0);
-        }
+        // 移除全部自定义 buff（走火入魔、重伤等）
+        player.removeEffect(RegisterEffects.EFFECT_DEVIATION);
+        player.removeEffect(RegisterEffects.EFFECT_CRITICAL_INJURY);
+
+        // 重置并随机所有属性
+        data.resetAndRandomize();
+        XuanLing.LOGGER.info("{} 死亡，重置并随机所有属性，移除全部自定义 buff", player.getName().getString());
     }
 
     @SubscribeEvent

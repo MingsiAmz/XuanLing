@@ -638,6 +638,47 @@ public class BasicData {
                 return data;
         }
 
+        /**
+         * 玩家死亡时重置并随机所有属性；重置所有状态与计数器。
+         * 自定义 buff 的移除由调用方（DataEvent.onEntityDeath）负责。
+         */
+        public void resetAndRandomize() {
+                // 随机化所有双精度属性（在配置范围内）
+                setNormalLife(XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_NORMAL_LIFE), Config.getMaxValue(Config.RANGE_NORMAL_LIFE)));
+                setSoulLife(XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_SOUL_LIFE), Config.getMaxValue(Config.RANGE_SOUL_LIFE)));
+                setMoveSpeedMof(XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_MOVE_SPEED), Config.getMaxValue(Config.RANGE_MOVE_SPEED)));
+                setFlySpeedMof(XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_FLY_SPEED), Config.getMaxValue(Config.RANGE_FLY_SPEED)));
+                setLucky(XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_LUCKY), Config.getMaxValue(Config.RANGE_LUCKY)));
+                setCharm(XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_CHARM), Config.getMaxValue(Config.RANGE_CHARM)));
+                setTPAO(XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_TPAO), Config.getMaxValue(Config.RANGE_TPAO)));
+                setInsight(XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_INSIGHT), Config.getMaxValue(Config.RANGE_INSIGHT)));
+                setInspiration(XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_INSPIRATION), Config.getMaxValue(Config.RANGE_INSPIRATION)));
+                setMindSense(XuanLing.RANDOM.nextDouble(Config.getMinValue(Config.RANGE_M_SENSE), Config.getMaxValue(Config.RANGE_M_SENSE)));
+
+                // 重置计数与状态
+                setMorality(0);
+                setCondemnation(0);
+                setLifespanMonth(120);
+                setRealmLevel(0);
+                setRealmExp(0.0);
+
+                // 重置参悟状态
+                setComprehending(false);
+                setComprehensionTick(0);
+                setComprehensionTarget("");
+                setComprehensionIntensity(0f);
+                setComprehensionMaxTick(0);
+                comprehensionLevel = 0;
+                comprehensionExp = 0.0;
+
+                // 重置 buff 状态标记
+                setDeviating(false);
+                setDeviationTick(0);
+                setCriticalInjured(false);
+                setCriticalInjuryTick(0);
+                setMeditation(false);
+        }
+
         @Override
         public String toString() {
                 String str = "normalLife:" + (int) normalLife + "\n" +
