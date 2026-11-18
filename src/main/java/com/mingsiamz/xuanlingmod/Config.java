@@ -161,6 +161,68 @@ public class Config {
                         .comment("特效渲染等级：LOW/MEDIUM/HIGH，客户端按等级简化渲染，降低低配机压力")
                         .defineEnum("special_effect_level", SpecialEffectLevel.MEDIUM);
 
+        /* ================================================================
+         * 01-config-new-items：Config 新增项（天劫扣寿曲线、重伤惩罚、善恶阈值）
+         * 所有数值不再硬编码，游戏逻辑应通过以下访问器读取默认值与范围。
+         * ================================================================ */
+
+        /**
+         * 天劫扣寿基础值，对应元婴（level 4）失败扣除的月寿命，公式 base × growthRate^(level - 4)
+         *
+         * @return 默认 200，最小 0
+         */
+        public static double getTribulationLifespanBase() {
+                return TRIBULATION_LIFESPAN_BASE.get();
+        }
+
+        /**
+         * 天劫扣寿曲线增长率，建议取值 [1.0, 5.0]，越大高境界扣寿越多
+         *
+         * @return 默认 1.7，范围 [1.0, 5.0]
+         */
+        public static double getTribulationLifespanGrowthRate() {
+                return TRIBULATION_LIFESPAN_GROWTH_RATE.get();
+        }
+
+        /**
+         * 重伤 debuff 的修炼效率惩罚，0-1 之间，默认 0.2 表示效率降至原来的 20%
+         *
+         * @return 默认 0.2，范围 [0, 1]
+         */
+        public static double getInjuryDebuffCultivationPenalty() {
+                return INJURY_DEBUFF_CULTIVATION_PENALTY.get();
+        }
+
+        /**
+         * 善标签阈值，0-1 之间，占比 >= 该值标记为“善”
+         *
+         * @return 默认 0.8，范围 [0, 1]
+         */
+        public static double getAlignmentGoodThreshold() {
+                return ALIGNMENT_GOOD_THRESHOLD.get();
+        }
+
+        /**
+         * 恶标签阈值，0-1 之间，占比 <= 该值标记为“恶”
+         *
+         * @return 默认 0.2，范围 [0, 1]
+         */
+        public static double getAlignmentEvilThreshold() {
+                return ALIGNMENT_EVIL_THRESHOLD.get();
+        }
+
+        /**
+         * 计算天劫失败扣除的寿命月数：deduction = base × growthRate^(level - 4)
+         * （元婴 level 4 扣除 base，更高境界按增长率指数递增）
+         *
+         * @param level 突破的境界等级
+         * @return 扣除的月寿命
+         */
+        public static double getTribulationLifespanDeduction(int level) {
+                return getTribulationLifespanBase()
+                                * Math.pow(getTribulationLifespanGrowthRate(), level - 4);
+        }
+
         /** 参悟所需参悟值基础值，公式 needComprehensionExp(level) = base × growthRate^level */
         public static final ModConfigSpec.DoubleValue COMPREHENSION_EXP_BASE = BUILDER
                         .comment("参悟升级所需参悟值基础值，公式 needComprehensionExp(level) = base × growthRate^level")
