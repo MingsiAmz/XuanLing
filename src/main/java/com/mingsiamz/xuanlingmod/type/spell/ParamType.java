@@ -4,7 +4,14 @@ public enum ParamType {
         INIT_SPEED("init_speed"),
         SPEED("speed"),
         DAMAGE("damage"),
-        NORMAL_VALUE("normal_value");
+        RADIUS("radius"),
+        NORMAL_VALUE("normal_value"),
+        DURATION("duration"),
+        COOLDOWN("cooldown"),
+        LIFETIME("lifetime"),
+        TICK_INTERVAL("tick_interval"),
+        MAX_TARGETS("max_targets"),
+        KNOCKBACK("knockback");
         public String name;
 
         private ParamType(String name) {

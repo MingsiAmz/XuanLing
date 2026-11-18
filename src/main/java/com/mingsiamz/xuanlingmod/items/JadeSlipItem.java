@@ -5,17 +5,24 @@ import com.mingsiamz.xuanlingmod.auto.generator.GenerationEngine;
 import com.mingsiamz.xuanlingmod.auto.generator.StatGenerator;
 import com.mingsiamz.xuanlingmod.data.component.ComponentRealm;
 import com.mingsiamz.xuanlingmod.data.component.JadeSlipData;
+import com.mingsiamz.xuanlingmod.data.controller.DataManager;
 import com.mingsiamz.xuanlingmod.register.RegisterDataComponents;
 import com.mingsiamz.xuanlingmod.register.RegisterItems;
+import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.XuanLing;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +30,22 @@ import java.util.Optional;
 public class JadeSlipItem extends Item {
     public JadeSlipItem(Properties properties) {
         super(properties.stacksTo(1).fireResistant().rarity(net.minecraft.world.item.Rarity.COMMON));
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+        ItemStack stack = player.getItemInHand(usedHand);
+        Optional<ComponentRealm> realmData = getRealmData(stack);
+        if (realmData.isEmpty()) {
+            return InteractionResultHolder.pass(stack);
+        }
+        if (!level.isClientSide) {
+            ComponentRealm realm = realmData.get();
+            LinkedHashMap<Integer, ComponentRealm> realms = new LinkedHashMap<>();
+            realms.put(realm.getIndex(), realm);
+            DataManager.saveData(realms, XuanLingTypeEnum.REALM, player.getStringUUID(), realm.getName());
+        }
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
     }
 
     
@@ -143,7 +166,7 @@ public class JadeSlipItem extends Item {
 
         if (realmOpt.isPresent()) {
             ComponentRealm realm = realmOpt.get();
-            String realmName = realm.getName() + " " + realm.getIndex() + "层";
+            String realmName = realm.getName();
             MutableComponent name = Component.literal("玉简·" + realmName)
                     .withStyle(getRarityStyle(rarity));
             stack.set(DataComponents.CUSTOM_NAME, name);
@@ -169,60 +192,14 @@ public class JadeSlipItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, context, tooltip, flag);
-
         Optional<ComponentRealm> realmOpt = getRealmData(stack);
-        Rarity rarity = getRarity(stack);
-        String source = getSource(stack);
-        String creator = getCreator(stack);
-
-        
-        tooltip.add(Component.literal("稀有度: " + rarity.getId())
-                .withStyle(getRarityStyle(rarity)));
-
-        
-        tooltip.add(Component.literal("来源: " + getSourceDisplayName(source))
-                .withStyle(ChatFormatting.GRAY));
-
-        if (!creator.isEmpty() && !creator.equals("world_gen")) {
-            tooltip.add(Component.literal("击杀者: " + creator)
-                    .withStyle(ChatFormatting.GOLD));
-        }
-
         if (realmOpt.isPresent()) {
             ComponentRealm realm = realmOpt.get();
-            tooltip.add(Component.literal("--- 境界信息 ---").withStyle(ChatFormatting.YELLOW));
-            tooltip.add(Component.literal("境界: " + realm.getName())
-                    .withStyle(ChatFormatting.WHITE));
-            tooltip.add(Component.literal("大境界: " + realm.getIndex() + " (" + getRealmLevelName(realm.getIndex()) + ")")
-                    .withStyle(ChatFormatting.WHITE));
-            tooltip.add(Component.literal("小境界: " + realm.getIndex() + " / " + realm.size())
-                    .withStyle(ChatFormatting.WHITE));
-
-            
-            tooltip.add(Component.literal("属性加成:").withStyle(ChatFormatting.AQUA));
-            tooltip.add(Component.literal("  气血: +" + (int)realm.getAddHealth())
-                    .withStyle(ChatFormatting.RED));
-            tooltip.add(Component.literal("  父气: +" + (int)realm.getAddParrentEnergy())
-                    .withStyle(ChatFormatting.BLUE));
-            tooltip.add(Component.literal("  子气: +" + (int)realm.getAddChildEnergy())
-                    .withStyle(ChatFormatting.LIGHT_PURPLE));
-            tooltip.add(Component.literal("  寿命: +" + (int)realm.getAddNormalLife())
-                    .withStyle(ChatFormatting.GREEN));
-            tooltip.add(Component.literal("  元寿: +" + (int)realm.getAddSoulLife())
-                    .withStyle(ChatFormatting.YELLOW));
-
-            
-            tooltip.add(Component.literal("突破奖励:").withStyle(ChatFormatting.LIGHT_PURPLE));
-            tooltip.add(Component.literal("  气血: +" + (int)realm.getNextLevelAddHealth())
-                    .withStyle(ChatFormatting.RED));
-            tooltip.add(Component.literal("  父气: +" + (int)realm.getNextLevelAddParrentEnergy())
-                    .withStyle(ChatFormatting.BLUE));
-            tooltip.add(Component.literal("  子气: +" + (int)realm.getNextLevelAddChildEnergy())
-                    .withStyle(ChatFormatting.LIGHT_PURPLE));
-
-            if (realm.canTrans()) {
-                tooltip.add(Component.literal("可飞升/渡劫").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
-            }
+            tooltip.add(Component.literal(realm.getName()).withStyle(ChatFormatting.WHITE));
+            String description = realm.canTrans()
+                    ? "此法门蕴含着渡劫飞升的感悟。"
+                    : "此玉简记录了一门修真法门的修炼感悟。";
+            tooltip.add(Component.literal(description).withStyle(ChatFormatting.GRAY));
         } else {
             tooltip.add(Component.literal("右键使用可记录当前境界").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         }

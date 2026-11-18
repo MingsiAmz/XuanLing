@@ -12,6 +12,7 @@ import com.mingsiamz.xuanlingmod.client.ArtSpellCache;
 import com.mingsiamz.xuanlingmod.data.SpellComponent;
 import com.mingsiamz.xuanlingmod.data.controller.DataLoader;
 import com.mingsiamz.xuanlingmod.network.BindSkillPacket;
+import com.mingsiamz.xuanlingmod.network.ManageDataPacket;
 import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
@@ -36,6 +37,7 @@ public class ArcaneMasteryMenuGui extends Screen {
         private static final int SCROLLBAR_WIDTH = 4;
         private static final int SCROLLBAR_MARGIN = 3;
         private static final int SLOT_BOTTOM_PAD = 30;
+        private static final int SLOT_LABEL_HEIGHT = 12;
 
         private final XuanLingTypeEnum type;
 
@@ -112,7 +114,7 @@ public class ArcaneMasteryMenuGui extends Screen {
                 int targetSlot = clamp(innerW / 6, 64, 96);
                 this.cols = Math.max(2, (this.gridW + GRID_GAP) / (targetSlot + GRID_GAP));
                 this.slotW = (this.gridW - GRID_GAP * (cols - 1)) / cols;
-                this.slotH = this.slotW;
+                this.slotH = this.slotW + SLOT_LABEL_HEIGHT;
 
                 int rows = (int) Math.ceil((double) slots.size() / cols);
                 this.contentH = rows * this.slotH + Math.max(0, rows - 1) * GRID_GAP;
@@ -134,33 +136,37 @@ public class ArcaneMasteryMenuGui extends Screen {
 
         private List<ArtSlot> buildHardcodedSlots() {
                 List<ArtSlot> list = new ArrayList<>();
-                switch (this.type) {
-                        case ART -> {
-                                ArrayList<String> names = getNames();
-                                if (names == null || names.isEmpty())
-                                        list.add(new ArtSlot("null", 0, false));
-                                else
-                                        for (String name : names)
-                                                list.add(new ArtSlot(name, 5, true));
+                ArrayList<String> names = getNames();
+                if (names == null || names.isEmpty()) {
+                        list.add(new ArtSlot("null", false));
+                        return list;
+                }
+                String activeArt = minecraft.player.getPersistentData()
+                                .getCompound(ManageDataPacket.ACTIVE_ART_KEY).getString("name");
+                CompoundTag binds = minecraft.player.getPersistentData().getCompound(BindSkillPacket.BIND_KEY);
+                for (String name : names) {
+                        ArtSlot slot = new ArtSlot(name, true);
+                        if (this.type == XuanLingTypeEnum.ART) {
+                                slot.setActive(name.equals(activeArt));
+                                slot.setOnClick(() -> Networking.sendToServer(
+                                                new ManageDataPacket(this.type, name, false)));
+                        } else {
+                                String binding = binds.contains(name) ? binds.getString(name) : "";
+                                slot.setBinding(binding);
+                                slot.setActive(!binding.isEmpty());
+                                slot.setOnClick(() -> startBinding(name));
                         }
-                        case SPELL -> {
-                                ArrayList<String> names = getNames();
-                                if (names == null || names.isEmpty())
-                                        list.add(new ArtSlot("null", 0, false));
-                                else {
-                                        CompoundTag binds = minecraft.player.getPersistentData()
-                                                        .getCompound(BindSkillPacket.BIND_KEY);
-                                        for (String name : names) {
-                                                ArtSlot slot = new ArtSlot(name, 5, true);
-                                                slot.setBinding(binds.contains(name) ? binds.getString(name) : "");
-                                                slot.setOnClick(() -> startBinding(name));
-                                                list.add(slot);
-                                        }
-                                }
-                        }
-                        default -> throw new IllegalArgumentException("Unexpected value: " + this.type);
+                        list.add(slot);
                 }
                 return list;
+        }
+
+        public void refreshData() {
+                if (this.minecraft == null || this.minecraft.player == null || this.panel == null) {
+                        return;
+                }
+                this.slots = buildHardcodedSlots();
+                recomputeLayout();
         }
 
         @Override
@@ -197,6 +203,9 @@ public class ArcaneMasteryMenuGui extends Screen {
 
                 g.disableScissor();
 
+                for (ArtSlot slot : slots) {
+                        slot.renderTooltip(g, this.type, mouseX, mouseY);
+                }
                 renderScrollbar(g, mouseX, mouseY);
                 backButton.render(g, mouseX, mouseY, partialTick);
 
@@ -275,7 +284,16 @@ public class ArcaneMasteryMenuGui extends Screen {
                                 slot.setPosition(sx, sy);
                                 slot.setSize(slotW, slotH);
                                 if (mx < barLimit && slot.isMouseOver(mx, my)) {
-                                        slot.onClick();
+                                        if (button != 0) {
+                                                return true;
+                                        }
+                                        if (hasShiftDown()) {
+                                                if (slot.unlocked) {
+                                                        Networking.sendToServer(new ManageDataPacket(this.type, slot.name, true));
+                                                }
+                                        } else {
+                                                slot.onClick();
+                                        }
                                         return true;
                                 }
                         }
@@ -428,19 +446,23 @@ public class ArcaneMasteryMenuGui extends Screen {
 
         public static class ArtSlot implements IGuiComponent {
                 private final String name;
-                private final int rarity;
                 private final boolean unlocked;
                 private int x, y;
                 private int width = 80;
                 private int height = 80;
                 private boolean hovered;
+                private boolean active;
                 private Runnable onClickAction;
                 private String binding = "";
 
-                public ArtSlot(String name, int rarity, boolean unlocked) {
+                public ArtSlot(String name, boolean unlocked) {
                         this.name = name;
-                        this.rarity = rarity;
                         this.unlocked = unlocked;
+                }
+
+                public ArtSlot setActive(boolean active) {
+                        this.active = active;
+                        return this;
                 }
 
                 public ArtSlot setBinding(String binding) {
@@ -459,6 +481,22 @@ public class ArcaneMasteryMenuGui extends Screen {
                         return this;
                 }
 
+                public void renderTooltip(GuiGraphics g, XuanLingTypeEnum type, int mouseX, int mouseY) {
+                        if (!unlocked || !hovered) {
+                                return;
+                        }
+                        List<Component> lines = new ArrayList<>();
+                        if (type == XuanLingTypeEnum.ART) {
+                                lines.add(Component.literal("功法：" + name));
+                                lines.add(Component.literal(active ? "已启用，点击停用" : "未启用，点击启用"));
+                        } else {
+                                lines.add(Component.literal("神通：" + name));
+                                lines.add(Component.literal(binding.isEmpty() ? "点击绑定按键" : "已绑定：" + binding));
+                        }
+                        lines.add(Component.literal("Shift + 左键删除"));
+                        g.renderComponentTooltip(net.minecraft.client.Minecraft.getInstance().font, lines, mouseX, mouseY);
+                }
+
                 public void onClick() {
                         if (unlocked && onClickAction != null) {
                                 onClickAction.run();
@@ -467,55 +505,40 @@ public class ArcaneMasteryMenuGui extends Screen {
 
                 @Override
                 public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-                        this.hovered = isMouseOver(mouseX, mouseY);
-                        int bgColor = unlocked ? 0x4000E5FF : 0x20FFFFFF;
-                        int borderColor = unlocked ? getRarityColor() : CultivationTheme.BORDER_DIM;
+                        int boxHeight = Math.max(20, height - SLOT_LABEL_HEIGHT);
+                        this.hovered = mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + boxHeight;
+                        int bgColor = unlocked ? 0x3000E5FF : 0x20FFFFFF;
+                        int borderColor = unlocked ? CultivationTheme.BORDER_CYAN : CultivationTheme.BORDER_DIM;
 
-                        g.fill(x, y, x + width, y + height, bgColor);
-                        GuiRenderUtil.border(g, x, y, x + width, y + height,
-                                        hovered ? CultivationTheme.BORDER_GOLD : borderColor);
+                        g.fill(x, y, x + width, y + boxHeight, bgColor);
+                        if (active && unlocked) {
+                                g.fill(x - 3, y - 3, x + width + 3, y - 1, 0x3000E5FF);
+                                g.fill(x - 3, y + boxHeight + 1, x + width + 3, y + boxHeight + 3, 0x3000E5FF);
+                                g.fill(x - 3, y - 1, x - 1, y + boxHeight + 1, 0x3000E5FF);
+                                g.fill(x + width + 1, y - 1, x + width + 3, y + boxHeight + 1, 0x3000E5FF);
+                        }
+                        GuiRenderUtil.border(g, x, y, x + width, y + boxHeight,
+                                        active ? CultivationTheme.ACCENT
+                                                        : hovered ? CultivationTheme.BORDER_GOLD : borderColor);
 
                         var font = net.minecraft.client.Minecraft.getInstance().font;
                         if (unlocked && name != null) {
                                 Component nameComp = Component.literal(name);
                                 int textX = x + (width - font.width(nameComp)) / 2;
-                                int textY = y + height - 18;
-                                if (height >= 60) {
-                                        g.drawString(font, nameComp, textX, textY, CultivationTheme.TEXT_PRIMARY,
-                                                        false);
-
-                                        String stars = "★".repeat(rarity);
-                                        Component starComp = Component.literal(stars);
-                                        int starX = x + (width - font.width(starComp)) / 2;
-                                        g.drawString(font, starComp, starX, y + 6, getRarityColor(), false);
-
-                                        if (!binding.isEmpty()) {
-                                                Component bindComp = Component.literal(binding);
-                                                g.drawString(font, bindComp,
-                                                                x + (width - font.width(bindComp)) / 2, y + 18,
-                                                                CultivationTheme.ACCENT, false);
-                                        }
-                                } else {
-                                        g.drawString(font, nameComp, textX, y + (height - 8) / 2,
-                                                        CultivationTheme.TEXT_PRIMARY, false);
+                                int textY = y + (boxHeight - 8) / 2;
+                                g.drawString(font, nameComp, textX, textY, CultivationTheme.TEXT_PRIMARY, false);
+                                if (!binding.isEmpty()) {
+                                        Component bindComp = Component.literal(binding);
+                                        g.drawString(font, bindComp, x + (width - font.width(bindComp)) / 2,
+                                                        y + boxHeight + 2, CultivationTheme.ACCENT, false);
                                 }
                         } else {
                                 Component empty = XuanLing.trans(XuanlingLangPro.GUI_STRING,
                                                 "arcane_mastery_empty_slot");
                                 int textX = x + (width - font.width(empty)) / 2;
-                                g.drawString(font, empty, textX, y + height / 2 - 4, CultivationTheme.TEXT_SECONDARY,
-                                                false);
+                                g.drawString(font, empty, textX, y + boxHeight / 2 - 4,
+                                                CultivationTheme.TEXT_SECONDARY, false);
                         }
-                }
-
-                private int getRarityColor() {
-                        return switch (rarity) {
-                                case 5 -> 0xFFFF4D4D;
-                                case 4 -> 0xFFFFC94D;
-                                case 3 -> 0xFFB44DFF;
-                                case 2 -> 0xFF4DFF7B;
-                                default -> CultivationTheme.BORDER_CYAN;
-                        };
                 }
 
                 @Override

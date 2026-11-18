@@ -39,6 +39,11 @@ public class Networking {
                                 CastSpellPacket.CODEC,
                                 Networking::handler);
 
+                reg.playToServer(
+                                ManageDataPacket.TYPE,
+                                ManageDataPacket.CODEC,
+                                Networking::handler);
+
                 reg.playToClient(
                                 SpellChoicePacket.TYPE,
                                 SpellChoicePacket.CODEC,
@@ -47,6 +52,11 @@ public class Networking {
                 reg.playToClient(
                                 SyncDataPacket.TYPE,
                                 SyncDataPacket.CODEC,
+                                Networking::handler);
+
+                reg.playToClient(
+                                SkillFxPacket.TYPE,
+                                SkillFxPacket.CODEC,
                                 Networking::handler);
         }
 

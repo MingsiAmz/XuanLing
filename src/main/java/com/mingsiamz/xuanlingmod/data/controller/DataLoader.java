@@ -157,6 +157,14 @@ public final class DataLoader {
                 };
         }
 
+        public static void remove(XuanLingTypeEnum enumType, String entityUuid, String name) {
+                String key = cacheKey(DataManager.resolveFile(enumType, entityUuid, name));
+                if (key != null) {
+                        CACHE.remove(key);
+                        invalidateTyped(key);
+                }
+        }
+
         public static JsonObject get(String key) {
                 return CACHE.get(key);
         }

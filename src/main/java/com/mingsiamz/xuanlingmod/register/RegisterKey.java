@@ -18,6 +18,7 @@ public class RegisterKey {
         public static final KeyMapping KEY_V = reKey("v", GLFW.GLFW_KEY_V);
         public static final KeyMapping KEY_B = reKey("b", GLFW.GLFW_KEY_B);
         public static final KeyMapping KEY_RELEASE = reKey("release", GLFW.GLFW_KEY_GRAVE_ACCENT);
+        public static final KeyMapping KEY_HIGH_USE = reKey("expend_energy_use", GLFW.GLFW_KEY_H);
 
         private static KeyMapping reKey(String name, int glfw) {
                 return new KeyMapping("key." + XuanLing.MODID + "." + name, glfw, "key." + XuanLing.MODID + ".keys");
@@ -32,5 +33,6 @@ public class RegisterKey {
                 event.register(KEY_V);
                 event.register(KEY_B);
                 event.register(KEY_RELEASE);
+                event.register(KEY_HIGH_USE);
         }
 }

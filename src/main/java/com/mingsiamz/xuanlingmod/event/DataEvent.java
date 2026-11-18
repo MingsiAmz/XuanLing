@@ -5,6 +5,7 @@ import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
 import com.mingsiamz.xuanlingmod.network.BindSkillPacket;
+import com.mingsiamz.xuanlingmod.network.ManageDataPacket;
 import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
@@ -26,7 +27,8 @@ public class DataEvent {
         private static final String[] SYNC_KEYS = {
                         XuanLing.MODID + XuanLingTypeEnum.SPELL.type,
                         XuanLing.MODID + XuanLingTypeEnum.ART.type,
-                        BindSkillPacket.BIND_KEY
+                        BindSkillPacket.BIND_KEY,
+                        ManageDataPacket.ACTIVE_ART_KEY
         };
 
         

@@ -296,7 +296,7 @@ public class StatGenerator {
         }
         
         return new RealmGeneratedStats(
-                nameGenerator != null ? nameGenerator.generateRealmName(template, minorLevel, random) : generateFallbackPhaseName(minorLevel, template.size(), random),
+                nameGenerator != null ? nameGenerator.generateRealmName(template, minorLevel, random) : template.name(),
                 template.level(),
                 minorLevel,
                 template.size(),

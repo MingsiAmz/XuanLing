@@ -59,6 +59,7 @@ public class ComponentEditorScreen extends Screen {
         private Component toastMessage = null;
         private long toastTime = 0;
         private ParamPopup activePopup = null;
+        private ImpComponent selectedComponent;
         private int toastColor = CultivationTheme.DANGER;
 
         private DragPayload dragPayload = null;
@@ -255,6 +256,7 @@ public class ComponentEditorScreen extends Screen {
 
                 palette.render(g, mouseX, mouseY, partialTick);
                 canvas.render(g, mouseX, mouseY, partialTick);
+                renderAdjustedParameters(g);
 
                 if (dragPayload != null) {
                         int w = 110;
@@ -285,6 +287,35 @@ public class ComponentEditorScreen extends Screen {
                         renderNamePopup(g, mouseX, mouseY, partialTick);
 
                 renderToast(g, mouseX, mouseY);
+        }
+
+        private void renderAdjustedParameters(GuiGraphics g) {
+                if (selectedComponent == null) {
+                        return;
+                }
+                List<String> lines = new ArrayList<>();
+                selectedComponent.getParams().forEach((key, value) -> {
+                        if (value instanceof Number number && number.doubleValue() != 0) {
+                                lines.add(key.name() + " = " + value);
+                        }
+                });
+                if (lines.isEmpty()) {
+                        return;
+                }
+                int panelWidth = 180;
+                int x = this.width - panelWidth - 12;
+                int y = 44;
+                int panelHeight = 34 + lines.size() * 12;
+                g.fill(x, y, x + panelWidth, y + panelHeight, 0xE0101518);
+                GuiRenderUtil.border(g, x, y, x + panelWidth, y + panelHeight, CultivationTheme.BORDER_CYAN);
+                g.drawString(this.font, Component.literal("已调整参数"), x + 8, y + 7,
+                                CultivationTheme.TEXT_GOLD, false);
+                g.drawString(this.font, selectedComponent.trans(), x + 8, y + 19,
+                                CultivationTheme.TEXT_SECONDARY, false);
+                for (int i = 0; i < lines.size(); i++) {
+                        g.drawString(this.font, lines.get(i), x + 8, y + 33 + i * 12,
+                                        CultivationTheme.TEXT_PRIMARY, false);
+                }
         }
 
         private void renderToast(GuiGraphics g, int mouseX, int mouseY) {
@@ -503,6 +534,7 @@ public class ComponentEditorScreen extends Screen {
         private void setupNodeClick(CanvasNode node) {
                 node.setOnConfigClick(() -> {
                         if (node.getDef() != null) {
+                                selectedComponent = node.getDef();
                                 if (node.getDef().getParams() == null || node.getDef().getParams().isEmpty()) {
                                         toast(XuanLing.trans(XuanlingLangPro.GUI_STRING,
                                                         "this_component_not_select_more"));

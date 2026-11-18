@@ -73,6 +73,18 @@ public final class DataManager {
                 return true;
         }
 
+        public static boolean deleteComponent(XuanLingTypeEnum type, String entityUuid, String name) {
+                Path file = resolveFile(type, entityUuid, name);
+                try {
+                        Files.deleteIfExists(file);
+                        DataLoader.remove(type, entityUuid, name);
+                        return true;
+                } catch (IOException e) {
+                        XuanLing.LOGGER.error("Failed to delete {} for {}", name, entityUuid, e);
+                        return false;
+                }
+        }
+
         public static void init() throws IOException {
                 Files.createDirectories(ART_CONFIG_DIR);
                 Files.createDirectories(SPELL_CONFIG_DIR);

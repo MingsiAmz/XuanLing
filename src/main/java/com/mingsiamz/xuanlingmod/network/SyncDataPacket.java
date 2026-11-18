@@ -1,6 +1,7 @@
 package com.mingsiamz.xuanlingmod.network;
 
 import com.mingsiamz.xuanlingmod.client.ArtSpellCache;
+import com.mingsiamz.xuanlingmod.gui.ArcaneMasteryMenuGui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -43,6 +44,9 @@ public class SyncDataPacket extends CustomPackageImp {
                 minecraft.player.getPersistentData().put(this.key, this.data.copy());
                 
                 ArtSpellCache.updateCache(this.key, this.data);
+                if (minecraft.screen instanceof ArcaneMasteryMenuGui menu) {
+                        menu.refreshData();
+                }
         }
 
         @Override

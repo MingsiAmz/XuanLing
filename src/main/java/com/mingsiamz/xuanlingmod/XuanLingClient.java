@@ -35,7 +35,6 @@ public class XuanLingClient {
 
         public XuanLingClient(ModContainer container) {
                 container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-                NeoForge.EVENT_BUS.addListener(EntityRenderersEvent.RegisterRenderers.class, XuanLingClient::registerRenderers);
                 NeoForge.EVENT_BUS.addListener(ClientTickEvent.Pre.class, XuanLingClient::onClientTick);
         }
 

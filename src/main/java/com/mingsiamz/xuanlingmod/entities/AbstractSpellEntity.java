@@ -30,12 +30,15 @@ public abstract class AbstractSpellEntity extends SkillEntity {
         protected String sourceName;
         protected float radius = 4.0f;
         protected float damage = 6.0f;
+        protected int maxTargets;
+        protected float knockback;
         protected boolean removeOnTrigger = true;
 
         public AbstractSpellEntity(EntityType<? extends AbstractSpellEntity> entityType, Level level) {
                 super(entityType, level);
                 this.noPhysics = true;
                 setInvulnerable(true);
+                setCustomNameVisible(false);
         }
 
         public AbstractSpellEntity(EntityType<? extends AbstractSpellEntity> entityType, Level level,
@@ -118,12 +121,20 @@ public abstract class AbstractSpellEntity extends SkillEntity {
 
         protected void applyComponentParams(ImpComponent comp) {
                 Object dmg = comp.getParams().get(com.mingsiamz.xuanlingmod.type.spell.ParamType.DAMAGE);
-                if (dmg instanceof Number n) {
+                if (dmg instanceof Number n && n.floatValue() > 0) {
                         this.damage = n.floatValue();
                 }
-                Object spd = comp.getParams().get(com.mingsiamz.xuanlingmod.type.spell.ParamType.SPEED);
-                if (spd instanceof Number n) {
-                        this.radius = Math.max(0.5f, n.floatValue());
+                Object radius = comp.getParams().get(com.mingsiamz.xuanlingmod.type.spell.ParamType.RADIUS);
+                if (radius instanceof Number n && n.floatValue() > 0) {
+                        this.radius = n.floatValue();
+                }
+                Object maxTargets = comp.getParams().get(com.mingsiamz.xuanlingmod.type.spell.ParamType.MAX_TARGETS);
+                if (maxTargets instanceof Number n && n.intValue() > 0) {
+                        this.maxTargets = n.intValue();
+                }
+                Object knockback = comp.getParams().get(com.mingsiamz.xuanlingmod.type.spell.ParamType.KNOCKBACK);
+                if (knockback instanceof Number n) {
+                        this.knockback = Math.max(0, n.floatValue());
                 }
         }
 
@@ -134,11 +145,16 @@ public abstract class AbstractSpellEntity extends SkillEntity {
                 LivingEntity caster = getCaster();
                 AABB area = new AABB(pos.x - radius, pos.y - radius, pos.z - radius,
                                 pos.x + radius, pos.y + radius, pos.z + radius);
+                int affected = 0;
                 for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, area)) {
-                        if (target == this || target == caster) {
+                        if (target == this || isOwner(target)) {
                                 continue;
                         }
+                        if (maxTargets > 0 && affected >= maxTargets) {
+                                break;
+                        }
                         applyEffectToTarget(level, target, caster, pos);
+                        affected++;
                 }
         }
 
@@ -149,8 +165,24 @@ public abstract class AbstractSpellEntity extends SkillEntity {
                 level.explode(null, pos.x, pos.y, pos.z, explosionRadius, ExplosionInteraction.NONE);
         }
 
+        protected boolean isOwner(LivingEntity target) {
+                if (target == null) {
+                        return false;
+                }
+                UUID casterUuid = getCasterUUID().orElseGet(() -> getOwnerUUID().orElse(null));
+                return casterUuid != null && casterUuid.equals(target.getUUID());
+        }
+
         protected void applyEffectToTarget(Level level, LivingEntity target, LivingEntity caster, Vec3 pos) {
-                target.hurt(level.damageSources().generic(), damage);
+                if (isOwner(target)) {
+                        return;
+                }
+                if (damage > 0) {
+                        target.hurt(level.damageSources().generic(), damage);
+                }
+                if (knockback > 0) {
+                        target.knockback(knockback, this.getX() - target.getX(), this.getZ() - target.getZ());
+                }
         }
 
         public void trigger(Level level, Vec3 pos) {

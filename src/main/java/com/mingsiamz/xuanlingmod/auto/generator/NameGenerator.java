@@ -168,10 +168,7 @@ public class NameGenerator {
     
     
     public String generateRealmName(RealmTemplate template, int minorLevel, Random random) {
-        
-        String realmName = template.name();
-        String phase = getPhaseName(minorLevel, template.size(), random);
-        return realmName + phase;
+        return template.name();
     }
 
     public String generateRandomRealmName(int level, Random random) {

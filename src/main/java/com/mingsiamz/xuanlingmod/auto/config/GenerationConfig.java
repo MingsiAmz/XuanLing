@@ -28,6 +28,7 @@ public class GenerationConfig {
     public static final ModConfigSpec.IntValue WEIGHT_LEGENDARY;
 
     
+    public static final ModConfigSpec.DoubleValue NPC_CULTIVATOR_CHANCE;
     public static final ModConfigSpec.DoubleValue NPC_ART_BASE_CHANCE;
     public static final ModConfigSpec.DoubleValue NPC_SPELL_BASE_CHANCE;
     public static final ModConfigSpec.DoubleValue NPC_TOP_PRODIGY_CHANCE;
@@ -102,6 +103,8 @@ public class GenerationConfig {
         BUILDER.pop();
 
         BUILDER.push("npc");
+        NPC_CULTIVATOR_CHANCE = BUILDER.comment("NPC成为修士的概率")
+                .defineInRange("cultivator_chance", 0.08, 0.0, 1.0);
         NPC_ART_BASE_CHANCE = BUILDER.comment("NPC拥有功法基础概率")
                 .defineInRange("art_base_chance", 0.3, 0.0, 1.0);
         NPC_SPELL_BASE_CHANCE = BUILDER.comment("NPC拥有神通基础概率")
