@@ -24,6 +24,33 @@ public class BasicData {
         private double inspiration = 0.0;
         private double mindSense = 0.0;
         private boolean isMeditation = false;
+
+        /** 道德值：正向行为提升，负向行为降低；高值可减轻/简化天劫 */
+        private int morality = 0;
+        /** 天谴值：负向行为累积，高值增加天劫伤害并可能触发非突破时的天罚 */
+        private int condemnation = 0;
+        /** 剩余寿命（月），每 7 个游戏天消耗 1 月，固定不随境界浮动 */
+        private int lifespanMonth = 120;
+        /** 上次扣除寿命时的世界天数（level.getDayTime()/24000），用于固定周期扣寿 */
+        private long lastLifespanCheckDay = 0;
+        /** 当前境界等级：0 凡人 … 4 元婴，突破 level4+ 需渡天劫 */
+        private int realmLevel = 0;
+        /** 当前修为，用于计算境界突破：needExp(level) = base × growthRate^level */
+        private double realmExp = 0.0;
+        /** 是否正在渡天劫中 */
+        private boolean isTribulating = false;
+        /** 天劫倒计时（tick），用于控制天劫持续时间和闪电频率 */
+        private int tribulationTick = 0;
+        /** 当前参悟等级 */
+        private int comprehensionLevel = 0;
+        /** 当前参悟值，用于计算参悟等级突破：needComprehensionExp(level) = base × growthRate^level */
+        private double comprehensionExp = 0.0;
+        /** 是否正在参悟中 */
+        private boolean isComprehending = false;
+        /** 参悟倒计时（tick），用于控制读条进度和寿命消耗 */
+        private int comprehensionTick = 0;
+        /** 当前参悟目标（功法/神通名称） */
+        private String comprehensionTarget = "";
         
         private String sect = "";
         private String nickName = "";
@@ -33,28 +60,76 @@ public class BasicData {
 
         public static final Codec<BasicData> CODEC = RecordCodecBuilder.create(builder -> builder
                         .group(
-                                        Codec.DOUBLE.fieldOf("normalLife").forGetter(d -> d.normalLife),
-                                        Codec.DOUBLE.fieldOf("soul_life").forGetter(d -> d.soulLife),
-                                        Codec.DOUBLE.fieldOf("move_speed_mof").forGetter(d -> d.moveSpeedMof),
-                                        Codec.DOUBLE.fieldOf("fly_speed_mof").forGetter(d -> d.flySpeedMof),
-                                        Codec.DOUBLE.fieldOf("TPAO").forGetter(d -> d.TPAO),
-                                        Codec.DOUBLE.fieldOf("lucky").forGetter(d -> d.lucky),
-                                        Codec.DOUBLE.fieldOf("charm").forGetter(d -> d.charm),
-                                        Codec.DOUBLE.fieldOf("insight").forGetter(d -> d.insight),
-                                        Codec.DOUBLE.fieldOf("inspiration").forGetter(d -> d.inspiration),
-                                        Codec.DOUBLE.fieldOf("mind_sense").forGetter(d -> d.mindSense),
-                                        Codec.BOOL.fieldOf("is_meditation").forGetter(d -> d.isMeditation),
-                                        Codec.STRING.fieldOf("sect").forGetter(d -> d.sect),
-                                        Codec.STRING.fieldOf("nick_name").forGetter(d -> d.nickName),
-                                        Codec.DOUBLE.fieldOf("lastmedix").forGetter(d -> d.lastMediX),
-                                        Codec.DOUBLE.fieldOf("lastmediy").forGetter(d -> d.lastMediY),
-                                        Codec.DOUBLE.fieldOf("lastmediz").forGetter(d -> d.lastMediZ))
-                        .apply(builder, BasicData::new));
+                                        Codec.DOUBLE.fieldOf("normalLife").forGetter(BasicData::getNormalLife),
+                                        Codec.DOUBLE.fieldOf("soul_life").forGetter(BasicData::getSoulLife),
+                                        Codec.DOUBLE.fieldOf("move_speed_mof").forGetter(BasicData::getMoveSpeedMof),
+                                        Codec.DOUBLE.fieldOf("fly_speed_mof").forGetter(BasicData::getFlySpeedMof),
+                                        Codec.DOUBLE.fieldOf("TPAO").forGetter(BasicData::getTPAO),
+                                        Codec.DOUBLE.fieldOf("lucky").forGetter(BasicData::getLucky),
+                                        Codec.DOUBLE.fieldOf("charm").forGetter(BasicData::getCharm),
+                                        Codec.DOUBLE.fieldOf("insight").forGetter(BasicData::getInsight),
+                                        Codec.DOUBLE.fieldOf("inspiration").forGetter(BasicData::getInspiration),
+                                        Codec.DOUBLE.fieldOf("mind_sense").forGetter(BasicData::getMindSense),
+                                        Codec.INT.fieldOf("morality").orElse(0).forGetter(BasicData::getMorality),
+                                        Codec.INT.fieldOf("condemnation").orElse(0).forGetter(BasicData::getCondemnation),
+                                        Codec.INT.fieldOf("lifespan_month").orElse(120).forGetter(BasicData::getLifespanMonth),
+                                        Codec.LONG.fieldOf("last_lifespan_check_day").orElse(0L).forGetter(BasicData::getLastLifespanCheckDay),
+                                        Codec.STRING.fieldOf("sect").forGetter(BasicData::getSect),
+                                        Codec.STRING.fieldOf("nick_name").forGetter(BasicData::getNickName)
+                        )
+                        .apply(builder, BasicData::fromCodec));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, BasicData> STREAM_CODEC = StreamCodec
                         .ofMember(BasicData::encode, BasicData::new);
 
         public BasicData() {
+        }
+
+        private BasicData(double normalLife, double soulLife, double moveSpeedMof, double flySpeedMof,
+                          double TPAO, double lucky, double charm, double insight, double inspiration,
+                          double mindSense, boolean isMeditation, int morality, int condemnation, int lifespanMonth,
+                          long lastLifespanCheckDay, String sect, String nickName,
+                          double lastMediX, double lastMediY, double lastMediZ,
+                          int realmLevel, double realmExp, boolean isTribulating, int tribulationTick, int comprehensionLevel,
+            double comprehensionExp, boolean isComprehending, int comprehensionTick, String comprehensionTarget) {
+            this.normalLife = normalLife;
+            this.soulLife = soulLife;
+            this.moveSpeedMof = moveSpeedMof;
+            this.flySpeedMof = flySpeedMof;
+            this.TPAO = TPAO;
+            this.lucky = lucky;
+            this.charm = charm;
+            this.insight = insight;
+            this.inspiration = inspiration;
+            this.mindSense = mindSense;
+            this.isMeditation = isMeditation;
+            this.morality = morality;
+            this.condemnation = condemnation;
+            this.lifespanMonth = lifespanMonth;
+            this.lastLifespanCheckDay = lastLifespanCheckDay;
+            this.sect = sect;
+            this.nickName = nickName;
+            this.lastMediX = lastMediX;
+            this.lastMediY = lastMediY;
+            this.lastMediZ = lastMediZ;
+            this.realmLevel = realmLevel;
+            this.realmExp = realmExp;
+            this.isTribulating = isTribulating;
+            this.tribulationTick = tribulationTick;
+            this.comprehensionLevel = comprehensionLevel;
+            this.comprehensionExp = comprehensionExp;
+            this.isComprehending = isComprehending;
+            this.comprehensionTick = comprehensionTick;
+            this.comprehensionTarget = comprehensionTarget;
+        }
+
+        private static BasicData fromCodec(double normalLife, double soulLife, double moveSpeedMof, double flySpeedMof,
+                                           double TPAO, double lucky, double charm, double insight,
+                                           double inspiration, double mindSense, int morality, int condemnation,
+                                           int lifespanMonth, long lastLifespanCheckDay, String sect, String nickName) {
+            return new BasicData(normalLife, soulLife, moveSpeedMof, flySpeedMof, TPAO, lucky, charm, insight,
+                                 inspiration, mindSense, false, morality, condemnation, lifespanMonth,
+                                 lastLifespanCheckDay, sect, nickName, 0, 0, 0, 0, 0.0, false, 0, 0, 0.0, false, 0, "");
         }
 
         public BasicData(RegistryFriendlyByteBuf buf) {
@@ -69,11 +144,24 @@ public class BasicData {
                 this.inspiration = buf.readDouble();
                 this.mindSense = buf.readDouble();
                 this.isMeditation = buf.readBoolean();
+                this.morality = buf.readInt();
+                this.condemnation = buf.readInt();
+                this.lifespanMonth = buf.readInt();
+                this.lastLifespanCheckDay = buf.readLong();
                 this.sect = buf.readUtf();
                 this.nickName = buf.readUtf();
                 this.lastMediX = buf.readDouble();
                 this.lastMediY = buf.readDouble();
                 this.lastMediZ = buf.readDouble();
+                this.realmLevel = buf.readInt();
+                this.realmExp = buf.readDouble();
+                this.isTribulating = buf.readBoolean();
+                this.tribulationTick = buf.readInt();
+                this.comprehensionLevel = buf.readInt();
+                this.comprehensionExp = buf.readDouble();
+                this.isComprehending = buf.readBoolean();
+                this.comprehensionTick = buf.readInt();
+                this.comprehensionTarget = buf.readUtf();
         }
 
         public BasicData(
@@ -88,11 +176,22 @@ public class BasicData {
                         double inspiration,
                         double mindSense,
                         boolean isMeditation,
+                        int morality,
+                        int condemnation,
+                        int lifespanMonth,
+                        long lastLifespanCheckDay,
                         String sect,
                         String nickName,
                         double lastMediX,
                         double lastMediY,
-                        double lastMediZ) {
+                        double lastMediZ,
+                        int realmLevel,
+                        double realmExp,
+                        int comprehensionLevel,
+                        double comprehensionExp,
+                        boolean isComprehending,
+                        int comprehensionTick,
+                        String comprehensionTarget) {
                 this.normalLife = normalLife;
                 this.soulLife = soulLife;
                 this.moveSpeedMof = moveSpeedMof;
@@ -103,11 +202,22 @@ public class BasicData {
                 this.insight = insight;
                 this.inspiration = inspiration;
                 this.isMeditation = isMeditation;
+                this.morality = morality;
+                this.condemnation = condemnation;
+                this.lifespanMonth = lifespanMonth;
+                this.lastLifespanCheckDay = lastLifespanCheckDay;
                 this.sect = sect;
                 this.nickName = nickName;
                 this.lastMediX = lastMediX;
                 this.lastMediY = lastMediY;
                 this.lastMediZ = lastMediZ;
+                this.realmLevel = realmLevel;
+                this.realmExp = realmExp;
+                this.comprehensionLevel = comprehensionLevel;
+                this.comprehensionExp = comprehensionExp;
+                this.isComprehending = isComprehending;
+                this.comprehensionTick = comprehensionTick;
+                this.comprehensionTarget = comprehensionTarget;
         }
 
         public double getNormalLife() {
@@ -248,6 +358,53 @@ public class BasicData {
                 return isMeditation;
         }
 
+        public int getMorality() {
+                return morality;
+        }
+
+        public void setMorality(int morality) {
+                int max = Config.getMaxValue(Config.MORALITY_MAX);
+                if (morality >= max) {
+                        morality = max;
+                } else if (morality <= Config.getMinValue(Config.MORALITY_MAX)) {
+                        morality = Config.getMinValue(Config.MORALITY_MAX);
+                }
+                this.morality = morality;
+        }
+
+        public int getCondemnation() {
+                return condemnation;
+        }
+
+        public void setCondemnation(int condemnation) {
+                int max = Config.getMaxValue(Config.CONDEMNATION_MAX);
+                if (condemnation >= max) {
+                        condemnation = max;
+                } else if (condemnation <= Config.getMinValue(Config.CONDEMNATION_MAX)) {
+                        condemnation = Config.getMinValue(Config.CONDEMNATION_MAX);
+                }
+                this.condemnation = condemnation;
+        }
+
+        public int getLifespanMonth() {
+                return lifespanMonth;
+        }
+
+        public void setLifespanMonth(int lifespanMonth) {
+                if (lifespanMonth < 0) {
+                        lifespanMonth = 0;
+                }
+                this.lifespanMonth = lifespanMonth;
+        }
+
+        public long getLastLifespanCheckDay() {
+                return lastLifespanCheckDay;
+        }
+
+        public void setLastLifespanCheckDay(long lastLifespanCheckDay) {
+                this.lastLifespanCheckDay = lastLifespanCheckDay;
+        }
+
         public void setSect(String sect) {
                 this.sect = sect;
         }
@@ -288,6 +445,38 @@ public class BasicData {
                 return lastMediZ;
         }
 
+        public int getRealmLevel() {
+                return realmLevel;
+        }
+
+        public void setRealmLevel(int realmLevel) {
+                this.realmLevel = realmLevel;
+        }
+
+        public double getRealmExp() {
+                return realmExp;
+        }
+
+        public void setRealmExp(double realmExp) {
+                this.realmExp = realmExp;
+        }
+
+        public boolean isTribulating() {
+                return isTribulating;
+        }
+
+        public void setTribulating(boolean isTribulating) {
+                this.isTribulating = isTribulating;
+        }
+
+        public int getTribulationTick() {
+                return tribulationTick;
+        }
+
+        public void setTribulationTick(int tribulationTick) {
+                this.tribulationTick = tribulationTick;
+        }
+
         public void setLastPos(Vec3 vec3) {
                 this.lastMediX = vec3.x;
                 this.lastMediY = vec3.y;
@@ -310,11 +499,24 @@ public class BasicData {
                 buf.writeDouble(this.inspiration);
                 buf.writeDouble(this.mindSense);
                 buf.writeBoolean(this.isMeditation);
+                buf.writeInt(this.morality);
+                buf.writeInt(this.condemnation);
+                buf.writeInt(this.lifespanMonth);
+                buf.writeLong(this.lastLifespanCheckDay);
                 buf.writeUtf(this.sect);
                 buf.writeUtf(this.nickName);
                 buf.writeDouble(this.lastMediX);
                 buf.writeDouble(this.lastMediY);
                 buf.writeDouble(this.lastMediZ);
+                buf.writeInt(this.realmLevel);
+                buf.writeDouble(this.realmExp);
+                buf.writeBoolean(this.isTribulating);
+                buf.writeInt(this.tribulationTick);
+                buf.writeInt(this.comprehensionLevel);
+                buf.writeDouble(this.comprehensionExp);
+                buf.writeBoolean(this.isComprehending);
+                buf.writeInt(this.comprehensionTick);
+                buf.writeUtf(this.comprehensionTarget);
         }
 
         public static BasicData initData() {
@@ -359,13 +561,41 @@ public class BasicData {
                                 && this.TPAO == b.TPAO
                                 && this.insight == b.insight
                                 && this.inspiration == b.inspiration
-                                && this.mindSense == b.mindSense;
+                                && this.mindSense == b.mindSense
+                                && this.morality == b.morality
+                                && this.condemnation == b.condemnation
+                                && this.lifespanMonth == b.lifespanMonth
+                                && this.lastLifespanCheckDay == b.lastLifespanCheckDay
+                                && this.realmLevel == b.realmLevel
+                                && Double.compare(this.realmExp, b.realmExp) == 0
+                                && this.isTribulating == b.isTribulating
+                                && this.tribulationTick == b.tribulationTick
+                                && this.comprehensionLevel == b.comprehensionLevel
+                                && Double.compare(this.comprehensionExp, b.comprehensionExp) == 0
+                                && this.isComprehending == b.isComprehending
+                                && this.comprehensionTick == b.comprehensionTick
+                                && this.comprehensionTarget.equals(b.comprehensionTarget);
+        }
+
+        public void setComprehending(boolean comprehending) {
+                this.isComprehending = comprehending;
+        }
+
+        public void setComprehensionTick(int comprehensionTick) {
+                this.comprehensionTick = comprehensionTick;
+        }
+
+        public void setComprehensionTarget(String comprehensionTarget) {
+                this.comprehensionTarget = comprehensionTarget;
         }
 
         public static BasicData copy(BasicData data) {
                 return new BasicData(data.normalLife, data.soulLife, data.moveSpeedMof, data.flySpeedMof, data.TPAO,
                                 data.lucky, data.charm, data.insight, data.inspiration, data.mindSense,
-                                     data.isMeditation, data.sect, data.nickName, data.lastMediX, data.lastMediY, data.lastMediZ);
+                                     data.isMeditation, data.morality, data.condemnation, data.lifespanMonth, data.lastLifespanCheckDay,
+                                     data.sect, data.nickName, data.lastMediX, data.lastMediY, data.lastMediZ,
+                                     data.realmLevel, data.realmExp, data.isTribulating, data.tribulationTick,
+                                     data.comprehensionLevel, data.comprehensionExp, data.isComprehending, data.comprehensionTick, data.comprehensionTarget);
         }
 
 }

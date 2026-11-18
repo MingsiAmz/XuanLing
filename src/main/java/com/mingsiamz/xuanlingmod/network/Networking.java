@@ -20,6 +20,11 @@ public class Networking {
                                 Networking::handler);
 
                 reg.playToServer(
+                                ComprehensionPacket.TYPE,
+                                ComprehensionPacket.CODEC,
+                                Networking::handler);
+
+                reg.playToServer(
                                 CreateDataPacket.TYPE,
                                 CreateDataPacket.CODEC,
                                 Networking::handler);
