@@ -2,23 +2,21 @@ package com.mingsiamz.xuanlingmod.gui;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
+import com.mingsiamz.xuanlingmod.gui.ChangeGui;
+import com.mingsiamz.xuanlingmod.network.ComprehensionPacket;
+import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationPanel;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationSlider;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
-import com.mingsiamz.xuanlingmod.util.gui.GuiComponentGroup;
-import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 import com.mingsiamz.xuanlingmod.util.gui.component.GuiButton;
-import com.mingsiamz.xuanlingmod.util.gui.layout.Justify;
-import com.mingsiamz.xuanlingmod.util.gui.layout.Layouts;
+import com.mingsiamz.xuanlingmod.util.gui.component.ProgressBar;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
 public class LevelProgressGui extends Screen {
@@ -28,13 +26,11 @@ public class LevelProgressGui extends Screen {
         private int py;
 
         private CultivationPanel panel;
-        private CultivationSlider timeSlider;
-        private EditBox timeInput;
+        private CultivationSlider intensitySlider;
+        private ProgressBar progressBar;
+        private GuiButton actionButton;
 
-        private static Minecraft minecraft = Minecraft.getInstance();
-        private int currentSelectedMonths = 0;
-
-        private boolean isSyncing = false;
+        private boolean wasComprehending = false;
 
         public LevelProgressGui() {
                 super(Component.literal("level_progress_gui"));
@@ -44,8 +40,8 @@ public class LevelProgressGui extends Screen {
         protected void init() {
                 super.init();
 
-                this.panelW = Math.max(300, Math.min(400, (int) (this.width * 0.35f)));
-                this.panelH = Math.max(200, Math.min(280, (int) (this.height * 0.45f)));
+                this.panelW = Math.max(340, Math.min(520, (int) (this.width * 0.40f)));
+                this.panelH = Math.max(260, Math.min(360, (int) (this.height * 0.50f)));
                 this.px = (this.width - panelW) / 2;
                 this.py = (this.height - panelH) / 2;
 
@@ -53,179 +49,125 @@ public class LevelProgressGui extends Screen {
                 panel.setPosition(px, py);
 
                 int innerW = panelW - CultivationTheme.PADDING * 2;
-                int sliderY = py + (int) (panelH * 0.40f);
-
-                Player player = minecraft.player;
-                BasicData basicData = RegisterAttachments.getBasicData(player);
-                int maxMonth = basicData.getNormalLife() > basicData.getSoulLife() ? (int)(basicData.getNormalLife() * 12) : (int)(basicData.getSoulLife() * 12);
-
-                timeSlider = new CultivationSlider(innerW, 10);
-                timeSlider.setPosition(px + CultivationTheme.PADDING, sliderY);
-
-                timeSlider.setOnValueChanged(val -> {
-                        if (isSyncing)
-                                return;
-                        isSyncing = true;
-                        currentSelectedMonths = (int) (val * maxMonth);
-                        updateInputBox(currentSelectedMonths);
-                        isSyncing = false;
-                });
-
-                int inputW = 50;
                 int cx = px + panelW / 2;
-                int inputX = cx - inputW / 2;
-                int inputY = sliderY + 32;
 
-                timeInput = new EditBox(this.font, inputX, inputY, inputW, 10, Component.literal("Months"));
-                timeInput.setMaxLength(4);
-                timeInput.setBordered(false);
-                timeInput.setVisible(true);
-                timeInput.setValue("0");
+                // 参悟强度滑动条
+                int sliderY = py + (int) (panelH * 0.34f);
+                intensitySlider = new CultivationSlider(innerW, 10);
+                intensitySlider.setPosition(px + CultivationTheme.PADDING, sliderY);
+                intensitySlider.setValue(0.5f);
 
-                timeInput.setResponder(text -> {
-                        if (isSyncing)
-                                return;
-                        if (!text.matches("\\d*")) {
-                                timeInput.setValue(text.replaceAll("[^\\d]", ""));
-                                return;
-                        }
-                        if (!text.isEmpty()) {
-                               int months = Mth.clamp(Integer.parseInt(text), 0, maxMonth);
-                                currentSelectedMonths = months;
-                                isSyncing = true;
-                               timeSlider.setValue((float) months / maxMonth);
-                                isSyncing = false;
-                        }
-                });
+                // 读条进度条
+                int barY = sliderY + 44;
+                progressBar = new ProgressBar(innerW, 14).setLabel("").showText(true);
+                progressBar.setPosition(px + CultivationTheme.PADDING, barY);
 
-                this.addRenderableWidget(timeInput);
+                // 开始/停止参悟按钮
+                Component btnComp = XuanLing.trans(XuanlingLangPro.GUI_STRING, "comprehend_start");
+                actionButton = new GuiButton(120, 24, btnComp.getString())
+                                .onClick(this::onActionClick);
+                actionButton.setPosition(cx - 60, barY + 42);
         }
 
-        private void updateInputBox(int months) {
-                timeInput.setValue(String.valueOf(months));
+        private void onActionClick() {
+                Player player = this.minecraft.player;
+                if (player == null)
+                        return;
+                BasicData data = RegisterAttachments.getBasicData(player);
+                if (data == null)
+                        return;
+                if (data.isComprehending()) {
+                        Networking.sendToServer(new ComprehensionPacket(false, "", 0f));
+                } else {
+                        Networking.sendToServer(new ComprehensionPacket(true, "comprehension", intensitySlider.getValue()));
+                }
         }
 
         @Override
         public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
                 this.renderBackground(g, mouseX, mouseY, partialTick);
-
                 panel.render(g, mouseX, mouseY, partialTick);
 
                 int cx = px + panelW / 2;
                 int innerW = panelW - CultivationTheme.PADDING * 2;
 
                 Component title = XuanLing.trans(XuanlingLangPro.GUI_STRING, "level_progress_gui_title");
-                g.drawString(font, title, cx - font.width(title) / 2, py + 15, CultivationTheme.BORDER_GOLD, true);
+                g.drawString(font, title, cx - font.width(title) / 2, py + 16, CultivationTheme.BORDER_GOLD, false);
 
-                Component yearTimeComponent = XuanLing.trans(XuanlingLangPro.GUI_STRING, "cultivate_time_year", currentSelectedMonths / 12, currentSelectedMonths % 12);
-                Component monthTimeComponent = XuanLing.trans(XuanlingLangPro.GUI_STRING, "cultivate_time_month", currentSelectedMonths);
-                int timeTextY = py + (int) (panelH * 0.25f);
-                if (currentSelectedMonths > 12) {
-                        g.drawString(font, yearTimeComponent, cx - font.width(yearTimeComponent) / 2, timeTextY, CultivationTheme.TEXT_PRIMARY,
-                                     false);
-                } else {
-                        g.drawString(font, monthTimeComponent, cx - font.width(monthTimeComponent) / 2, timeTextY, CultivationTheme.TEXT_PRIMARY,
-                                     false);
+                Player player = this.minecraft.player;
+                BasicData data = player == null ? null : RegisterAttachments.getBasicData(player);
 
+                if (data != null) {
+                        Component lifeComp = XuanLing.trans(XuanlingLangPro.GUI_STRING, "lifespan",
+                                        data.getLifespanMonth());
+                        g.drawString(font, lifeComp, px + CultivationTheme.PADDING, py + 42,
+                                        CultivationTheme.TEXT_PRIMARY, false);
                 }
-                timeSlider.render(g, mouseX, mouseY, partialTick);
 
-                int inputW = 50;
-                int inputH = 10;
-                int inputX = cx - inputW / 2;
-                int inputY = timeSlider.getY() + 32;
-
-                Component hintText = XuanLing.trans(XuanlingLangPro.GUI_STRING, "input_time_month");
-                g.drawString(font, hintText, cx - font.width(hintText) / 2, inputY - 14,
+                // 参悟强度滑动条
+                int sliderY = py + (int) (panelH * 0.28f);
+                Component intensityLabel = XuanLing.trans(XuanlingLangPro.GUI_STRING, "comprehend_intensity");
+                int pct = (int) (intensitySlider.getValue() * 100);
+                Component pctComp = Component.literal(pct + "%");
+                g.drawString(font, intensityLabel, px + CultivationTheme.PADDING, sliderY - 14,
                                 CultivationTheme.TEXT_SECONDARY, false);
+                g.drawString(font, pctComp, px + panelW - CultivationTheme.PADDING - font.width(pctComp), sliderY - 14,
+                                CultivationTheme.TEXT_PRIMARY, false);
 
-                int boxPadding = 2;
-                g.fill(inputX - boxPadding, inputY - boxPadding, inputX + inputW + boxPadding,
-                                inputY + inputH + boxPadding, CultivationTheme.PANEL_BG_DARK);
-                GuiRenderUtil.border(g, inputX - boxPadding, inputY - boxPadding, inputX + inputW + boxPadding,
-                                inputY + inputH + boxPadding, CultivationTheme.BORDER_CYAN);
+                boolean comprehending = data != null && data.isComprehending();
 
-                String text = timeInput.getValue();
-                int textW = font.width(text);
-                int textRenderX = inputX + (inputW - textW) / 2;
-                int textRenderY = inputY + (inputH - 8) / 2;
+                // 读条结束后滑动条复位
+                if (wasComprehending && !comprehending) {
+                        intensitySlider.setValue(0f);
+                }
+                wasComprehending = comprehending;
 
-                g.drawString(font, text, textRenderX, textRenderY, CultivationTheme.TEXT_PRIMARY, false);
-
-                if (timeInput.isFocused() && (System.currentTimeMillis() / 500) % 2 == 0) {
-                        g.fill(textRenderX + textW + 1, textRenderY - 1, textRenderX + textW + 2, textRenderY + 9,
-                                        CultivationTheme.TEXT_PRIMARY);
+                int barY = sliderY + 44;
+                if (comprehending) {
+                        int tick = data.getComprehensionTick();
+                        int maxTick = data.getComprehensionMaxTick();
+                        float progress = maxTick > 0 ? 1f - (float) tick / maxTick : 0f;
+                        progressBar.setInstant(progress);
+                        progressBar.setLabel(XuanLing.trans(XuanlingLangPro.GUI_STRING, "comprehend_progress")
+                                        .getString());
+                        actionButton.setText(XuanLing.trans(XuanlingLangPro.GUI_STRING, "comprehend_stop").getString());
+                        Component meditating = XuanLing.trans(XuanlingLangPro.GUI_STRING, "comprehend_meditating");
+                        g.drawString(font, meditating, cx - font.width(meditating) / 2, barY - 16,
+                                        CultivationTheme.TEXT_INFO, false);
+                } else {
+                        progressBar.setInstant(0f);
+                        progressBar.setLabel(XuanLing.trans(XuanlingLangPro.GUI_STRING, "comprehend_progress")
+                                        .getString());
+                        actionButton.setText(XuanLing.trans(XuanlingLangPro.GUI_STRING, "comprehend_start").getString());
                 }
 
-                Component startTrain = XuanLing.trans(XuanlingLangPro.GUI_STRING, "start_train");
-                Component refining = XuanLing.trans(XuanlingLangPro.GUI_STRING, "refining");
-                GuiComponentGroup btnGroup = new GuiComponentGroup()
-                                .setLayout(Layouts.row().setJustify(Justify.CENTER).setSpacing(10))
-                                .setFixedWidth(innerW)
-                                .add(new GuiButton(80, 20, startTrain.getString()).onClick(() -> {
-                                }))
-                                .add(new GuiButton(80, 20, refining.getString()).onClick(() -> {
-                                }));
+                intensitySlider.render(g, mouseX, mouseY, partialTick);
 
-                btnGroup.setPosition(px + CultivationTheme.PADDING, py + panelH - 45);
-                btnGroup.render(g, mouseX, mouseY, partialTick);
+                progressBar.setPosition(px + CultivationTheme.PADDING, barY);
+                progressBar.render(g, mouseX, mouseY, partialTick);
+
+                actionButton.render(g, mouseX, mouseY, partialTick);
         }
 
         @Override
         public boolean mouseClicked(double mx, double my, int button) {
-                int inputW = 50;
-                int cx = px + panelW / 2;
-                int inputX = cx - inputW / 2;
-                int inputY = timeSlider.getY() + 32;
-
-                if (mx >= inputX - 2 && mx <= inputX + inputW + 2 && my >= inputY - 2 && my <= inputY + 10 + 2) {
-                        timeInput.setFocused(true);
+                if (intensitySlider.mouseClicked(mx, my, button))
                         return true;
-                }
-
-                if (timeInput.isFocused()) {
-                        timeInput.setFocused(false);
-                        timeInput.setValue(timeInput.getValue());
-                }
-
-                if (timeSlider.mouseClicked(mx, my, button))
+                if (actionButton.mouseClicked(mx, my, button))
                         return true;
                 return super.mouseClicked(mx, my, button);
         }
 
         @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-                if (timeInput.isFocused()) {
-                        if (keyCode == 257 || keyCode == 335) {
-                                timeInput.setFocused(false);
-                                timeInput.setValue(timeInput.getValue());
-                                return true;
-                        }
-                        if (timeInput.keyPressed(keyCode, scanCode, modifiers))
-                                return true;
-                }
-                return super.keyPressed(keyCode, scanCode, modifiers);
-        }
-
-        @Override
-        public boolean charTyped(char codePoint, int modifiers) {
-                if (timeInput.isFocused() && timeInput.charTyped(codePoint, modifiers))
-                        return true;
-                return super.charTyped(codePoint, modifiers);
-        }
-
-        @Override
         public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
-                if (timeSlider.mouseDragged(mx, my, button, dx, dy))
+                if (intensitySlider.mouseDragged(mx, my, button, dx, dy))
                         return true;
                 return super.mouseDragged(mx, my, button, dx, dy);
         }
 
         @Override
         public boolean mouseReleased(double mx, double my, int button) {
-                if (timeSlider.mouseReleased(mx, my, button))
-                        return true;
-                if (timeInput.mouseReleased(mx, my, button))
+                if (intensitySlider.mouseReleased(mx, my, button))
                         return true;
                 return super.mouseReleased(mx, my, button);
         }
@@ -237,6 +179,6 @@ public class LevelProgressGui extends Screen {
 
         @Override
         public void onClose() {
-                minecraft.setScreen(ChangeGui.cycle('0'));
+                this.minecraft.setScreen(ChangeGui.cycle('0'));
         }
 }

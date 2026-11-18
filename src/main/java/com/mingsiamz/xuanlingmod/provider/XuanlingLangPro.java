@@ -65,6 +65,12 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "input_time_month", "修炼月数");
                         this.add(GUI_STRING + "start_train", "开始修炼");
                         this.add(GUI_STRING + "refining", "炼化");
+                        this.add(GUI_STRING + "comprehend_intensity", "参悟强度");
+                        this.add(GUI_STRING + "comprehend_start", "开始参悟");
+                        this.add(GUI_STRING + "comprehend_stop", "停止参悟");
+                        this.add(GUI_STRING + "comprehend_progress", "参悟进度");
+                        this.add(GUI_STRING + "comprehend_meditating", "参悟中...");
+                        this.add(GUI_STRING + "lifespan", "寿命:%s月");
                         this.add(GUI_STRING + "not_use_meditation", "无法打坐，你并未入门");
                         this.add(GUI_STRING + "battle_mode", "战  斗");
                         this.add(GUI_STRING + "battle_release_hint", "按 ~ 释 放");
@@ -207,6 +213,12 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "input_time_month", "training month");
                         this.add(GUI_STRING + "start_train", "Start Train");
                         this.add(GUI_STRING + "refining", "Refining");
+                        this.add(GUI_STRING + "comprehend_intensity", "Comprehension Intensity");
+                        this.add(GUI_STRING + "comprehend_start", "Start Comprehension");
+                        this.add(GUI_STRING + "comprehend_stop", "Stop Comprehension");
+                        this.add(GUI_STRING + "comprehend_progress", "Comprehension Progress");
+                        this.add(GUI_STRING + "comprehend_meditating", "Comprehending...");
+                        this.add(GUI_STRING + "lifespan", "Lifespan: %s months");
                         this.add(GUI_STRING + "not_use_meditation",
                                         "You’re not ready to use meditation because you haven’t learned the basics yet.");
                         this.add(GUI_STRING + "battle_mode", "Combat");

@@ -166,6 +166,11 @@ public class Config {
                         .comment("走火入魔 debuff 的持续时间，单位 tick，默认 6000 tick（5 分钟）")
                         .defineInRange("deviation_debuff_duration_tick", 6000, 1, Integer.MAX_VALUE);
 
+        /** 参悟读条总时长（tick），默认 400 即 20 秒 */
+        public static final ModConfigSpec.IntValue COMPREHENSION_DURATION_TICK = BUILDER
+                        .comment("参悟读条总时长，单位 tick，默认 400 tick（20 秒）")
+                        .defineInRange("comprehension_duration_tick", 400, 1, Integer.MAX_VALUE);
+
         /** 善恶标签的善阈值，morality/(morality+condemnation) >= 该值时标记为“善” */
         public static final ModConfigSpec.DoubleValue ALIGNMENT_GOOD_THRESHOLD = BUILDER
                         .comment("善标签阈值，0-1 之间，默认 0.8，占比 >= 0.8 标记为善")
@@ -229,6 +234,15 @@ public class Config {
          */
         public static int getDeviationDebuffDurationTick() {
                 return DEVIATION_DEBUFF_DURATION_TICK.get();
+        }
+
+        /**
+         * 参悟读条总时长（tick）
+         *
+         * @return 默认 400（20 秒）
+         */
+        public static int getComprehensionDurationTick() {
+                return COMPREHENSION_DURATION_TICK.get();
         }
 
         /**

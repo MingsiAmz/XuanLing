@@ -1,5 +1,6 @@
 package com.mingsiamz.xuanlingmod.network;
 
+import com.mingsiamz.xuanlingmod.Config;
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
@@ -17,14 +18,22 @@ public class ComprehensionPacket extends CustomPackageImp {
 
         private boolean start;
         private String target;
+        private float intensity;
 
         public ComprehensionPacket() {
 
         }
 
+        public ComprehensionPacket(boolean start, String target, float intensity) {
+                this.start = start;
+                this.target = target;
+                this.intensity = intensity;
+        }
+
         public ComprehensionPacket(RegistryFriendlyByteBuf buf) {
                 this.start = buf.readBoolean();
                 this.target = buf.readUtf(128);
+                this.intensity = buf.readFloat();
         }
 
         @Override
@@ -41,13 +50,18 @@ public class ComprehensionPacket extends CustomPackageImp {
                 if (basicData == null)
                         return;
                 if (start) {
+                        int duration = Config.getComprehensionDurationTick();
                         basicData.setComprehending(true);
-                        basicData.setComprehensionTick(400);
+                        basicData.setComprehensionTick(duration);
+                        basicData.setComprehensionMaxTick(duration);
                         basicData.setComprehensionTarget(target);
+                        basicData.setComprehensionIntensity(intensity);
                 } else {
                         basicData.setComprehending(false);
                         basicData.setComprehensionTick(0);
                         basicData.setComprehensionTarget("");
+                        basicData.setComprehensionIntensity(0f);
+                        basicData.setComprehensionMaxTick(0);
                 }
         }
 
@@ -55,6 +69,7 @@ public class ComprehensionPacket extends CustomPackageImp {
         void encode(RegistryFriendlyByteBuf buf) {
                 buf.writeBoolean(start);
                 buf.writeUtf(target, 128);
+                buf.writeFloat(intensity);
         }
 
         public void setStart(boolean start) {
@@ -63,6 +78,10 @@ public class ComprehensionPacket extends CustomPackageImp {
 
         public void setTarget(String target) {
                 this.target = target;
+        }
+
+        public void setIntensity(float intensity) {
+                this.intensity = intensity;
         }
 
 }

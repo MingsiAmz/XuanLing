@@ -13,6 +13,10 @@ import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.register.RegisterEffects;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,6 +26,7 @@ import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
@@ -38,6 +43,9 @@ public class DataEvent {
             BindSkillPacket.BIND_KEY,
             ManageDataPacket.ACTIVE_ART_KEY
     };
+
+    /** 参悟读条开始时的位置，用于检测玩家移动打断 */
+    private static final Map<UUID, Vec3> COMPREHENSION_POS = new HashMap<>();
 
     private static void syncToClient(Player player) {
         if (!(player instanceof ServerPlayer serverPlayer))
@@ -157,6 +165,69 @@ public class DataEvent {
             data.setRealmExp(data.getRealmExp() + speedGain);
         }
 
+        // 参悟读条与实时削寿（Issue 08）：读条期间按滑动条强度削减寿命
+        // 参悟顿悟与走火入魔（Issue 09）：随机顿悟进度×2，打断后施加走火入魔
+        if (data.isComprehending() && data.getComprehensionTick() > 0) {
+            int tick = data.getComprehensionTick();
+            int maxTick = data.getComprehensionMaxTick();
+            float intensity = data.getComprehensionIntensity();
+
+            // 记录读条起始位置，用于移动打断检测
+            if (tick == maxTick && maxTick > 0) {
+                COMPREHENSION_POS.put(player.getUUID(), player.position());
+            }
+
+            // 移动打断：玩家离开读条起始方块即判定打断
+            Vec3 startPos = COMPREHENSION_POS.get(player.getUUID());
+            if (startPos != null && !player.blockPosition().equals(BlockPos.containing(startPos.x, startPos.y, startPos.z))) {
+                interruptComprehension(player, data);
+                checkBreakthrough(player, data, level, serverPlayer);
+                return;
+            }
+
+            // 随机顿悟：进度 ×2
+            boolean enlightened = level.random.nextDouble() < Config.ENLIGHTENMENT_CHANCE.get();
+            // 自发走火入魔：概率触发，直接打断
+            boolean deviated = level.random.nextDouble() < Config.DEVIATION_CHANCE.get();
+
+            if (deviated) {
+                interruptComprehension(player, data);
+                checkBreakthrough(player, data, level, serverPlayer);
+                return;
+            }
+
+            // 推进读条进度：顿悟时进度 ×2
+            int progressStep = enlightened ? 2 : 1;
+            if (enlightened) {
+                XuanLing.LOGGER.info("{} 参悟顿悟，进度 ×2", player.getName().getString());
+            }
+            int newTick = tick - progressStep;
+
+            // 实时削减寿命：总削减 = COMPREHENSION_LIFESPAN_COST × intensity 月，按读条进度分摊至每 tick
+            if (maxTick > 0) {
+                double cost = Config.COMPREHENSION_LIFESPAN_COST.get();
+                int elapsed = maxTick - tick; // 本轮已流逝的 tick
+                int drainInterval = Math.max(1, (int) Math.ceil(maxTick / Math.max(0.001, cost * intensity)));
+                if (elapsed > 0 && elapsed % drainInterval == 0) {
+                    data.setLifespanMonth(data.getLifespanMonth() - 1);
+                }
+            }
+
+            if (newTick <= 0) {
+                // 读条结束：参悟完成，重置读条状态（客户端滑动条随之复位）
+                String target = data.getComprehensionTarget();
+                data.setComprehending(false);
+                data.setComprehensionTick(0);
+                data.setComprehensionTarget("");
+                data.setComprehensionIntensity(0f);
+                data.setComprehensionMaxTick(0);
+                COMPREHENSION_POS.remove(player.getUUID());
+                XuanLing.LOGGER.info("{} 参悟完成：{}", player.getName().getString(), target);
+            } else {
+                data.setComprehensionTick(newTick);
+            }
+        }
+
         // 检查境界突破
         checkBreakthrough(player, data, level, serverPlayer);
 
@@ -171,7 +242,7 @@ public class DataEvent {
             // Issue 07：死亡前不可清除，若效果被移除则重新施加
             if (player.getEffect(RegisterEffects.EFFECT_DEVIATION) == null) {
                 player.addEffect(new MobEffectInstance(
-                                RegisterEffects.EFFECT_DEVIATION, data.getDeviationTick(), 0, false, false));
+                                RegisterEffects.EFFECT_DEVIATION, data.getDeviationTick(), 0, false, true));
             }
             if (data.getDeviationTick() <= 0) {
                 data.setDeviating(false);
@@ -192,6 +263,28 @@ public class DataEvent {
                 player.removeEffect(RegisterEffects.EFFECT_CRITICAL_INJURY);
             }
         }
+    }
+
+    /**
+     * 打断参悟：停止参悟与修炼，并施加走火入魔 debuff。
+     */
+    private static void interruptComprehension(Player player, BasicData data) {
+        data.setComprehending(false);
+        data.setComprehensionTick(0);
+        data.setComprehensionTarget("");
+        data.setComprehensionIntensity(0f);
+        data.setComprehensionMaxTick(0);
+        // 停止修炼（打坐）
+        data.setMeditation(false);
+        if (player.getEffect(RegisterEffects.EFFECT_MEDITATION) != null) {
+            player.removeEffect(RegisterEffects.EFFECT_MEDITATION);
+        }
+        COMPREHENSION_POS.remove(player.getUUID());
+        // 施加走火入魔 debuff（仅“走火入魔”显示在效果栏，底层负面效果由 EffectDeviation 以不可见方式叠加）
+        data.setDeviating(true);
+        data.setDeviationTick(Config.getDeviationDebuffDurationTick());
+        player.addEffect(new MobEffectInstance(
+                        RegisterEffects.EFFECT_DEVIATION, data.getDeviationTick(), 0, false, true));
     }
 
     /**

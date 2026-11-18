@@ -34,6 +34,11 @@ public class GuiButton implements IGuiComponent {
                 return this;
         }
 
+        public GuiButton setText(String text) {
+                this.text = text;
+                return this;
+        }
+
         public GuiButton setColors(int bg, int hoverBg, int border, int hoverBorder) {
                 this.bgColor = bg;
                 this.hoverBgColor = hoverBg;

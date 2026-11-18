@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 public class BasicData {
@@ -64,7 +65,11 @@ public class BasicData {
         private int comprehensionTick = 0;
         /** 当前参悟目标（功法/神通名称） */
         private String comprehensionTarget = "";
-        
+        /** 参悟强度（滑动条设定值 0~1），用于读条期间实时削减寿命 */
+        private float comprehensionIntensity = 0f;
+        /** 参悟读条总时长（tick），用于计算每 tick 寿命削减量 */
+        private int comprehensionMaxTick = 0;
+
         private String sect = "";
         private String nickName = "";
         private double lastMediX = 0;
@@ -105,6 +110,7 @@ public class BasicData {
                           double lastMediX, double lastMediY, double lastMediZ,
                           int realmLevel, double realmExp, boolean isTribulating, int tribulationTick, int comprehensionLevel,
                           double comprehensionExp, boolean isComprehending, int comprehensionTick, String comprehensionTarget,
+                          float comprehensionIntensity, int comprehensionMaxTick,
                           boolean isDeviating, int deviationTick, boolean isCriticalInjured, int criticalInjuryTick) {
             this.normalLife = normalLife;
             this.soulLife = soulLife;
@@ -135,6 +141,8 @@ public class BasicData {
             this.isComprehending = isComprehending;
             this.comprehensionTick = comprehensionTick;
             this.comprehensionTarget = comprehensionTarget;
+            this.comprehensionIntensity = comprehensionIntensity;
+            this.comprehensionMaxTick = comprehensionMaxTick;
             this.isDeviating = isDeviating;
             this.deviationTick = deviationTick;
             this.isCriticalInjured = isCriticalInjured;
@@ -148,7 +156,7 @@ public class BasicData {
             return new BasicData(normalLife, soulLife, moveSpeedMof, flySpeedMof, TPAO, lucky, charm, insight,
                                  inspiration, mindSense, false, morality, condemnation, lifespanMonth,
                                  lastLifespanCheckDay, sect, nickName, 0, 0, 0, 0, 0.0, false, 0, 0, 0.0, false, 0, "",
-                                 false, 0, false, 0);
+                                 0f, 0, false, 0, false, 0);
         }
 
         public BasicData(RegistryFriendlyByteBuf buf) {
@@ -181,6 +189,8 @@ public class BasicData {
                 this.isComprehending = buf.readBoolean();
                 this.comprehensionTick = buf.readInt();
                 this.comprehensionTarget = buf.readUtf();
+                this.comprehensionIntensity = buf.readFloat();
+                this.comprehensionMaxTick = buf.readInt();
                 this.isDeviating = buf.readBoolean();
                 this.deviationTick = buf.readInt();
                 this.isCriticalInjured = buf.readBoolean();
@@ -215,6 +225,8 @@ public class BasicData {
                         boolean isComprehending,
                         int comprehensionTick,
                         String comprehensionTarget,
+                        float comprehensionIntensity,
+                        int comprehensionMaxTick,
                         boolean isDeviating,
                         int deviationTick,
                         boolean isCriticalInjured,
@@ -245,6 +257,8 @@ public class BasicData {
                 this.isComprehending = isComprehending;
                 this.comprehensionTick = comprehensionTick;
                 this.comprehensionTarget = comprehensionTarget;
+                this.comprehensionIntensity = comprehensionIntensity;
+                this.comprehensionMaxTick = comprehensionMaxTick;
                 this.isDeviating = isDeviating;
                 this.deviationTick = deviationTick;
                 this.isCriticalInjured = isCriticalInjured;
@@ -601,6 +615,8 @@ public class BasicData {
                 buf.writeBoolean(this.isComprehending);
                 buf.writeInt(this.comprehensionTick);
                 buf.writeUtf(this.comprehensionTarget);
+                buf.writeFloat(this.comprehensionIntensity);
+                buf.writeInt(this.comprehensionMaxTick);
                 buf.writeBoolean(this.isDeviating);
                 buf.writeInt(this.deviationTick);
                 buf.writeBoolean(this.isCriticalInjured);
@@ -663,6 +679,8 @@ public class BasicData {
                                 && this.isComprehending == b.isComprehending
                                 && this.comprehensionTick == b.comprehensionTick
                                 && this.comprehensionTarget.equals(b.comprehensionTarget)
+                                && Float.compare(this.comprehensionIntensity, b.comprehensionIntensity) == 0
+                                && this.comprehensionMaxTick == b.comprehensionMaxTick
                                 && this.isDeviating == b.isDeviating
                                 && this.deviationTick == b.deviationTick
                                 && this.isCriticalInjured == b.isCriticalInjured
@@ -681,6 +699,34 @@ public class BasicData {
                 this.comprehensionTarget = comprehensionTarget;
         }
 
+        public boolean isComprehending() {
+                return isComprehending;
+        }
+
+        public int getComprehensionTick() {
+                return comprehensionTick;
+        }
+
+        public String getComprehensionTarget() {
+                return comprehensionTarget;
+        }
+
+        public float getComprehensionIntensity() {
+                return comprehensionIntensity;
+        }
+
+        public void setComprehensionIntensity(float comprehensionIntensity) {
+                this.comprehensionIntensity = Mth.clamp(comprehensionIntensity, 0f, 1f);
+        }
+
+        public int getComprehensionMaxTick() {
+                return comprehensionMaxTick;
+        }
+
+        public void setComprehensionMaxTick(int comprehensionMaxTick) {
+                this.comprehensionMaxTick = comprehensionMaxTick;
+        }
+
         public static BasicData copy(BasicData data) {
                 return new BasicData(data.normalLife, data.soulLife, data.moveSpeedMof, data.flySpeedMof, data.TPAO,
                                 data.lucky, data.charm, data.insight, data.inspiration, data.mindSense,
@@ -688,6 +734,7 @@ public class BasicData {
                                      data.sect, data.nickName, data.lastMediX, data.lastMediY, data.lastMediZ,
                                      data.realmLevel, data.realmExp, data.isTribulating, data.tribulationTick,
                                      data.comprehensionLevel, data.comprehensionExp, data.isComprehending, data.comprehensionTick, data.comprehensionTarget,
+                                     data.comprehensionIntensity, data.comprehensionMaxTick,
                                      data.isDeviating, data.deviationTick, data.isCriticalInjured, data.criticalInjuryTick);
         }
 
