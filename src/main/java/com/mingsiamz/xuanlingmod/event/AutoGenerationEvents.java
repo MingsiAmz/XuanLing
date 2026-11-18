@@ -186,6 +186,8 @@ public class AutoGenerationEvents {
     private static double calculateJadeSlipDropChance(NPCTemplate template, LivingEntity victim, Entity killer) {
         double baseChance = GenerationConfig.getJadeSlipBaseDropChance();
         double rarityMultiplier = GenerationConfig.getJadeSlipMultiplier(template.rarity());
+        // C3：玉简掉落全局折减，确保掉落率低于凋零头；保留“无掉落保护”约束
+        double globalFactor = com.mingsiamz.xuanlingmod.Config.getJadeSlipGlobalDropFactor();
 
         
         int realmLevel = getRealmLevel(victim);
@@ -198,7 +200,7 @@ public class AutoGenerationEvents {
         if (template.lootTemplate().getCustomLootTable() != null && !template.lootTemplate().getCustomLootTable().isEmpty()) {
         }
 
-        return Math.min(1.0, baseChance * rarityMultiplier * levelMultiplier * killerMultiplier);
+        return Math.min(1.0, baseChance * rarityMultiplier * levelMultiplier * killerMultiplier * globalFactor);
     }
 
     
@@ -245,13 +247,15 @@ public class AutoGenerationEvents {
                     + stats.spell().baseHeal() * 0.008 + stats.spell().maxTargets() * 0.03;
         }
 
-        double realmPower = stats.realmLevel() * 0.18;
+        double realmLevel = stats.realmLevel();
+        // C4：基础属性乘数直接与境界等级挂钩，功法/神通进一步加成
+        double realmPower = 1.0 + realmLevel * 0.3;
         double totalPower = realmPower + artPower * 0.03 + spellPower;
         if (stats.art() != null) totalPower += 0.15;
         multiplyAttribute(entity, Attributes.MAX_HEALTH, totalPower);
         multiplyAttribute(entity, Attributes.ATTACK_DAMAGE, totalPower * 0.65);
         multiplyAttribute(entity, Attributes.MOVEMENT_SPEED, Math.min(0.35, totalPower * 0.06));
-        addAttribute(entity, Attributes.ARMOR, stats.realmLevel() * 0.5 + spellPower * 2);
+        addAttribute(entity, Attributes.ARMOR, realmLevel * 0.5 + spellPower * 2);
         entity.setHealth(entity.getMaxHealth());
     }
 

@@ -93,6 +93,18 @@ public class DefaultEnergy {
                 }
         }
 
+        /** 直接设定能量上限，不依赖客户端查找，仅用于服务端初始化 */
+        public void setMaxValueDirect(ComponentEnergy.Type type, double energy) {
+                if (energy < 0) {
+                        energy = 0;
+                }
+                if (type == ComponentEnergy.Type.PARRENT) {
+                        this.maxPValue = energy;
+                } else if (type == ComponentEnergy.Type.CHILD) {
+                        this.maxCValue = energy;
+                }
+        }
+
         public void setMaxEnergyValue(ComponentEnergy.Type type, double energy) {
                 ComponentEnergy tmpEnergy = BasicEnergy.getEnergy(Minecraft.getInstance().player.getUUID(),
                                 this.energyType, type.name());

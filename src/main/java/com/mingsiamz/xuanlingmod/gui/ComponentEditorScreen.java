@@ -10,7 +10,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.client.ArtSpellCache;
+import com.mingsiamz.xuanlingmod.Config;
 import com.mingsiamz.xuanlingmod.data.ArtComponent;
+import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.ComponentCodec;
 import com.mingsiamz.xuanlingmod.data.ComponentGroup;
 import com.mingsiamz.xuanlingmod.data.SpellComponent;
@@ -24,6 +26,7 @@ import com.mingsiamz.xuanlingmod.type.ImpComponent;
 import com.mingsiamz.xuanlingmod.type.RegistryComponent;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.type.spell.ParamType;
+import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 import com.mingsiamz.xuanlingmod.util.gui.component.GuiButton;
@@ -124,7 +127,7 @@ public class ComponentEditorScreen extends Screen {
                 nameInput.setValue("");
 
                 descriptionInput = new EditBox(this.font, inputX, descInputY, inputW, descInputH,
-                                Component.literal("description"));
+                                Component.literal("输入功法/神通/境界描述（幽灵提示，不存储）"));
                 descriptionInput.setMaxLength(512);
                 descriptionInput.setBordered(false);
                 descriptionInput.setVisible(false);
@@ -148,44 +151,60 @@ public class ComponentEditorScreen extends Screen {
                 if (minecraft == null || minecraft.player == null)
                         return;
 
-                if (!ensureComponentsConnected())
+                boolean creative = minecraft.player.isCreative();
+
+                // A3：创造模式下跳过连线、名称合法性与组件非空校验，便于测试
+                if (!creative && !ensureComponentsConnected())
                         return;
 
                 String trimmed = this.name == null ? "" : this.name.trim();
 
-                if (trimmed.isEmpty()) {
-                        toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_name_empty"));
-                        return;
-                }
+                if (!creative) {
+                        if (trimmed.isEmpty()) {
+                                toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_name_empty"));
+                                return;
+                        }
 
-                if (!isValidName(trimmed)) {
-                        toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_name_invalid"));
-                        return;
-                }
+                        if (!isValidName(trimmed)) {
+                                toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_name_invalid"));
+                                return;
+                        }
 
-                ComponentGroup built = collectComponentGroup();
-                if (built.isEmpty()) {
-                        toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_component_empty"));
-                        return;
+                        ComponentGroup built = collectComponentGroup();
+                        if (built.isEmpty()) {
+                                toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_component_empty"));
+                                return;
+                        }
+                        this.componentGroup = built;
+                } else {
+                        this.componentGroup = collectComponentGroup();
                 }
 
                 this.name = trimmed;
-                this.componentGroup = built;
 
                 boolean valid = switch (this.type) {
-                        case SPELL -> new SpellComponent(this.name, built).check();
-                        case ART -> new ArtComponent(this.name, built).check();
+                        case SPELL -> new SpellComponent(this.name, this.componentGroup).check();
+                        case ART -> new ArtComponent(this.name, this.componentGroup).check();
                         default -> false;
                 };
 
-                if (!valid) {
+                if (!creative && !valid) {
                         toast(this.type == XuanLingTypeEnum.REALM || this.type == XuanLingTypeEnum.ENERGY
                                         ? XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_not_support")
                                         : XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation_failed"));
                         return;
                 }
 
-                String payload = ComponentCodec.encodeGroup(built).toString();
+                // D3：创建消耗灵感，不足则阻止，成功后扣除
+                double cost = calculateInspirationCost(this.componentGroup);
+                BasicData data = RegisterAttachments.getBasicData(minecraft.player);
+                if (data == null || data.getInspiration() < cost) {
+                        toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_inspiration_insufficient"));
+                        return;
+                }
+                data.setInspiration(data.getInspiration() - cost);
+
+                String payload = ComponentCodec.encodeGroup(this.componentGroup).toString();
                 if (payload.getBytes(
                                 java.nio.charset.StandardCharsets.UTF_8).length > CreateDataPacket.MAX_PAYLOAD_LENGTH) {
                         toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation_failed"));
@@ -193,8 +212,6 @@ public class ComponentEditorScreen extends Screen {
                 }
 
                 Networking.sendToServer(new CreateDataPacket(this.type, this.name, payload));
-
-                double speed = calculateCultivationSpeed(built);
 
                 String key = XuanLing.MODID + this.type.type;
                 CompoundTag root = minecraft.player.getPersistentData();
@@ -204,10 +221,36 @@ public class ComponentEditorScreen extends Screen {
                 root.getCompound(key).putString(this.name, this.name);
                 ArtSpellCache.updateCache(key, root.getCompound(key));
 
-                giveTalismanPaper(this.type, this.name, this.description, speed);
-
+                // A5：创建后不再自动给予玉简/符纸，玉简由玩家自行制作后右键打开界面存储数据
                 toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation_success", this.name),
                                 CultivationTheme.BORDER_GOLD);
+        }
+
+        /** D3：计算创建所需灵感 = 类型基础消耗 + Σ(组件基础消耗 + 调整后参数 × 单参数系数) */
+        private double calculateInspirationCost(ComponentGroup group) {
+                double base = switch (this.type) {
+                        case SPELL -> Config.getInspirationCreateSpellBase();
+                        case ART -> Config.getInspirationCreateArtBase();
+                        case REALM -> Config.getInspirationCreateRealmBase();
+                        default -> 0.0;
+                };
+                if (group == null)
+                        return base;
+                for (String basicType : group.getMaps().keySet()) {
+                        for (ConcurrentLinkedQueue<ImpComponent> comps : group.getMaps()
+                                        .get(basicType).values()) {
+                                for (ImpComponent comp : comps) {
+                                        base += Config.getInspirationComponentBaseCost();
+                                        for (Object value : comp.getParams().values()) {
+                                                if (value instanceof Number number) {
+                                                        base += Math.abs(number.doubleValue())
+                                                                        * Config.getInspirationParamCostPerUnit();
+                                                }
+                                        }
+                                }
+                        }
+                }
+                return base;
         }
 
         private double calculateCultivationSpeed(ComponentGroup group) {

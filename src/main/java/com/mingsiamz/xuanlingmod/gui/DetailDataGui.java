@@ -97,6 +97,21 @@ public class DetailDataGui extends Screen {
                 leftCol.add(new Label("tpao", (int) basicData.getTPAO()).setWidth(140));
                 rightCol.add(new Label("mindsense", (int) basicData.getMindSense()).setWidth(140));
 
+                leftCol.add(new Label(Component.literal("morality: " + basicData.getMorality())).setWidth(140));
+                rightCol.add(new Label(Component.literal("condemnation: " + basicData.getCondemnation()))
+                                .setWidth(140));
+
+                leftCol.add(new Label(Component.literal("lifespan: " + basicData.getLifespanMonth())).setWidth(140));
+                rightCol.add(new Label(
+                                Component.literal("inspiration: " + String.format("%.2f", basicData.getInspiration())))
+                                .setWidth(140));
+
+                leftCol.add(new Label(Component.literal("realmexp: " + String.format("%.2f", basicData.getRealmExp())))
+                                .setWidth(140));
+                rightCol.add(
+                                new Label(Component.literal("alignment: " + basicData.getAlignmentLabel()))
+                                                .setWidth(140));
+
                 statsGroup.add(leftCol);
                 statsGroup.add(rightCol);
 

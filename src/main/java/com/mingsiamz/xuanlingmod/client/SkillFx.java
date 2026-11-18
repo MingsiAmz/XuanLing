@@ -31,6 +31,12 @@ public final class SkillFx {
             return;
         }
 
+        // B1：弹射物使用 photon2 圆形特效加拖尾，在碰撞箱中心渲染
+        if (entity instanceof com.mingsiamz.xuanlingmod.entities.ProjectileSkillEntity) {
+            playProjectile(minecraft, entity, trail);
+            return;
+        }
+
         // 按特效等级分桶渲染 photon2 特效
         Config.SpecialEffectLevel level = Config.SPECIAL_EFFECT_LEVEL.get();
         switch (level) {
@@ -99,6 +105,39 @@ public final class SkillFx {
         emitter.config.setStartColor(NumberFunction.color(0xFF8888FF));
         emitter.config.setMaxParticles(trail ? 16 : 16);
         emitter.config.emission.setEmissionRate(NumberFunction.constant(trail ? 2 : 2));
+        FX fx = new FX();
+        fx.getFxData().objects().add(emitter);
+        EntityEffectExecutor effect = new EntityEffectExecutor(fx, minecraft.level, entity,
+                EntityEffectExecutor.AutoRotate.FORWARD);
+        effect.setOffset(new Vector3f(0, entity.getBbHeight() * 0.5f, 0));
+        effect.setAllowMulti(trail);
+        effect.start();
+    }
+
+    /**
+     * B1：弹射物专用圆形特效 + 拖尾，粒子围绕碰撞箱中心低速环绕，LOW/MEDIUM/HIGH 均简化为不同粒子数。
+     */
+    private static void playProjectile(Minecraft minecraft, Entity entity, boolean trail) {
+        Config.SpecialEffectLevel level = Config.SPECIAL_EFFECT_LEVEL.get();
+        int maxParticles = switch (level) {
+            case LOW -> 12;
+            case MEDIUM -> 24;
+            case HIGH -> 48;
+        };
+        int rate = switch (level) {
+            case LOW -> 2;
+            case MEDIUM -> 4;
+            case HIGH -> 8;
+        };
+        ParticleEmitter emitter = new ParticleEmitter();
+        emitter.config.setDuration(trail ? 8 : 40);
+        emitter.config.setLooping(trail);
+        emitter.config.setStartLifetime(NumberFunction.constant(trail ? 10 : 20));
+        emitter.config.setStartSpeed(NumberFunction.constant(0.04));
+        emitter.config.setStartSize(new NumberFunction3(0.1f, 0.1f, 0.1f));
+        emitter.config.setStartColor(NumberFunction.color(0xFF55E6FF));
+        emitter.config.setMaxParticles(maxParticles);
+        emitter.config.emission.setEmissionRate(NumberFunction.constant(rate));
         FX fx = new FX();
         fx.getFxData().objects().add(emitter);
         EntityEffectExecutor effect = new EntityEffectExecutor(fx, minecraft.level, entity,

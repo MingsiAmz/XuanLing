@@ -5,10 +5,12 @@ import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
+import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Type;
 import com.mingsiamz.xuanlingmod.network.BindSkillPacket;
 import com.mingsiamz.xuanlingmod.network.ManageDataPacket;
 import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.network.TribulationFxPacket;
+import com.mingsiamz.xuanlingmod.event.AutoGenerationEvents;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.register.RegisterEffects;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
@@ -21,6 +23,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
@@ -68,7 +71,12 @@ public class DataEvent {
             player.setData(RegisterAttachments.DEFAULT_DATA, new DefaultData());
         }
         if (!player.hasData(RegisterAttachments.DEFAULT_ENERGY)) {
-            player.setData(RegisterAttachments.DEFAULT_ENERGY, new DefaultEnergy());
+            DefaultEnergy energy = new DefaultEnergy();
+            // C2：新玩家初始内力 10，使左上角能量条能够显示
+            energy.setMaxValueDirect(Type.CHILD, 10);
+            energy.setEnergyValue(Type.CHILD, 10);
+            player.setData(RegisterAttachments.DEFAULT_ENERGY, energy);
+
         }
 
         syncToClient(player);
@@ -86,10 +94,28 @@ public class DataEvent {
 
     /**
      * Issue 10：玩家死亡时重置并随机所有属性；全部移除自定义 buff。
+     * C1：玩家击杀生物时获得修为，凡人期亦可获得，修为条随之上涨。
      */
     @SubscribeEvent
     public static void onEntityDeath(LivingDeathEvent event) {
         LivingEntity entity = event.getEntity();
+        Entity killer = event.getSource() != null ? event.getSource().getEntity() : null;
+
+        // C1：若击杀者是玩家，则给玩家增加修为（包括凡人期）
+        if (entity instanceof LivingEntity victim && killer instanceof Player killerPlayer) {
+            if (killerPlayer.hasData(RegisterAttachments.BASIC_DATA)) {
+                BasicData killerData = RegisterAttachments.getBasicData(killerPlayer);
+                if (killerData != null) {
+                    int victimRealm = getEntityRealmLevel(victim);
+                    double gain = Config.getKillRealmExpBase()
+                                    + Config.getKillRealmExpPerLevel() * victimRealm;
+                    killerData.setRealmExp(killerData.getRealmExp() + gain);
+                    XuanLing.LOGGER.info("{} 击杀生物获得 {} 修为，目标境界 {}", killerPlayer.getName().getString(),
+                                    gain, victimRealm);
+                }
+            }
+        }
+
         if (!(entity instanceof Player player)) {
             return;
         }
@@ -108,6 +134,15 @@ public class DataEvent {
         // 重置并随机所有属性
         data.resetAndRandomize();
         XuanLing.LOGGER.info("{} 死亡，重置并随机所有属性，移除全部自定义 buff", player.getName().getString());
+    }
+
+    /** 获取生物的境界等级，普通生物视为 0，已生成的修士 NPC 按其 NPC_DATA 读取 */
+    private static int getEntityRealmLevel(LivingEntity entity) {
+        var tag = entity.getPersistentData().getCompound(AutoGenerationEvents.NPC_DATA);
+        if (tag.contains(AutoGenerationEvents.REALM_LEVEL)) {
+            return tag.getInt(AutoGenerationEvents.REALM_LEVEL);
+        }
+        return 0;
     }
 
     @SubscribeEvent
@@ -159,6 +194,13 @@ public class DataEvent {
             }
             data.setRealmExp(data.getRealmExp() + speedGain);
         }
+
+        // D2：灵感被动恢复，闭关修炼额外恢复（按消耗时间计算增加）
+        double inspirationGain = Config.getInspirationGainPerTick();
+        if (data.isMeditation()) {
+            inspirationGain += Config.getInspirationMeditationGain();
+        }
+        data.setInspiration(data.getInspiration() + inspirationGain);
 
         // 参悟读条与实时削寿（Issue 08）：读条期间按滑动条强度削减寿命
         // 参悟顿悟与走火入魔（Issue 09）：随机顿悟进度×2，打断后施加走火入魔

@@ -184,6 +184,6 @@ public final class TopLeftQiHud {
         }
 
         private static boolean isHaveNeili() {
-                return HudDataProvider.getNeili() == 0 && HudDataProvider.getMaxNeili() == 0;
+                return HudDataProvider.getMaxNeili() <= 0;
         }
 }

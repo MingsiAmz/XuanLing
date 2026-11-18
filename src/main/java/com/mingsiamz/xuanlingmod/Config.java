@@ -282,6 +282,114 @@ public class Config {
         }
 
         /**
+         * 玩家初始灵感值
+         *
+         * @return 默认 0
+         */
+        public static double getInspirationBase() {
+                return INSPIRATION_BASE.get();
+        }
+
+        /**
+         * 灵感上限
+         *
+         * @return 默认 1000
+         */
+        public static double getInspirationMax() {
+                return INSPIRATION_MAX.get();
+        }
+
+        /**
+         * 灵感每 tick 被动恢复量
+         *
+         * @return 默认 0.001
+         */
+        public static double getInspirationGainPerTick() {
+                return INSPIRATION_GAIN_PER_TICK.get();
+        }
+
+        /**
+         * 闭关修炼时每 tick 额外恢复的灵感量
+         *
+         * @return 默认 0.01
+         */
+        public static double getInspirationMeditationGain() {
+                return INSPIRATION_MEDITATION_GAIN.get();
+        }
+
+        /**
+         * 创建时每个组件的基础灵感消耗
+         *
+         * @return 默认 5
+         */
+        public static double getInspirationComponentBaseCost() {
+                return INSPIRATION_COMPONENT_BASE_COST.get();
+        }
+
+        /**
+         * 每单位参数增加额外需要的灵感消耗
+         *
+         * @return 默认 0.1
+         */
+        public static double getInspirationParamCostPerUnit() {
+                return INSPIRATION_PARAM_COST_PER_UNIT.get();
+        }
+
+        /**
+         * 创建神通的基础灵感消耗
+         *
+         * @return 默认 10
+         */
+        public static double getInspirationCreateSpellBase() {
+                return INSPIRATION_CREATE_SPELL_BASE.get();
+        }
+
+        /**
+         * 创建功法的基础灵感消耗
+         *
+         * @return 默认 20
+         */
+        public static double getInspirationCreateArtBase() {
+                return INSPIRATION_CREATE_ART_BASE.get();
+        }
+
+        /**
+         * 创建境界的基础灵感消耗
+         *
+         * @return 默认 50
+         */
+        public static double getInspirationCreateRealmBase() {
+                return INSPIRATION_CREATE_REALM_BASE.get();
+        }
+
+        /**
+         * 击杀生物获得的基础修为，凡人期亦可获得
+         *
+         * @return 默认 5
+         */
+        public static double getKillRealmExpBase() {
+                return KILL_REALM_EXP_BASE.get();
+        }
+
+        /**
+         * 击杀生物每境界等级额外获得的修为
+         *
+         * @return 默认 2
+         */
+        public static double getKillRealmExpPerLevel() {
+                return KILL_REALM_EXP_PER_LEVEL.get();
+        }
+
+        /**
+         * 玉简掉落全局折减系数，0-1 之间
+         *
+         * @return 默认 0.4
+         */
+        public static double getJadeSlipGlobalDropFactor() {
+                return JADE_SLIP_GLOBAL_DROP_FACTOR.get();
+        }
+
+        /**
          * 计算天劫失败扣除的寿命月数：deduction = base × growthRate^(level - 4)
          * （元婴 level 4 扣除 base，更高境界按增长率指数递增）
          *
@@ -317,6 +425,66 @@ public class Config {
         public static final ModConfigSpec.IntValue COMPREHENSION_LIFESPAN_COST = BUILDER
                         .comment("参悟每消耗多少月寿命，固定不随境界浮动")
                         .defineInRange("comprehension_lifespan_cost", 1, 1, 100);
+
+        /** 玩家初始灵感值 */
+        public static final ModConfigSpec.DoubleValue INSPIRATION_BASE = BUILDER
+                        .comment("玩家初始灵感值，用于创建功法、神通、境界")
+                        .defineInRange("inspiration_base", 0.0, 0, Double.MAX_VALUE);
+
+        /** 灵感上限 */
+        public static final ModConfigSpec.DoubleValue INSPIRATION_MAX = BUILDER
+                        .comment("灵感上限，灵感被动恢复不会超过此值")
+                        .defineInRange("inspiration_max", 1000.0, 0, Double.MAX_VALUE);
+
+        /** 灵感每 tick 被动恢复量 */
+        public static final ModConfigSpec.DoubleValue INSPIRATION_GAIN_PER_TICK = BUILDER
+                        .comment("灵感每 tick 被动恢复量，建议取极小值如 0.001")
+                        .defineInRange("inspiration_gain_per_tick", 0.001, 0, Double.MAX_VALUE);
+
+        /** 闭关修炼时每 tick 额外恢复的灵感量 */
+        public static final ModConfigSpec.DoubleValue INSPIRATION_MEDITATION_GAIN = BUILDER
+                        .comment("闭关修炼时每 tick 额外恢复的灵感量")
+                        .defineInRange("inspiration_meditation_gain", 0.01, 0, Double.MAX_VALUE);
+
+        /** 创建时每个组件的基础灵感消耗 */
+        public static final ModConfigSpec.DoubleValue INSPIRATION_COMPONENT_BASE_COST = BUILDER
+                        .comment("创建功法/神通/境界时，每个组件的基础灵感消耗")
+                        .defineInRange("inspiration_component_base_cost", 5.0, 0, Double.MAX_VALUE);
+
+        /** 每单位参数增加额外需要的灵感消耗 */
+        public static final ModConfigSpec.DoubleValue INSPIRATION_PARAM_COST_PER_UNIT = BUILDER
+                        .comment("每单位参数增加额外需要的灵感消耗")
+                        .defineInRange("inspiration_param_cost_per_unit", 0.1, 0, Double.MAX_VALUE);
+
+        /** 创建神通的基础灵感消耗 */
+        public static final ModConfigSpec.DoubleValue INSPIRATION_CREATE_SPELL_BASE = BUILDER
+                        .comment("创建神通的基础灵感消耗")
+                        .defineInRange("inspiration_create_spell_base", 10.0, 0, Double.MAX_VALUE);
+
+        /** 创建功法的基础灵感消耗 */
+        public static final ModConfigSpec.DoubleValue INSPIRATION_CREATE_ART_BASE = BUILDER
+                        .comment("创建功法的基础灵感消耗")
+                        .defineInRange("inspiration_create_art_base", 20.0, 0, Double.MAX_VALUE);
+
+        /** 创建境界的基础灵感消耗 */
+        public static final ModConfigSpec.DoubleValue INSPIRATION_CREATE_REALM_BASE = BUILDER
+                        .comment("创建境界的基础灵感消耗")
+                        .defineInRange("inspiration_create_realm_base", 50.0, 0, Double.MAX_VALUE);
+
+        /** 击杀生物获得的基础修为，凡人期亦可获得 */
+        public static final ModConfigSpec.DoubleValue KILL_REALM_EXP_BASE = BUILDER
+                        .comment("击杀生物获得的基础修为，凡人期亦可获得")
+                        .defineInRange("kill_realm_exp_base", 5.0, 0, Double.MAX_VALUE);
+
+        /** 击杀生物每境界等级额外获得的修为 */
+        public static final ModConfigSpec.DoubleValue KILL_REALM_EXP_PER_LEVEL = BUILDER
+                        .comment("击杀生物每境界等级额外获得的修为")
+                        .defineInRange("kill_realm_exp_per_level", 2.0, 0, Double.MAX_VALUE);
+
+        /** 玉简掉落全局折减系数，用于将掉落率压至低于凋零头 */
+        public static final ModConfigSpec.DoubleValue JADE_SLIP_GLOBAL_DROP_FACTOR = BUILDER
+                        .comment("玉简掉落全局折减系数，0-1 之间，越小掉落越稀有")
+                        .defineInRange("jade_slip_global_drop_factor", 0.4, 0, 1);
 
         /**
          * 计算指定境界所需修为：needExp(level) = base × growthRate^level

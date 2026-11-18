@@ -2,6 +2,7 @@ package com.mingsiamz.xuanlingmod.util.gui.component.canvas;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.mingsiamz.xuanlingmod.type.ImpComponent;
 import com.mingsiamz.xuanlingmod.type.spell.ActionType;
@@ -132,6 +133,7 @@ public class CanvasNode {
                 Font font = Minecraft.getInstance().font;
                 if (def != null) {
                         g.drawString(font, def.trans(), sx + 6, sy + 3, CultivationTheme.TEXT_PRIMARY, false);
+                        renderAdjustedParams(g, font, sx, sy);
                 }
 
                 int btnX = sx + w - 14;
@@ -149,6 +151,23 @@ public class CanvasNode {
                 if (selected) {
                         GuiRenderUtil.border(g, sx - 2, sy - 2, sx + w + 2, sy + h + 2, highlightColor);
                         GuiRenderUtil.border(g, sx - 1, sy - 1, sx + w + 1, sy + h + 1, highlightColor);
+                }
+        }
+
+        /** A1：在卡片中心显示已调整（非默认 0）的参数，最多两行，保留两位小数 */
+        private void renderAdjustedParams(GuiGraphics g, Font font, int sx, int sy) {
+                int line = 0;
+                for (Map.Entry<com.mingsiamz.xuanlingmod.type.spell.ParamType, Object> entry : def
+                                .getParams().entrySet()) {
+                        if (line >= 2)
+                                break;
+                        Object value = entry.getValue();
+                        if (value instanceof Number number && number.doubleValue() != 0) {
+                                g.drawString(font, entry.getKey().name + "="
+                                                + String.format("%.2f", number.doubleValue()), sx + 6,
+                                        sy + 14 + line * 10, CultivationTheme.TEXT_SECONDARY, false);
+                                line++;
+                        }
                 }
         }
 
