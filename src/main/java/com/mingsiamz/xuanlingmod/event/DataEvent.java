@@ -15,10 +15,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -86,6 +89,51 @@ public class DataEvent {
     @SubscribeEvent
     public static void onEntityDeath(LivingDeathEvent event) {
         LivingEntity entity = event.getEntity();
+        Entity sourceEntity = event.getSource().getEntity();
+        LivingEntity killer = null;
+        if (sourceEntity instanceof Player player) {
+            killer = player;
+        } else if (sourceEntity instanceof Projectile projectile && projectile.getOwner() instanceof Player player) {
+            killer = player;
+        }
+        if (killer == null) {
+            return;
+        }
+        if (!killer.hasData(RegisterAttachments.BASIC_DATA)) {
+            return;
+        }
+        BasicData data = RegisterAttachments.getBasicData(killer);
+        if (data == null || killer.level().isClientSide) {
+            return;
+        }
+
+        int maxMorality = Config.getMaxValue(Config.MORALITY_MAX);
+        int maxCondemnation = Config.getMaxValue(Config.CONDEMNATION_MAX);
+        int moralityChange = Config.getKillMoralityChange();
+        int condemnationChange = Config.getKillCondemnationChange();
+
+        // 击杀生物类型：敌对生物提升道德，友好/中立生物增加天谴
+        MobCategory category = entity.getType().getCategory();
+        if (category == MobCategory.MONSTER) {
+            data.setMorality(data.getMorality() + moralityChange);
+        } else if (category == MobCategory.CREATURE
+                || category == MobCategory.AMBIENT
+                || category == MobCategory.WATER_CREATURE) {
+            data.setCondemnation(data.getCondemnation() + condemnationChange);
+        }
+
+        // 击杀目标数值：高天谴值目标提升道德，高道德值目标增加天谴
+        if (entity.hasData(RegisterAttachments.BASIC_DATA)) {
+            BasicData victim = RegisterAttachments.getBasicData(entity);
+            if (victim != null) {
+                if (victim.getCondemnation() > maxCondemnation / 2) {
+                    data.setMorality(data.getMorality() + moralityChange);
+                }
+                if (victim.getMorality() > maxMorality / 2) {
+                    data.setCondemnation(data.getCondemnation() + condemnationChange);
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -147,6 +195,16 @@ public class DataEvent {
         // 已达到突破条件
         int tribulationMinLevel = Config.TRIBULATION_MIN_LEVEL.get();
         if (currentLevel >= tribulationMinLevel) {
+            // 极高道德值可无需渡劫，直接突破
+            int maxMorality = Config.getMaxValue(Config.MORALITY_MAX);
+            if (data.getMorality() >= maxMorality * 0.9) {
+                data.setTribulating(false);
+                data.setTribulationTick(0);
+                data.setRealmLevel(currentLevel + 1);
+                data.setRealmExp(0.0);
+                XuanLing.LOGGER.info("{} 道德值极高，无需渡劫直接突破至 {}", player.getName().getString(), currentLevel + 1);
+                return;
+            }
             // level4+ 需要渡天劫
             data.setTribulating(true);
             data.setTribulationTick(400); // 20秒天劫
@@ -191,10 +249,16 @@ public class DataEvent {
                     level.addFreshEntity(lightning);
                 }
 
-                // 天雷造成伤害（根据天谴值调整）
+                // 天雷造成伤害（根据天谴值与善恶标签调整）
                 double condemnation = data.getCondemnation();
                 double baseDamage = 6.0; // 3颗心
                 double damage = baseDamage + condemnation * 0.01; // 天谴值越高伤害越大
+                // 善标签减免，恶标签增加，中立不变
+                switch (data.getAlignmentLabel()) {
+                    case GOOD -> damage *= 0.5;
+                    case EVIL -> damage *= 1.5;
+                    default -> {}
+                }
                 player.hurt(level.damageSources().lightningBolt(), (float) damage);
                 XuanLing.LOGGER.info("天劫雷劈 {}，造成 {} 伤害", player.getName().getString(), damage);
             }

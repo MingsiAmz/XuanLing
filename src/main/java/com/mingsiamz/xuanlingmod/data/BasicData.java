@@ -41,6 +41,11 @@ public class BasicData {
         private boolean isTribulating = false;
         /** 天劫倒计时（tick），用于控制天劫持续时间和闪电频率 */
         private int tribulationTick = 0;
+
+        /** 善恶标签：善 / 中立 / 恶 */
+        public enum Alignment {
+                GOOD, NEUTRAL, EVIL
+        }
         /** 当前参悟等级 */
         private int comprehensionLevel = 0;
         /** 当前参悟值，用于计算参悟等级突破：needComprehensionExp(level) = base × growthRate^level */
@@ -384,6 +389,27 @@ public class BasicData {
                         condemnation = Config.getMinValue(Config.CONDEMNATION_MAX);
                 }
                 this.condemnation = condemnation;
+        }
+
+        /**
+         * 按 morality / (morality + condemnation) 占比计算善恶标签
+         * 分母为 0 时视为中立；>= goodThreshold 为善；<= evilThreshold 为恶；其余中立
+         *
+         * @return 当前的善恶标签
+         */
+        public Alignment getAlignmentLabel() {
+                int total = morality + condemnation;
+                if (total <= 0) {
+                        return Alignment.NEUTRAL;
+                }
+                double ratio = (double) morality / total;
+                if (ratio >= Config.getAlignmentGoodThreshold()) {
+                        return Alignment.GOOD;
+                }
+                if (ratio <= Config.getAlignmentEvilThreshold()) {
+                        return Alignment.EVIL;
+                }
+                return Alignment.NEUTRAL;
         }
 
         public int getLifespanMonth() {

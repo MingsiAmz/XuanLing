@@ -126,6 +126,16 @@ public class Config {
                         .comment("天谴值上限")
                         .defineInRange("condemnation_max", 1000, 0, 100000);
 
+        /** 击杀敌对生物或高天谴值目标时，道德值增加量 */
+        public static final ModConfigSpec.IntValue KILL_MORALITY_CHANGE = BUILDER
+                        .comment("击杀敌对生物或高天谴值目标时，道德值增加量")
+                        .defineInRange("kill_morality_change", 10, 0, 1000);
+
+        /** 击杀友好/中立生物或高道德值目标时，天谴值增加量 */
+        public static final ModConfigSpec.IntValue KILL_CONDEMNATION_CHANGE = BUILDER
+                        .comment("击杀友好/中立生物或高道德值目标时，天谴值增加量")
+                        .defineInRange("kill_condemnation_change", 10, 0, 1000);
+
         /** 每消耗多少个游戏天减少 1 月寿命，固定不随境界浮动 */
         public static final ModConfigSpec.IntValue LIFESPAN_DAYS_PER_MONTH = BUILDER
                         .comment("每消耗多少个游戏天减少 1 月寿命，固定 7 天，不随境界浮动")
@@ -209,6 +219,24 @@ public class Config {
          */
         public static double getAlignmentEvilThreshold() {
                 return ALIGNMENT_EVIL_THRESHOLD.get();
+        }
+
+        /**
+         * 击杀敌对生物或高天谴值目标时，道德值增加量
+         *
+         * @return 默认 10，范围 [0, 1000]
+         */
+        public static int getKillMoralityChange() {
+                return KILL_MORALITY_CHANGE.get();
+        }
+
+        /**
+         * 击杀友好/中立生物或高道德值目标时，天谴值增加量
+         *
+         * @return 默认 10，范围 [0, 1000]
+         */
+        public static int getKillCondemnationChange() {
+                return KILL_CONDEMNATION_CHANGE.get();
         }
 
         /**
