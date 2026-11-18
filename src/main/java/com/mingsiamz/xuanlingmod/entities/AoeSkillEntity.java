@@ -13,55 +13,57 @@ import net.minecraft.world.phys.Vec3;
 
 public class AoeSkillEntity extends AbstractSpellEntity {
 
-    private int tickAlive;
-    private boolean triggered;
+        private int tickAlive;
+        private boolean triggered;
 
-    public AoeSkillEntity(EntityType<? extends AbstractSpellEntity> entityType, Level level) {
-        super(entityType, level);
-    }
-
-    public AoeSkillEntity(Level level, LivingEntity caster, XuanLingTypeEnum sourceType, String sourceName,
-                          float radius) {
-        super(RegisterEntities.AOE_SPELL_ENTITY.get(), level, caster, sourceType, sourceName);
-        setPos(caster.getX(), caster.getEyeY(), caster.getZ());
-        setRadius(radius);
-        setLifeDuretion(3.0f);
-        setRemoveOnTrigger(false);
-    }
-
-    @Override
-    public void tick() {
-        if (!level().isClientSide) {
-            tickAlive++;
-            if (!triggered) {
-                triggered = true;
-                trigger(level(), this.position());
-            }
-            if (tickAlive >= (int) (getLifeDuretion() * 20)) {
-                this.remove(RemovalReason.KILLED);
-            }
+        public AoeSkillEntity(EntityType<? extends AbstractSpellEntity> entityType, Level level) {
+                super(entityType, level);
         }
 
-        super.tick();
-    }
+        public AoeSkillEntity(Level level, LivingEntity caster, XuanLingTypeEnum sourceType, String sourceName,
+                        float radius) {
+                super(RegisterEntities.AOE_SPELL_ENTITY.get(), level, caster, sourceType, sourceName);
+                setPos(caster.getX(), caster.getEyeY(), caster.getZ());
+                setRadius(radius);
+                setLifeDuretion(3.0f);
+                setRemoveOnTrigger(false);
+        }
 
-    public static AoeSkillEntity spawn(Level level, LivingEntity caster, XuanLingTypeEnum sourceType,
-                                       String sourceName, float radius) {
-        AoeSkillEntity entity = new AoeSkillEntity(level, caster, sourceType, sourceName, radius);
-        level.addFreshEntity(entity);
-        return entity;
-    }
+        @Override
+        public void tick() {
+                if (!level().isClientSide) {
+                        tickAlive++;
+                        if (!triggered) {
+                                triggered = true;
+                                trigger(level(), this.position());
+                        }
+                        if (tickAlive >= (int) (getLifeDuretion() * 20)) {
+                                this.remove(RemovalReason.KILLED);
+                        }
+                }
 
-    public static AoeSkillEntity spawn(Level level, Vec3 pos, LivingEntity caster, XuanLingTypeEnum sourceType,
-                                       String sourceName, float radius) {
-        AoeSkillEntity entity = new AoeSkillEntity(level, caster, sourceType, sourceName, radius);
-        entity.setPos(pos.x, pos.y, pos.z);
-        level.addFreshEntity(entity);
-        return entity;
-    }
+                super.tick();
+        }
 
-    public static AttributeSupplier.Builder createAttribute() {
-        return Mob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 16.0);
-    }
+        public static AoeSkillEntity spawn(Level level, LivingEntity caster, XuanLingTypeEnum sourceType,
+                        String sourceName, float radius) {
+                AoeSkillEntity entity = new AoeSkillEntity(level, caster, sourceType, sourceName, radius);
+                entity.setSource(sourceType, sourceName, caster);
+                level.addFreshEntity(entity);
+                return entity;
+        }
+
+        public static AoeSkillEntity spawn(Level level, Vec3 pos, LivingEntity caster, XuanLingTypeEnum sourceType,
+                        String sourceName, float radius) {
+                AoeSkillEntity entity = new AoeSkillEntity(level, caster, sourceType, sourceName, radius);
+                entity.setSource(sourceType, sourceName, caster);
+                entity.setPos(pos.x, pos.y, pos.z);
+                level.addFreshEntity(entity);
+                return entity;
+        }
+
+        public static AttributeSupplier.Builder createAttribute() {
+                return Mob.createMobAttributes()
+                                .add(Attributes.MAX_HEALTH, 16.0);
+        }
 }

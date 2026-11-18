@@ -77,14 +77,20 @@ public class SkillCastPacket extends CustomPackageImp {
 
         
         public static void cast(LivingEntity entity, String name) {
+                if (entity == null || entity.level().isClientSide)
+                        return;
                 SpellComponent spell = SpellComponent.load(entity.getStringUUID(), name);
                 if (spell == null) {
                         XuanLing.LOGGER.warn("[battle] {} failed to load spell '{}'",
                                         entity.getName().getString(), name);
                         return;
                 }
+                if (!spell.cast(entity)) {
+                        XuanLing.LOGGER.warn("[battle] {} spell '{}' has no supported basic type",
+                                        entity.getName().getString(), name);
+                        return;
+                }
                 XuanLing.LOGGER.info("[battle] {} cast spell {}", entity.getName().getString(), name);
-                spell.run();
         }
 
         @Override

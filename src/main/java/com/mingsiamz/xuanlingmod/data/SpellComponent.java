@@ -1,6 +1,9 @@
 package com.mingsiamz.xuanlingmod.data;
 
 import com.mingsiamz.xuanlingmod.data.controller.DataManager;
+import com.mingsiamz.xuanlingmod.entities.AoeSkillEntity;
+import com.mingsiamz.xuanlingmod.entities.ProjectileSkillEntity;
+import com.mingsiamz.xuanlingmod.type.ImpComponent;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.type.spell.ActionType;
 import com.mingsiamz.xuanlingmod.type.spell.BasicType;
@@ -24,6 +27,27 @@ public class SpellComponent {
                 if (!check())
                         return;
                 this.group.run();
+        }
+
+        public boolean cast(LivingEntity caster) {
+                if (caster == null || caster.level().isClientSide || !check())
+                        return false;
+                for (ImpComponent component : this.group.getComponents(this.type, BasicType.GROUP)) {
+                        if (BasicType.PROJECTLE.name.equals(component.name())) {
+                                ProjectileSkillEntity.spawn(caster.level(), caster, caster.getLookAngle(),
+                                                this.type, this.name);
+                                return true;
+                        }
+                        if (BasicType.AOE.name.equals(component.name())) {
+                                AoeSkillEntity.spawn(caster.level(), caster, this.type, this.name, 4.0f);
+                                return true;
+                        }
+                        if (BasicType.SELF.name.equals(component.name())) {
+                                run();
+                                return true;
+                        }
+                }
+                return false;
         }
 
         

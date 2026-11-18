@@ -85,6 +85,15 @@ public class ProjectileSkillEntity extends AbstractSpellEntity {
 
     @Override
     protected void applyComponentParams(ImpComponent comp) {
+        super.applyComponentParams(comp);
+    }
+
+    public static ProjectileSkillEntity spawn(Level level, LivingEntity caster, Vec3 direction,
+                                               XuanLingTypeEnum sourceType, String sourceName) {
+        ProjectileSkillEntity entity = new ProjectileSkillEntity(level, caster, direction, sourceType, sourceName);
+        entity.setSource(sourceType, sourceName, caster);
+        level.addFreshEntity(entity);
+        return entity;
     }
 
     public static AttributeSupplier.Builder createAttribute() {

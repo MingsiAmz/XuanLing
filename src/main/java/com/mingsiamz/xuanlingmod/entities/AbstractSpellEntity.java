@@ -78,6 +78,7 @@ public abstract class AbstractSpellEntity extends SkillEntity {
         public AbstractSpellEntity setSource(XuanLingTypeEnum type, String name, LivingEntity caster) {
                 this.sourceType = type;
                 this.sourceName = name;
+                setCasterUUID(caster);
                 setOwnerUUID(caster);
                 loadParamsFromData();
                 return this;
