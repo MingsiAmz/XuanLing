@@ -1,7 +1,10 @@
 package com.mingsiamz.xuanlingmod.register;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.entities.AbstractSpellEntity;
+import com.mingsiamz.xuanlingmod.entities.AoeSkillEntity;
 import com.mingsiamz.xuanlingmod.entities.EjectEntity;
+import com.mingsiamz.xuanlingmod.entities.ProjectileSkillEntity;
 import com.mingsiamz.xuanlingmod.entities.SkillEntity;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,6 +22,12 @@ public class RegisterEntities {
         public static final DeferredHolder<EntityType<?>, EntityType<SkillEntity>> SKILL_ENTITY = rgSimpleEntity("skill_entity", SkillEntity::new);
 
         public static final DeferredHolder<EntityType<?>, EntityType<EjectEntity>> EJECT_ENTITY = rgSimpleEntity("eject_entity", EjectEntity::new);
+
+        public static final DeferredHolder<EntityType<?>, EntityType<ProjectileSkillEntity>> PROJECTILE_SPELL_ENTITY =
+                rgSimpleEntity("projectile_spell_entity", ProjectileSkillEntity::new);
+
+        public static final DeferredHolder<EntityType<?>, EntityType<AoeSkillEntity>> AOE_SPELL_ENTITY =
+                rgSimpleEntity("aoe_spell_entity", AoeSkillEntity::new);
         
         public static void register(IEventBus bus) {
                 ENTITY_TYPE.register(bus);
@@ -27,6 +36,8 @@ public class RegisterEntities {
         public static void registerEntityAtb(EntityAttributeCreationEvent event) {
                 event.put(SKILL_ENTITY.get(), SkillEntity.createAttribute().build());
                 event.put(EJECT_ENTITY.get(), EjectEntity.createAttribute().build());
+                event.put(PROJECTILE_SPELL_ENTITY.get(), ProjectileSkillEntity.createAttribute().build());
+                event.put(AOE_SPELL_ENTITY.get(), AoeSkillEntity.createAttribute().build());
         }
 
         private static <E extends SkillEntity> DeferredHolder<EntityType<?>, EntityType<E>> rgSimpleEntity(String name, EntityType.EntityFactory<E> factory) {

@@ -28,8 +28,8 @@ import net.minecraft.world.level.Level;
 
 public class SkillEntity extends LivingEntity {
 
-        private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER_UUID =
-                SynchedEntityData.defineId(SkillEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+        private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER_UUID = SynchedEntityData
+                        .defineId(SkillEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
         protected String damageKey = "spawn_skill_damage";
         protected float lifeDuretion = 5f;
@@ -108,7 +108,7 @@ public class SkillEntity extends LivingEntity {
                 this.nbt.putFloat(this.damageKey, value);
                 return this;
         }
-        
+
         public float getDamage() {
                 if (!this.nbt.contains(this.damageKey))
                         return 0;
@@ -117,17 +117,19 @@ public class SkillEntity extends LivingEntity {
 
         public LivingEntity getOwner() {
                 return getOwnerUUID().map(uuid -> {
-                                Player player = level().getPlayerByUUID(uuid);
-                                if (player != null) return player;
-                                for (Entity entity : level().getEntities(this, this.getBoundingBox().expandTowards(64, 64, 64))) {
-                                        if (entity.getUUID().equals(uuid) && entity instanceof LivingEntity living) {
-                                                return living;
-                                        }
+                        Player player = level().getPlayerByUUID(uuid);
+                        if (player != null)
+                                return player;
+                        for (Entity entity : level().getEntities(this,
+                                        this.getBoundingBox().expandTowards(64, 64, 64))) {
+                                if (entity.getUUID().equals(uuid) && entity instanceof LivingEntity living) {
+                                        return living;
                                 }
-                                return null;
-                        }).orElse(null);
+                        }
+                        return null;
+                }).orElse(null);
         }
-        
+
         public SkillEntity setOwnerUUID(LivingEntity owner) {
                 this.entityData.set(DATA_OWNER_UUID, Optional.ofNullable(owner.getUUID()));
                 return this;
@@ -148,6 +150,6 @@ public class SkillEntity extends LivingEntity {
 
         public static AttributeSupplier.Builder createAttribute() {
                 return Mob.createMobAttributes()
-                        .add(Attributes.MAX_HEALTH);
+                                .add(Attributes.MAX_HEALTH);
         }
 }

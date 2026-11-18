@@ -55,9 +55,10 @@ public class XuanLingClient {
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
                 event.registerEntityRenderer(RegisterEntities.SKILL_ENTITY.get(), SkillEntityRender::new);
                 event.registerEntityRenderer(RegisterEntities.EJECT_ENTITY.get(), SkillEntityRender::new);
+                event.registerEntityRenderer(RegisterEntities.PROJECTILE_SPELL_ENTITY.get(), SkillEntityRender::new);
+                event.registerEntityRenderer(RegisterEntities.AOE_SPELL_ENTITY.get(), SkillEntityRender::new);
         }
 
-        @SubscribeEvent
         public static void onClientTick(ClientTickEvent.Pre event) {
                 try {
                         keyVoid();
