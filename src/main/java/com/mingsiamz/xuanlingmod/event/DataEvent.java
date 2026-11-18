@@ -8,20 +8,19 @@ import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
 import com.mingsiamz.xuanlingmod.network.BindSkillPacket;
 import com.mingsiamz.xuanlingmod.network.ManageDataPacket;
 import com.mingsiamz.xuanlingmod.network.Networking;
+import com.mingsiamz.xuanlingmod.network.TribulationFxPacket;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
+import com.mingsiamz.xuanlingmod.register.RegisterEffects;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -77,61 +76,42 @@ public class DataEvent {
         syncToClient(event.getEntity());
     }
 
+    /**
+     * Issue 07：玩家死亡时全部移除自定义 buff（走火入魔、重伤等）。
+     */
+    @SubscribeEvent
+    public static void onEntityDeath(LivingDeathEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (!(entity instanceof Player player)) {
+            return;
+        }
+        if (!player.hasData(RegisterAttachments.BASIC_DATA)) {
+            return;
+        }
+        BasicData data = RegisterAttachments.getBasicData(player);
+        if (data == null) {
+            return;
+        }
+
+        // 移除走火入魔
+        if (data.isDeviating()) {
+            player.removeEffect(RegisterEffects.EFFECT_DEVIATION);
+            data.setDeviating(false);
+            data.setDeviationTick(0);
+        }
+        // 移除重伤
+        if (data.isCriticalInjured()) {
+            player.removeEffect(RegisterEffects.EFFECT_CRITICAL_INJURY);
+            data.setCriticalInjured(false);
+            data.setCriticalInjuryTick(0);
+        }
+    }
+
     @SubscribeEvent
     public static void onEntityWasDeath(EntityTickEvent.Post event) {
         if (event.getEntity() instanceof LivingEntity entity) {
             if (!entity.isAlive()) {
                 entity.getData(RegisterAttachments.DEFAULT_DATA);
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onEntityDeath(LivingDeathEvent event) {
-        LivingEntity entity = event.getEntity();
-        Entity sourceEntity = event.getSource().getEntity();
-        LivingEntity killer = null;
-        if (sourceEntity instanceof Player player) {
-            killer = player;
-        } else if (sourceEntity instanceof Projectile projectile && projectile.getOwner() instanceof Player player) {
-            killer = player;
-        }
-        if (killer == null) {
-            return;
-        }
-        if (!killer.hasData(RegisterAttachments.BASIC_DATA)) {
-            return;
-        }
-        BasicData data = RegisterAttachments.getBasicData(killer);
-        if (data == null || killer.level().isClientSide) {
-            return;
-        }
-
-        int maxMorality = Config.getMaxValue(Config.MORALITY_MAX);
-        int maxCondemnation = Config.getMaxValue(Config.CONDEMNATION_MAX);
-        int moralityChange = Config.getKillMoralityChange();
-        int condemnationChange = Config.getKillCondemnationChange();
-
-        // 击杀生物类型：敌对生物提升道德，友好/中立生物增加天谴
-        MobCategory category = entity.getType().getCategory();
-        if (category == MobCategory.MONSTER) {
-            data.setMorality(data.getMorality() + moralityChange);
-        } else if (category == MobCategory.CREATURE
-                || category == MobCategory.AMBIENT
-                || category == MobCategory.WATER_CREATURE) {
-            data.setCondemnation(data.getCondemnation() + condemnationChange);
-        }
-
-        // 击杀目标数值：高天谴值目标提升道德，高道德值目标增加天谴
-        if (entity.hasData(RegisterAttachments.BASIC_DATA)) {
-            BasicData victim = RegisterAttachments.getBasicData(entity);
-            if (victim != null) {
-                if (victim.getCondemnation() > maxCondemnation / 2) {
-                    data.setMorality(data.getMorality() + moralityChange);
-                }
-                if (victim.getMorality() > maxMorality / 2) {
-                    data.setCondemnation(data.getCondemnation() + condemnationChange);
-                }
             }
         }
     }
@@ -170,6 +150,10 @@ public class DataEvent {
             double tpa0 = data.getTPAO();
             // 修炼速度：base × insight^0.6 × TPAO^0.4
             double speedGain = 0.1 * Math.pow(insight, 0.6) * Math.pow(tpa0, 0.4);
+            // 重伤 debuff：修炼效率降至原来的 1/5（Config 默认 0.2）
+            if (data.isCriticalInjured()) {
+                speedGain *= Config.getInjuryDebuffCultivationPenalty();
+            }
             data.setRealmExp(data.getRealmExp() + speedGain);
         }
 
@@ -179,6 +163,34 @@ public class DataEvent {
         // 天劫进行中
         if (data.isTribulating()) {
             handleTribulation(player, data, level, serverPlayer);
+        }
+
+        // 走火入魔倒计时
+        if (data.isDeviating() && data.getDeviationTick() > 0) {
+            data.setDeviationTick(data.getDeviationTick() - 1);
+            // Issue 07：死亡前不可清除，若效果被移除则重新施加
+            if (player.getEffect(RegisterEffects.EFFECT_DEVIATION) == null) {
+                player.addEffect(new MobEffectInstance(
+                                RegisterEffects.EFFECT_DEVIATION, data.getDeviationTick(), 0, false, false));
+            }
+            if (data.getDeviationTick() <= 0) {
+                data.setDeviating(false);
+                player.removeEffect(RegisterEffects.EFFECT_DEVIATION);
+            }
+        }
+
+        // 重伤倒计时
+        if (data.isCriticalInjured() && data.getCriticalInjuryTick() > 0) {
+            data.setCriticalInjuryTick(data.getCriticalInjuryTick() - 1);
+            // Issue 07：死亡前不可清除，若效果被移除则重新施加
+            if (player.getEffect(RegisterEffects.EFFECT_CRITICAL_INJURY) == null) {
+                player.addEffect(new MobEffectInstance(
+                                RegisterEffects.EFFECT_CRITICAL_INJURY, data.getCriticalInjuryTick(), 0, false, false));
+            }
+            if (data.getCriticalInjuryTick() <= 0) {
+                data.setCriticalInjured(false);
+                player.removeEffect(RegisterEffects.EFFECT_CRITICAL_INJURY);
+            }
         }
     }
 
@@ -219,7 +231,8 @@ public class DataEvent {
     }
 
     /**
-     * 处理天劫过程：定时召唤闪电，造成伤害，倒计时结束后突破成功
+     * 处理天劫过程：定时召唤闪电，造成伤害，倒计时结束后突破成功。
+     * 若玩家在渡劫期间死亡，则判定为天劫失败：按平滑曲线扣寿并施加重伤 debuff。
      */
     private static void handleTribulation(Player player, BasicData data, Level level, ServerPlayer serverPlayer) {
         int tick = data.getTribulationTick();
@@ -227,15 +240,35 @@ public class DataEvent {
             // 天劫结束，突破成功
             data.setTribulating(false);
             data.setTribulationTick(0);
-            data.setRealmLevel(data.getRealmLevel() + 1);
+            int newLevel = data.getRealmLevel() + 1;
+            data.setRealmLevel(newLevel);
             data.setRealmExp(0.0);
-            XuanLing.LOGGER.info("{} 渡天劫成功，境界突破至 {}", player.getName().getString(), data.getRealmLevel());
+            XuanLing.LOGGER.info("{} 渡天劫成功，境界突破至 {}", player.getName().getString(), newLevel);
+            return;
+        }
+
+        // 玩家在渡劫期间死亡：天劫失败
+        if (!player.isAlive()) {
+            data.setTribulating(false);
+            data.setTribulationTick(0);
+            // 按平滑曲线扣除寿命
+            int realmLevel = data.getRealmLevel();
+            double deduction = Config.getTribulationLifespanDeduction(realmLevel);
+            data.setLifespanMonth(data.getLifespanMonth() - (int) deduction);
+            // 施加重伤 debuff
+            int injuryDuration = Config.getInjuryDebuffDurationTick();
+            data.setCriticalInjured(true);
+            data.setCriticalInjuryTick(injuryDuration);
+            player.addEffect(new MobEffectInstance(
+                            RegisterEffects.EFFECT_CRITICAL_INJURY, injuryDuration, 0, false, false));
+            XuanLing.LOGGER.info("{} 渡天劫失败，扣除 {} 月寿命并获得重伤 debuff，境界等级 {}", player.getName().getString(),
+                            (int) deduction, realmLevel);
             return;
         }
 
         // 每 40 tick (2秒) 一道天雷
         if (tick % 40 == 0) {
-            if (level instanceof ServerLevel serverLevel) {
+            if (level instanceof ServerLevel) {
                 BlockPos pos = player.blockPosition();
                 // 闪电稍微偏移，避免直接叠在玩家头上
                 BlockPos strikePos = pos.offset(
@@ -248,6 +281,9 @@ public class DataEvent {
                     lightning.setVisualOnly(false);
                     level.addFreshEntity(lightning);
                 }
+
+                // 客户端 photon2 雷电特效（仅客户端渲染）
+                TribulationFxPacket.send(player);
 
                 // 天雷造成伤害（根据天谴值与善恶标签调整）
                 double condemnation = data.getCondemnation();

@@ -41,6 +41,14 @@ public class BasicData {
         private boolean isTribulating = false;
         /** 天劫倒计时（tick），用于控制天劫持续时间和闪电频率 */
         private int tribulationTick = 0;
+        /** 是否处于走火入魔状态 */
+        private boolean isDeviating = false;
+        /** 走火入魔倒计时（tick） */
+        private int deviationTick = 0;
+        /** 是否处于重伤状态 */
+        private boolean isCriticalInjured = false;
+        /** 重伤倒计时（tick） */
+        private int criticalInjuryTick = 0;
 
         /** 善恶标签：善 / 中立 / 恶 */
         public enum Alignment {
@@ -96,7 +104,8 @@ public class BasicData {
                           long lastLifespanCheckDay, String sect, String nickName,
                           double lastMediX, double lastMediY, double lastMediZ,
                           int realmLevel, double realmExp, boolean isTribulating, int tribulationTick, int comprehensionLevel,
-            double comprehensionExp, boolean isComprehending, int comprehensionTick, String comprehensionTarget) {
+                          double comprehensionExp, boolean isComprehending, int comprehensionTick, String comprehensionTarget,
+                          boolean isDeviating, int deviationTick, boolean isCriticalInjured, int criticalInjuryTick) {
             this.normalLife = normalLife;
             this.soulLife = soulLife;
             this.moveSpeedMof = moveSpeedMof;
@@ -126,6 +135,10 @@ public class BasicData {
             this.isComprehending = isComprehending;
             this.comprehensionTick = comprehensionTick;
             this.comprehensionTarget = comprehensionTarget;
+            this.isDeviating = isDeviating;
+            this.deviationTick = deviationTick;
+            this.isCriticalInjured = isCriticalInjured;
+            this.criticalInjuryTick = criticalInjuryTick;
         }
 
         private static BasicData fromCodec(double normalLife, double soulLife, double moveSpeedMof, double flySpeedMof,
@@ -134,7 +147,8 @@ public class BasicData {
                                            int lifespanMonth, long lastLifespanCheckDay, String sect, String nickName) {
             return new BasicData(normalLife, soulLife, moveSpeedMof, flySpeedMof, TPAO, lucky, charm, insight,
                                  inspiration, mindSense, false, morality, condemnation, lifespanMonth,
-                                 lastLifespanCheckDay, sect, nickName, 0, 0, 0, 0, 0.0, false, 0, 0, 0.0, false, 0, "");
+                                 lastLifespanCheckDay, sect, nickName, 0, 0, 0, 0, 0.0, false, 0, 0, 0.0, false, 0, "",
+                                 false, 0, false, 0);
         }
 
         public BasicData(RegistryFriendlyByteBuf buf) {
@@ -167,6 +181,10 @@ public class BasicData {
                 this.isComprehending = buf.readBoolean();
                 this.comprehensionTick = buf.readInt();
                 this.comprehensionTarget = buf.readUtf();
+                this.isDeviating = buf.readBoolean();
+                this.deviationTick = buf.readInt();
+                this.isCriticalInjured = buf.readBoolean();
+                this.criticalInjuryTick = buf.readInt();
         }
 
         public BasicData(
@@ -196,7 +214,11 @@ public class BasicData {
                         double comprehensionExp,
                         boolean isComprehending,
                         int comprehensionTick,
-                        String comprehensionTarget) {
+                        String comprehensionTarget,
+                        boolean isDeviating,
+                        int deviationTick,
+                        boolean isCriticalInjured,
+                        int criticalInjuryTick) {
                 this.normalLife = normalLife;
                 this.soulLife = soulLife;
                 this.moveSpeedMof = moveSpeedMof;
@@ -223,6 +245,10 @@ public class BasicData {
                 this.isComprehending = isComprehending;
                 this.comprehensionTick = comprehensionTick;
                 this.comprehensionTarget = comprehensionTarget;
+                this.isDeviating = isDeviating;
+                this.deviationTick = deviationTick;
+                this.isCriticalInjured = isCriticalInjured;
+                this.criticalInjuryTick = criticalInjuryTick;
         }
 
         public double getNormalLife() {
@@ -503,6 +529,38 @@ public class BasicData {
                 this.tribulationTick = tribulationTick;
         }
 
+        public boolean isDeviating() {
+                return isDeviating;
+        }
+
+        public void setDeviating(boolean isDeviating) {
+                this.isDeviating = isDeviating;
+        }
+
+        public int getDeviationTick() {
+                return deviationTick;
+        }
+
+        public void setDeviationTick(int deviationTick) {
+                this.deviationTick = deviationTick;
+        }
+
+        public boolean isCriticalInjured() {
+                return isCriticalInjured;
+        }
+
+        public void setCriticalInjured(boolean isCriticalInjured) {
+                this.isCriticalInjured = isCriticalInjured;
+        }
+
+        public int getCriticalInjuryTick() {
+                return criticalInjuryTick;
+        }
+
+        public void setCriticalInjuryTick(int criticalInjuryTick) {
+                this.criticalInjuryTick = criticalInjuryTick;
+        }
+
         public void setLastPos(Vec3 vec3) {
                 this.lastMediX = vec3.x;
                 this.lastMediY = vec3.y;
@@ -543,6 +601,10 @@ public class BasicData {
                 buf.writeBoolean(this.isComprehending);
                 buf.writeInt(this.comprehensionTick);
                 buf.writeUtf(this.comprehensionTarget);
+                buf.writeBoolean(this.isDeviating);
+                buf.writeInt(this.deviationTick);
+                buf.writeBoolean(this.isCriticalInjured);
+                buf.writeInt(this.criticalInjuryTick);
         }
 
         public static BasicData initData() {
@@ -600,7 +662,11 @@ public class BasicData {
                                 && Double.compare(this.comprehensionExp, b.comprehensionExp) == 0
                                 && this.isComprehending == b.isComprehending
                                 && this.comprehensionTick == b.comprehensionTick
-                                && this.comprehensionTarget.equals(b.comprehensionTarget);
+                                && this.comprehensionTarget.equals(b.comprehensionTarget)
+                                && this.isDeviating == b.isDeviating
+                                && this.deviationTick == b.deviationTick
+                                && this.isCriticalInjured == b.isCriticalInjured
+                                && this.criticalInjuryTick == b.criticalInjuryTick;
         }
 
         public void setComprehending(boolean comprehending) {
@@ -621,7 +687,8 @@ public class BasicData {
                                      data.isMeditation, data.morality, data.condemnation, data.lifespanMonth, data.lastLifespanCheckDay,
                                      data.sect, data.nickName, data.lastMediX, data.lastMediY, data.lastMediZ,
                                      data.realmLevel, data.realmExp, data.isTribulating, data.tribulationTick,
-                                     data.comprehensionLevel, data.comprehensionExp, data.isComprehending, data.comprehensionTick, data.comprehensionTarget);
+                                     data.comprehensionLevel, data.comprehensionExp, data.isComprehending, data.comprehensionTick, data.comprehensionTarget,
+                                     data.isDeviating, data.deviationTick, data.isCriticalInjured, data.criticalInjuryTick);
         }
 
 }

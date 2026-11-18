@@ -152,6 +152,8 @@ public class XuanlingLangPro {
                         this.add("entity.xuanling.eject_entity", "弹射实体");
                         
                         this.add("effect.xuanling.meditation", "冥想");
+                        this.add("effect.xuanling.deviation", "走火入魔");
+                        this.add("effect.xuanling.critical_injury", "重伤");
                 }
         }
 
@@ -291,6 +293,8 @@ public class XuanlingLangPro {
                         this.add("entity.xuanling.eject_entity", "Eject Entity");
                         
                         this.add("effect.xuanling.meditation", "Meditation");
+                        this.add("effect.xuanling.deviation", "Deviation");
+                        this.add("effect.xuanling.critical_injury", "Critical Injury");
                 }
         }
 }

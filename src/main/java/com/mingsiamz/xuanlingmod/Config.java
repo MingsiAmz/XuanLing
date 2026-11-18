@@ -156,6 +156,16 @@ public class Config {
                         .comment("重伤 debuff 的修炼效率惩罚，0-1 之间，默认 0.2 表示效率降至原来的 20%")
                         .defineInRange("injury_debuff_cultivation_penalty", 0.2, 0, 1);
 
+        /** 重伤 debuff 的持续时间（tick），默认 36000 即 30 分钟 */
+        public static final ModConfigSpec.IntValue INJURY_DEBUFF_DURATION_TICK = BUILDER
+                        .comment("重伤 debuff 的持续时间，单位 tick，默认 36000 tick（30 分钟）")
+                        .defineInRange("injury_debuff_duration_tick", 36000, 1, Integer.MAX_VALUE);
+
+        /** 走火入魔 debuff 的持续时间（tick），默认 6000 即 5 分钟 */
+        public static final ModConfigSpec.IntValue DEVIATION_DEBUFF_DURATION_TICK = BUILDER
+                        .comment("走火入魔 debuff 的持续时间，单位 tick，默认 6000 tick（5 分钟）")
+                        .defineInRange("deviation_debuff_duration_tick", 6000, 1, Integer.MAX_VALUE);
+
         /** 善恶标签的善阈值，morality/(morality+condemnation) >= 该值时标记为“善” */
         public static final ModConfigSpec.DoubleValue ALIGNMENT_GOOD_THRESHOLD = BUILDER
                         .comment("善标签阈值，0-1 之间，默认 0.8，占比 >= 0.8 标记为善")
@@ -201,6 +211,24 @@ public class Config {
          */
         public static double getInjuryDebuffCultivationPenalty() {
                 return INJURY_DEBUFF_CULTIVATION_PENALTY.get();
+        }
+
+        /**
+         * 重伤 debuff 的持续时间（tick）
+         *
+         * @return 默认 36000（30 分钟）
+         */
+        public static int getInjuryDebuffDurationTick() {
+                return INJURY_DEBUFF_DURATION_TICK.get();
+        }
+
+        /**
+         * 走火入魔 debuff 的持续时间（tick）
+         *
+         * @return 默认 6000（5 分钟）
+         */
+        public static int getDeviationDebuffDurationTick() {
+                return DEVIATION_DEBUFF_DURATION_TICK.get();
         }
 
         /**

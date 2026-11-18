@@ -63,6 +63,11 @@ public class Networking {
                                 SkillFxPacket.TYPE,
                                 SkillFxPacket.CODEC,
                                 Networking::handler);
+
+                reg.playToClient(
+                                TribulationFxPacket.TYPE,
+                                TribulationFxPacket.CODEC,
+                                Networking::handler);
         }
 
         public static <T extends CustomPackageImp> void handler(T t, IPayloadContext ctx) {
