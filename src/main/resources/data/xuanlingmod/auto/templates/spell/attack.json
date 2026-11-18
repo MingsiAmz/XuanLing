@@ -1,0 +1,60 @@
+{
+  "id": "spell:attack:basic",
+  "name": "基础攻击神通模板",
+  "description": "最基础的攻击类神通",
+  "category": "ATTACK",
+  "rarity": "COMMON",
+  "elementType": "FIRE",
+  "minRealmLevel": 1,
+  "maxRealmLevel": 4,
+  "prefixes": [
+    "烈火",
+    "炎爆",
+    "火球",
+    "焚天",
+    "灼烧"
+  ],
+  "bases": [
+    "术",
+    "法",
+    "诀",
+    "咒",
+    "印"
+  ],
+  "suffixes": [
+    "·初级",
+    "·入门",
+    "·基础",
+    "·一式",
+    "·起手"
+  ],
+  "components": [
+    {
+      "componentId": "component:spell:fireball",
+      "weight": 100,
+      "required": true
+    },
+    {
+      "componentId": "component:spell:burn",
+      "weight": 60,
+      "required": false
+    }
+  ],
+  "cooldown": {
+    "baseCooldown": 100,
+    "cooldownReductionPerLevel": 5,
+    "minCooldown": 40,
+    "sharedCooldownGroup": "fire_attack"
+  },
+  "scaling": {
+    "damageBase": 10.0,
+    "damagePerLevel": 3.0,
+    "damagePerSpiritualPower": 0.5,
+    "rangeBase": 16.0,
+    "rangePerLevel": 1.0,
+    "areaBase": 1.0,
+    "areaPerLevel": 0.2
+  },
+  "unlockCondition": "realm >= 1",
+  "maxLevel": 10
+}

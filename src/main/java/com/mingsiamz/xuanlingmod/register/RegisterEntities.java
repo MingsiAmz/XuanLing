@@ -19,7 +19,7 @@ public class RegisterEntities {
         public static final DeferredHolder<EntityType<?>, EntityType<SkillEntity>> SKILL_ENTITY = rgSimpleEntity("skill_entity", SkillEntity::new);
 
         public static final DeferredHolder<EntityType<?>, EntityType<EjectEntity>> EJECT_ENTITY = rgSimpleEntity("eject_entity", EjectEntity::new);
-
+        
         public static void register(IEventBus bus) {
                 ENTITY_TYPE.register(bus);
         }
@@ -30,6 +30,6 @@ public class RegisterEntities {
         }
 
         private static <E extends SkillEntity> DeferredHolder<EntityType<?>, EntityType<E>> rgSimpleEntity(String name, EntityType.EntityFactory<E> factory) {
-                return ENTITY_TYPE.register(name, () -> EntityType.Builder.<E>of(factory, MobCategory.MISC).sized(1f, 1f).noSummon().noSave().fireImmune().canSpawnFarFromPlayer().updateInterval(60).build(XuanLing.prefix("skill_entity").toString()));
+                return ENTITY_TYPE.register(name, () -> EntityType.Builder.<E>of(factory, MobCategory.MISC).sized(1f, 1f).noSummon().noSave().fireImmune().canSpawnFarFromPlayer().updateInterval(60).build(XuanLing.prefix(name).toString()));
         }
 }

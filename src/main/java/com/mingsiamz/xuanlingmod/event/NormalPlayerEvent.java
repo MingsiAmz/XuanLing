@@ -8,6 +8,7 @@ import org.joml.Vector3f;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
+import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
 import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Type;
 import com.mingsiamz.xuanlingmod.gui.ChangeGui;
@@ -17,6 +18,7 @@ import com.mingsiamz.xuanlingmod.register.RegisterEffects;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.neoforged.api.distmarker.Dist;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,11 +41,17 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClick
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
-@EventBusSubscriber(modid = XuanLing.MODID)
+@EventBusSubscriber(modid = XuanLing.MODID, value = Dist.CLIENT)
 public class NormalPlayerEvent {
         @SubscribeEvent
         public static void playerJoinWorld(PlayerEvent.PlayerLoggedInEvent event) {
                 Player player = event.getEntity();
+                if (!player.hasData(RegisterAttachments.BASIC_DATA))
+                        player.setData(RegisterAttachments.BASIC_DATA, new BasicData());
+                if (!player.hasData(RegisterAttachments.DEFAULT_DATA))
+                        player.setData(RegisterAttachments.DEFAULT_DATA, new DefaultData());
+                if (!player.hasData(RegisterAttachments.DEFAULT_ENERGY))
+                        player.setData(RegisterAttachments.DEFAULT_ENERGY, new DefaultEnergy());
         }
 
         @SubscribeEvent
@@ -53,22 +61,15 @@ public class NormalPlayerEvent {
 
         @SubscribeEvent
         public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-                // for (Field fields : EntityType.class.getFields()) {
-                // // event.registerEntity(Capabilities.EnergyStorage.ENTITY, fields, (entity,
-                // ctx) -> entity.);
-                // }
         }
 
         @SubscribeEvent
         public static void onRightClickItem(RightClickItem event) {
                 Player player = event.getEntity();
                 Level level = player.level();
-                InteractionHand hand = event.getHand();
                 DefaultEnergy energy = RegisterAttachments.getDefaultEnergy(player);
-                ItemStack item = player.getItemInHand(hand);
-                if (level.isClientSide) {
-
-                } else {
+                ItemStack item = player.getItemInHand(event.getHand());
+                if (!level.isClientSide) {
                         pushEnergyItem(item, energy);
                 }
         }
@@ -85,9 +86,7 @@ public class NormalPlayerEvent {
         public static void onPlayerTickPre(PlayerTickEvent.Pre event) {
                 Player player = event.getEntity();
                 Level level = player.level();
-                if (level.isClientSide) {
-
-                } else {
+                if (!level.isClientSide) {
                         onMeditation(player);
                 }
         }
@@ -101,13 +100,20 @@ public class NormalPlayerEvent {
         }
 
         public static void pushEnergyItem(ItemStack item, DefaultEnergy energy) {
-                if ((item.getItem() instanceof IEnergyStorage iitem) && energy != null) {
-                        if (!iitem.canReceive())
-                                return;
-                        int sum = iitem.getEnergyStored() + (int) energy.getNowValue(Type.PARRENT);
-                        int toExtract = sum >= iitem.getMaxEnergyStored() ? iitem.getMaxEnergyStored() : sum;
-                        iitem.extractEnergy(toExtract, false);
-                }
+                if (!(item.getItem() instanceof IEnergyStorage iitem) || energy == null)
+                        return;
+                if (!iitem.canReceive())
+                        return;
+                int toPush = (int) energy.getNowValue(Type.PARRENT);
+                if (toPush <= 0)
+                        return;
+                int space = iitem.getMaxEnergyStored() - iitem.getEnergyStored();
+                int amount = Math.min(toPush, space);
+                if (amount <= 0)
+                        return;
+                int received = iitem.receiveEnergy(amount, false);
+                if (received > 0)
+                        energy.setEnergyValue(Type.PARRENT, energy.getNowValue(Type.PARRENT) - received);
         }
 
         public static void onMeditation(LivingEntity entity) {

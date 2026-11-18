@@ -1,29 +1,45 @@
 package com.mingsiamz.xuanlingmod.gui;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.client.ArtSpellCache;
+import com.mingsiamz.xuanlingmod.data.ArtComponent;
+import com.mingsiamz.xuanlingmod.data.ComponentCodec;
 import com.mingsiamz.xuanlingmod.data.ComponentGroup;
 import com.mingsiamz.xuanlingmod.data.SpellComponent;
 import com.mingsiamz.xuanlingmod.gui.component.DragPayload;
 import com.mingsiamz.xuanlingmod.gui.component.ParamPopup;
+import com.mingsiamz.xuanlingmod.items.TalismanPaperItem;
+import com.mingsiamz.xuanlingmod.network.CreateDataPacket;
+import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.type.ImpComponent;
 import com.mingsiamz.xuanlingmod.type.RegistryComponent;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
+import com.mingsiamz.xuanlingmod.type.spell.ParamType;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiRenderUtil;
 import com.mingsiamz.xuanlingmod.util.gui.component.GuiButton;
 import com.mingsiamz.xuanlingmod.util.gui.component.ModalDialog;
 import com.mingsiamz.xuanlingmod.util.gui.component.canvas.CanvasNode;
 import com.mingsiamz.xuanlingmod.util.gui.component.canvas.CanvasPanel;
+import com.mingsiamz.xuanlingmod.util.gui.component.canvas.Connection;
 import com.mingsiamz.xuanlingmod.util.gui.component.canvas.EditorState;
 import com.mingsiamz.xuanlingmod.util.gui.component.palette.PalettePanel;
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 
 public class ComponentEditorScreen extends Screen {
@@ -43,26 +59,32 @@ public class ComponentEditorScreen extends Screen {
         private Component toastMessage = null;
         private long toastTime = 0;
         private ParamPopup activePopup = null;
+        private int toastColor = CultivationTheme.DANGER;
 
         private DragPayload dragPayload = null;
         private XuanLingTypeEnum type;
         private String name = "";
+        private String description = "";
         private ComponentGroup componentGroup = new ComponentGroup();
         private ModalDialog nameDialog;
 
         private boolean showNamePopup = false;
         private EditBox nameInput;
+        private EditBox descriptionInput;
         private GuiButton confirmButton;
         private GuiButton cancelButton;
 
         private int popupX;
         private int popupY;
-        private final int popupW = 240;
-        private final int popupH = 110;
+        private final int popupW = 280;
+        private final int popupH = 180;
         private int inputX;
         private int inputY;
         private int inputW;
+        private int descInputY;
+        private int descInputH;
         private static final int INPUT_H = 18;
+        private static final int DESC_INPUT_H = 60;
 
         public ComponentEditorScreen(XuanLingTypeEnum type) {
                 super(Component.literal("make cultivation method"));
@@ -100,6 +122,13 @@ public class ComponentEditorScreen extends Screen {
                 nameInput.setVisible(false);
                 nameInput.setValue("");
 
+                descriptionInput = new EditBox(this.font, inputX, descInputY, inputW, descInputH,
+                                Component.literal("description"));
+                descriptionInput.setMaxLength(512);
+                descriptionInput.setBordered(false);
+                descriptionInput.setVisible(false);
+                descriptionInput.setValue("");
+
                 confirmButton = new GuiButton(80, 20,
                                 XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation").getString());
                 cancelButton = new GuiButton(80, 20,
@@ -115,28 +144,108 @@ public class ComponentEditorScreen extends Screen {
         }
 
         private void onCreate() {
-                if (this.componentGroup == null || this.componentGroup.isEmpty())
+                if (minecraft == null || minecraft.player == null)
                         return;
-                LocalPlayer player = minecraft.player;
-                if (minecraft != null && player != null) {
-                        switch (this.type) {
-                                case REALM -> {
 
-                                }
-                                case SPELL -> {
-                                        SpellComponent spell = new SpellComponent(this.name, this.componentGroup);
-                                        spell.toJson(player);
-                                }
-                                case ART -> {
+                if (!ensureComponentsConnected())
+                        return;
 
-                                }
-                                default -> throw new IllegalArgumentException("Unexpected value: " + this.type);
+                String trimmed = this.name == null ? "" : this.name.trim();
 
+                if (trimmed.isEmpty()) {
+                        toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_name_empty"));
+                        return;
+                }
+
+                if (!isValidName(trimmed)) {
+                        toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_name_invalid"));
+                        return;
+                }
+
+                ComponentGroup built = collectComponentGroup();
+                if (built.isEmpty()) {
+                        toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_component_empty"));
+                        return;
+                }
+
+                this.name = trimmed;
+                this.componentGroup = built;
+
+                boolean valid = switch (this.type) {
+                        case SPELL -> new SpellComponent(this.name, built).check();
+                        case ART -> new ArtComponent(this.name, built).check();
+                        default -> false;
+                };
+
+                if (!valid) {
+                        toast(this.type == XuanLingTypeEnum.REALM || this.type == XuanLingTypeEnum.ENERGY
+                                        ? XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_not_support")
+                                        : XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation_failed"));
+                        return;
+                }
+
+                String payload = ComponentCodec.encodeGroup(built).toString();
+                if (payload.getBytes(
+                                java.nio.charset.StandardCharsets.UTF_8).length > CreateDataPacket.MAX_PAYLOAD_LENGTH) {
+                        toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation_failed"));
+                        return;
+                }
+
+                Networking.sendToServer(new CreateDataPacket(this.type, this.name, payload));
+
+                double speed = calculateCultivationSpeed(built);
+
+                String key = XuanLing.MODID + this.type.type;
+                CompoundTag root = minecraft.player.getPersistentData();
+                if (!root.contains(key, net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+                        root.put(key, new CompoundTag());
+                }
+                root.getCompound(key).putString(this.name, this.name);
+                ArtSpellCache.updateCache(key, root.getCompound(key));
+
+                giveTalismanPaper(this.type, this.name, this.description, speed);
+
+                toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation_success", this.name),
+                                CultivationTheme.BORDER_GOLD);
+        }
+
+        private double calculateCultivationSpeed(ComponentGroup group) {
+                double totalSpeed = 0.0;
+                if (group == null)
+                        return 1.0;
+
+                String[] basicTypes = {
+                                com.mingsiamz.xuanlingmod.type.spell.BasicType.PROJECTLE.name,
+                                com.mingsiamz.xuanlingmod.type.spell.BasicType.SELF.name,
+                                com.mingsiamz.xuanlingmod.type.spell.BasicType.AOE.name
+                };
+
+                for (String basicType : basicTypes) {
+                        ConcurrentLinkedQueue<ImpComponent> comps = group.getComponents(this.type, basicType);
+                        if (comps != null) {
+                                for (ImpComponent comp : comps) {
+                                        ConcurrentHashMap<ParamType, Object> params = comp.getParams();
+                                        if (params != null && params.containsKey(ParamType.SPEED)) {
+                                                Object speedObj = params.get(ParamType.SPEED);
+                                                if (speedObj instanceof Number) {
+                                                        totalSpeed += ((Number) speedObj).doubleValue();
+                                                }
+                                        }
+                                }
                         }
-                        player.displayClientMessage(Component
-                                        .literal(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_cultivation") + ":"
-                                                        + this.name),
-                                        false);
+                }
+                return Math.max(1.0, totalSpeed);
+        }
+
+        private void giveTalismanPaper(XuanLingTypeEnum type, String nickname, String description, double speed) {
+                if (minecraft == null || minecraft.player == null)
+                        return;
+
+                ItemStack paper = new ItemStack(com.mingsiamz.xuanlingmod.register.RegisterItems.TALISMAN_PAPER.get());
+                TalismanPaperItem.setData(paper, type, nickname, description, speed);
+
+                if (!minecraft.player.getInventory().add(paper)) {
+                        minecraft.player.drop(paper, false);
                 }
         }
 
@@ -218,8 +327,18 @@ public class ComponentEditorScreen extends Screen {
                         if (mx >= inputX - 2 && mx <= inputX + inputW + 2
                                         && my >= inputY - 2 && my <= inputY + INPUT_H + 2) {
                                 nameInput.setFocused(true);
+                                descriptionInput.setFocused(false);
+                                return true;
+                        }
+                        if (mx >= inputX - 2 && mx <= inputX + inputW + 2
+                                        && my >= descInputY - 2 && my <= descInputY + descInputH + 2) {
+                                descriptionInput.setFocused(true);
+                                nameInput.setFocused(false);
+                                descriptionInput.mouseClicked(mx, my, button);
+                                return true;
                         } else {
                                 nameInput.setFocused(false);
+                                descriptionInput.setFocused(false);
                         }
                         return true;
                 }
@@ -292,13 +411,9 @@ public class ComponentEditorScreen extends Screen {
                                         }
 
                                         if (targetGroup != null) {
-                                                String groupType = targetGroup.getGroupName();
-                                                String compType = dragPayload.component.type();
-
                                                 if (!CanvasNode.canJoinGroup(targetGroup, dragPayload.component)) {
-                                                        this.toastMessage = XuanLing.trans(XuanlingLangPro.GUI_STRING,
-                                                                        "the_component_not_join_group");
-                                                        this.toastTime = System.currentTimeMillis();
+                                                        toast(XuanLing.trans(XuanlingLangPro.GUI_STRING,
+                                                                        "the_component_not_join_group"));
                                                         CanvasNode normalNode = new CanvasNode(dragPayload.component,
                                                                         (int) cx - 55, (int) cy - 23);
                                                         setupNodeClick(normalNode);
@@ -309,7 +424,6 @@ public class ComponentEditorScreen extends Screen {
                                                         setupNodeClick(childNode);
                                                         targetGroup.children.add(childNode);
                                                 }
-                                                componentGroup.addComponent(this.type, compType, dragPayload.component);
                                         } else {
                                                 CanvasNode normalNode = new CanvasNode(dragPayload.component,
                                                                 (int) cx - 55, (int) cy - 23);
@@ -328,6 +442,12 @@ public class ComponentEditorScreen extends Screen {
         @Override
         public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
                 if (keyCode == 257 || keyCode == 335) {
+                        if (showNamePopup && descriptionInput.isFocused()) {
+                                if ((modifiers & 1) == 0) {
+                                        descriptionInput.setValue(descriptionInput.getValue() + "\n");
+                                        return true;
+                                }
+                        }
                         confirmName();
                         return true;
                 }
@@ -335,15 +455,23 @@ public class ComponentEditorScreen extends Screen {
                         closeNamePopup();
                         return true;
                 }
-                if (nameInput.keyPressed(keyCode, scanCode, modifiers))
-                        return true;
+                if (showNamePopup) {
+                        if (nameInput.isFocused() && nameInput.keyPressed(keyCode, scanCode, modifiers))
+                                return true;
+                        if (descriptionInput.isFocused() && descriptionInput.keyPressed(keyCode, scanCode, modifiers))
+                                return true;
+                }
                 return super.keyPressed(keyCode, scanCode, modifiers);
         }
 
         @Override
         public boolean charTyped(char codePoint, int modifiers) {
-                if (showNamePopup && nameInput.charTyped(codePoint, modifiers))
-                        return true;
+                if (showNamePopup) {
+                        if (nameInput.isFocused() && nameInput.charTyped(codePoint, modifiers))
+                                return true;
+                        if (descriptionInput.isFocused() && descriptionInput.charTyped(codePoint, modifiers))
+                                return true;
+                }
                 return super.charTyped(codePoint, modifiers);
         }
 
@@ -374,48 +502,57 @@ public class ComponentEditorScreen extends Screen {
 
         private void setupNodeClick(CanvasNode node) {
                 node.setOnConfigClick(() -> {
-                        if (node.getDef() == null)
-                                return;
-                        if (node.getDef().getParams() == null || node.getDef().getParams().isEmpty()) {
-                                this.toastMessage = XuanLing.trans(XuanlingLangPro.GUI_STRING,
-                                                "this_component_not_select_more");
-                                this.toastTime = System.currentTimeMillis();
-                                return;
+                        if (node.getDef() != null) {
+                                if (node.getDef().getParams() == null || node.getDef().getParams().isEmpty()) {
+                                        toast(XuanLing.trans(XuanlingLangPro.GUI_STRING,
+                                                        "this_component_not_select_more"));
+                                        return;
+                                }
+                                int popupX = canvas.toScreenX(node.getCanvasX() + node.getWidth() + 10);
+                                int popupY = canvas.toScreenY(node.getCanvasY());
+
+                                activePopup = new ParamPopup(node.getDef(), popupX, popupY);
                         }
-
-                        int popupX = canvas.toScreenX(node.getCanvasX() + node.getWidth() + 10);
-                        int popupY = canvas.toScreenY(node.getCanvasY());
-
-                        if (popupX + 160 > this.width)
-                                popupX = canvas.toScreenX(node.getCanvasX()) - 170;
-
-                        activePopup = new ParamPopup(node.getDef(), popupX, popupY);
                 });
         }
 
         private void computePopupLayout() {
-                this.popupX = (this.width - popupW) / 2;
-                this.popupY = (this.height - popupH) / 2;
+                this.popupX = Math.max(10, (this.width - popupW) / 2);
+                this.popupY = Math.max(10, (this.height - popupH) / 2);
                 this.inputW = popupW - 40;
                 this.inputX = popupX + 20;
                 this.inputY = popupY + 40;
+                this.descInputY = inputY + INPUT_H + 10;
+                this.descInputH = DESC_INPUT_H;
         }
 
         private void openNamePopup() {
+                if (!ensureComponentsConnected())
+                        return;
+
                 this.showNamePopup = true;
                 this.nameInput.setValue(this.name == null ? "" : this.name);
                 this.nameInput.setVisible(true);
                 this.nameInput.setFocused(true);
+                this.descriptionInput.setValue(this.description == null ? "" : this.description);
+                this.descriptionInput.setVisible(true);
         }
 
         private void closeNamePopup() {
                 this.showNamePopup = false;
                 this.nameInput.setVisible(false);
                 this.nameInput.setFocused(false);
+                this.descriptionInput.setVisible(false);
+                this.descriptionInput.setFocused(false);
         }
 
         private void confirmName() {
                 this.name = this.nameInput.getValue().trim();
+                String desc = this.descriptionInput.getValue().trim();
+                if (desc.length() > 1024) {
+                        desc = desc.substring(0, 1024);
+                }
+                this.description = desc;
                 closeNamePopup();
                 onCreate();
         }
@@ -435,6 +572,14 @@ public class ComponentEditorScreen extends Screen {
                 GuiRenderUtil.border(g, inputX - 2, inputY - 2, inputX + inputW + 2, inputY + INPUT_H + 2,
                                 CultivationTheme.BORDER_CYAN);
 
+                Component descLabel = XuanLing.trans(XuanlingLangPro.GUI_STRING, "input_cultivation_description");
+                g.drawString(font, descLabel, inputX, descInputY - 12, CultivationTheme.TEXT_SECONDARY, false);
+
+                g.fill(inputX - 2, descInputY - 2, inputX + inputW + 2, descInputY + descInputH + 2,
+                                CultivationTheme.PANEL_BG_DARK);
+                GuiRenderUtil.border(g, inputX - 2, descInputY - 2, inputX + inputW + 2, descInputY + descInputH + 2,
+                                CultivationTheme.BORDER_CYAN);
+
                 String text = nameInput.getValue();
                 int textW = font.width(text);
                 int textX = inputX + (inputW - textW) / 2;
@@ -446,7 +591,157 @@ public class ComponentEditorScreen extends Screen {
                                         CultivationTheme.TEXT_PRIMARY);
                 }
 
+                String descText = descriptionInput.getValue();
+                if (!descText.isEmpty()) {
+                        List<String> wrappedLines = wrapText(descText, inputW - 4);
+                        for (int i = 0; i < wrappedLines.size(); i++) {
+                                String line = wrappedLines.get(i);
+                                int lineY = descInputY + 4 + i * 10;
+                                if (lineY + 10 <= descInputY + descInputH) {
+                                        g.drawString(font, line, inputX + 2, lineY, CultivationTheme.TEXT_PRIMARY,
+                                                        false);
+                                }
+                        }
+                }
+
+                if (descriptionInput.isFocused() && (System.currentTimeMillis() / 500) % 2 == 0) {
+                        String descTextCursor = descriptionInput.getValue();
+                        int cursorPos = descriptionInput.getCursorPosition();
+                        List<String> wrappedLines = wrapText(descTextCursor, inputW - 4);
+
+                        int charCount = 0;
+                        int cursorLine = 0;
+                        int cursorX = inputX + 2;
+                        int cursorY = descInputY + 4;
+
+                        for (int i = 0; i < wrappedLines.size(); i++) {
+                                String line = wrappedLines.get(i);
+                                int lineLen = line.length();
+                                int lineCharCount = lineLen + (i < wrappedLines.size() - 1 ? 1 : 0);
+
+                                if (cursorPos <= charCount + lineCharCount) {
+                                        cursorLine = i;
+                                        int posInLine = cursorPos - charCount;
+                                        String textBeforeCursor = line.substring(0, Math.min(posInLine, lineLen));
+                                        cursorX = inputX + 2 + font.width(textBeforeCursor);
+                                        cursorY = descInputY + 4 + i * 10;
+                                        break;
+                                }
+                                charCount += lineCharCount;
+                        }
+
+                        if (wrappedLines.size() > 0 && cursorPos > charCount) {
+                                String lastLine = wrappedLines.get(wrappedLines.size() - 1);
+                                cursorX = inputX + 2 + font.width(lastLine);
+                                cursorY = descInputY + 4 + (wrappedLines.size() - 1) * 10;
+                        }
+
+                        if (cursorY + 10 <= descInputY + descInputH) {
+                                g.fill(cursorX, cursorY, cursorX + 1, cursorY + 10, CultivationTheme.TEXT_PRIMARY);
+                        }
+                }
+
                 confirmButton.render(g, mouseX, mouseY, partialTick);
                 cancelButton.render(g, mouseX, mouseY, partialTick);
         }
+
+        private List<String> wrapText(String text, int maxWidth) {
+                List<String> lines = new ArrayList<>();
+                String[] paragraphs = text.split("\n");
+                for (String paragraph : paragraphs) {
+                        if (font.width(paragraph) <= maxWidth) {
+                                lines.add(paragraph);
+                        } else {
+                                String[] words = paragraph.split(" ");
+                                StringBuilder currentLine = new StringBuilder();
+                                for (String word : words) {
+                                        String testLine = currentLine.isEmpty() ? word : currentLine + " " + word;
+                                        if (font.width(testLine) <= maxWidth) {
+                                                currentLine = new StringBuilder(testLine);
+                                        } else {
+                                                if (!currentLine.isEmpty()) {
+                                                        lines.add(currentLine.toString());
+                                                }
+                                                currentLine = new StringBuilder(word);
+                                        }
+                                }
+                                if (!currentLine.isEmpty()) {
+                                        lines.add(currentLine.toString());
+                                }
+                        }
+                }
+                return lines.isEmpty() ? List.of("") : lines;
+        }
+
+        
+        private boolean ensureComponentsConnected() {
+                if (areComponentsConnected())
+                        return true;
+                toast(XuanLing.trans(XuanlingLangPro.GUI_STRING, "create_component_not_connected"));
+                return false;
+        }
+
+        private boolean areComponentsConnected() {
+                if (state.nodes.isEmpty())
+                        return true;
+                if (state.connections.isEmpty())
+                        return false;
+
+                Set<CanvasNode> visited = new HashSet<>();
+                ArrayDeque<CanvasNode> queue = new ArrayDeque<>();
+                CanvasNode start = state.nodes.get(0);
+                visited.add(start);
+                queue.add(start);
+
+                while (!queue.isEmpty()) {
+                        CanvasNode current = queue.poll();
+                        for (Connection connection : state.connections) {
+                                CanvasNode other;
+                                if (connection.getFrom() == current)
+                                        other = connection.getTo();
+                                else if (connection.getTo() == current)
+                                        other = connection.getFrom();
+                                else
+                                        continue;
+
+                                if (state.nodes.contains(other) && visited.add(other))
+                                        queue.add(other);
+                        }
+                }
+
+                return visited.size() == state.nodes.size();
+        }
+
+        private ComponentGroup collectComponentGroup() {
+                ComponentGroup group = new ComponentGroup();
+                for (CanvasNode node : state.nodes) {
+                        if (node.isGroup()) {
+                                for (CanvasNode child : node.children)
+                                        addDefTo(group, child.getDef());
+                        } else {
+                                addDefTo(group, node.getDef());
+                        }
+                }
+                return group;
+        }
+
+        private void addDefTo(ComponentGroup group, ImpComponent def) {
+                if (def != null)
+                        group.addComponent(this.type, def.type(), def);
+        }
+
+        private boolean isValidName(String s) {
+                return CreateDataPacket.isValidName(s);
+        }
+
+        private void toast(Component message) {
+                toast(message, CultivationTheme.DANGER);
+        }
+
+        private void toast(Component message, int color) {
+                this.toastMessage = message;
+                this.toastColor = color;
+                this.toastTime = System.currentTimeMillis();
+        }
+
 }

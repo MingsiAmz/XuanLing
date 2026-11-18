@@ -1,0 +1,57 @@
+{
+  "id": "art:shenfa:basic",
+  "name": "基础身法模板",
+  "description": "最基础的身法移动技巧",
+  "type": "SHENFA",
+  "rarity": "COMMON",
+  "elementType": "WIND",
+  "minRealmLevel": 1,
+  "maxRealmLevel": 3,
+  "prefixes": [
+    "轻灵",
+    "疾行",
+    "云步",
+    "流影",
+    "幻步"
+  ],
+  "bases": [
+    "身法",
+    "步法",
+    "轻功",
+    "遁法",
+    "行气"
+  ],
+  "suffixes": [
+    "诀",
+    "法",
+    "术",
+    "心诀",
+    "奥义"
+  ],
+  "components": [
+    {
+      "componentId": "component:movement:basic_dash",
+      "weight": 100,
+      "required": true
+    },
+    {
+      "componentId": "component:movement:basic_dodge",
+      "weight": 70,
+      "required": false
+    },
+    {
+      "componentId": "component:movement:air_step",
+      "weight": 50,
+      "required": false
+    }
+  ],
+  "statModifiers": {
+    "movementSpeed": 1.3,
+    "dodgeChance": 1.2,
+    "fallDamageReduction": 1.5,
+    "staminaCost": 0.9
+  },
+  "elementAffinity": 0.3,
+  "unlockCondition": "realm >= 1",
+  "maxLevel": 10
+}

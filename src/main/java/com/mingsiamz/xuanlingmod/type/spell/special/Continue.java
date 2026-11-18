@@ -10,7 +10,7 @@ public class Continue extends ImpComponent {
         }
 
         public Continue() {
-                this(SpecialType.GROUP, SpecialType.NORMAL.name, 0);
+                this(SpecialType.GROUP, SpecialType.CONTINUOUS.name, 0);
         }
 
         @Override

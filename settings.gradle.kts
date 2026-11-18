@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "xuanling-template-1.21.1"
-include("app")
+// 单模组工程，无 app 子项目，移除多余的 include("app")

@@ -10,7 +10,7 @@ public class RecoverPE extends ImpComponent {
         }
 
         public RecoverPE() {
-                this(ActionType.GROUP, ActionType.RECOVER_C_ENERGY.name, 0);
+                this(ActionType.GROUP, ActionType.RECOVER_P_ENERGY.name, 0);
         }
 
         @Override

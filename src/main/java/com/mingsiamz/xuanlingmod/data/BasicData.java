@@ -2,7 +2,6 @@ package com.mingsiamz.xuanlingmod.data;
 
 import com.mingsiamz.xuanlingmod.Config;
 import com.mingsiamz.xuanlingmod.XuanLing;
-import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -25,8 +24,9 @@ public class BasicData {
         private double inspiration = 0.0;
         private double mindSense = 0.0;
         private boolean isMeditation = false;
-        private String sect = XuanLing.trans(XuanlingLangPro.MISC_STRING, "entity_now_sect").getString();
-        private String nickName = XuanLing.trans(XuanlingLangPro.MISC_STRING, "entity_nick_name").getString();
+        
+        private String sect = "";
+        private String nickName = "";
         private double lastMediX = 0;
         private double lastMediY = 0;
         private double lastMediZ = 0;

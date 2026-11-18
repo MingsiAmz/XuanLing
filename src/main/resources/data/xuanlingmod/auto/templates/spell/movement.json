@@ -1,0 +1,65 @@
+{
+  "id": "spell:movement:basic",
+  "name": "基础移动神通模板",
+  "description": "最基础的移动类神通",
+  "category": "MOVEMENT",
+  "rarity": "COMMON",
+  "elementType": "WIND",
+  "minRealmLevel": 1,
+  "maxRealmLevel": 4,
+  "prefixes": [
+    "疾风",
+    "闪现",
+    "缩地",
+    "御风",
+    "追风"
+  ],
+  "bases": [
+    "步",
+    "身",
+    "遁",
+    "行",
+    "跃"
+  ],
+  "suffixes": [
+    "·初级",
+    "·入门",
+    "·基础",
+    "·一式",
+    "·起手"
+  ],
+  "components": [
+    {
+      "componentId": "component:spell:blink",
+      "weight": 100,
+      "required": true
+    },
+    {
+      "componentId": "component:spell:dash",
+      "weight": 70,
+      "required": false
+    },
+    {
+      "componentId": "component:spell:fly_short",
+      "weight": 40,
+      "required": false
+    }
+  ],
+  "cooldown": {
+    "baseCooldown": 150,
+    "cooldownReductionPerLevel": 6,
+    "minCooldown": 60,
+    "sharedCooldownGroup": "movement"
+  },
+  "scaling": {
+    "distanceBase": 10.0,
+    "distancePerLevel": 2.0,
+    "distancePerSpiritualPower": 0.5,
+    "durationBase": 0.0,
+    "durationPerLevel": 0.0,
+    "cooldownReductionBase": 0.0,
+    "cooldownReductionPerLevel": 0.0
+  },
+  "unlockCondition": "realm >= 1",
+  "maxLevel": 10
+}

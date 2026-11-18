@@ -3,9 +3,11 @@ package com.mingsiamz.xuanlingmod;
 import java.util.function.Supplier;
 
 import com.mingsiamz.xuanlingmod.animations.player.AnmMeditation;
+import com.mingsiamz.xuanlingmod.gui.BattleModeHud;
 import com.mingsiamz.xuanlingmod.gui.StateGui;
 import com.mingsiamz.xuanlingmod.network.MeditationPacket;
 import com.mingsiamz.xuanlingmod.network.Networking;
+import com.mingsiamz.xuanlingmod.network.SkillCastPacket;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterEntities;
 import com.mingsiamz.xuanlingmod.register.RegisterKey;
@@ -23,6 +25,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 @Mod(value = XuanLing.MODID, dist = Dist.CLIENT)
@@ -32,6 +35,8 @@ public class XuanLingClient {
 
         public XuanLingClient(ModContainer container) {
                 container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+                NeoForge.EVENT_BUS.addListener(EntityRenderersEvent.RegisterRenderers.class, XuanLingClient::registerRenderers);
+                NeoForge.EVENT_BUS.addListener(ClientTickEvent.Pre.class, XuanLingClient::onClientTick);
         }
 
         @SubscribeEvent
@@ -64,12 +69,36 @@ public class XuanLingClient {
         private static void keyVoid() throws Throwable {
                 if (minecraft.screen != null)
                         return;
-                if (RegisterKey.KEY_R.consumeClick()) {
+                if (RegisterKey.KEY_LALT.consumeClick()) {
+                        BattleModeHud.toggle();
+                }
+                if (!BattleModeHud.isActive() && RegisterKey.KEY_R.consumeClick()) {
                         minecraft.setScreen(new StateGui());
                 }
                 if (RegisterKey.KEY_MEDITATION.consumeClick()) {
                         XuanLing.LOGGER.info("click");
                         Networking.sendToServer(new MeditationPacket());
+                }
+                if (BattleModeHud.isActive()) {
+                        if (RegisterKey.KEY_RELEASE.consumeClick()) {
+                                if (!BattleModeHud.isEmpty())
+                                        Networking.sendToServer(new SkillCastPacket(BattleModeHud.release()));
+                        }
+                        if (RegisterKey.KEY_R.consumeClick()) {
+                                BattleModeHud.pressKey('R');
+                        }
+                        if (RegisterKey.KEY_G.consumeClick()) {
+                                BattleModeHud.pressKey('G');
+                        }
+                        if (RegisterKey.KEY_C.consumeClick()) {
+                                BattleModeHud.pressKey('C');
+                        }
+                        if (RegisterKey.KEY_V.consumeClick()) {
+                                BattleModeHud.pressKey('V');
+                        }
+                        if (RegisterKey.KEY_B.consumeClick()) {
+                                BattleModeHud.pressKey('B');
+                        }
                 }
         }
 }

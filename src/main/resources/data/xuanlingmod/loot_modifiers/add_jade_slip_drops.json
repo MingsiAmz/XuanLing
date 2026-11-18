@@ -1,0 +1,16 @@
+{
+  "type": "neoforge:add_table_loot",
+  "conditions": [
+    {
+      "condition": "minecraft:killed_by_player"
+    },
+    {
+      "condition": "minecraft:random_chance_with_looting",
+      "chance": 0.15,
+      "looting_multiplier": 0.05
+    }
+  ],
+  "tables": [
+    "xuanlingmod:entities/jade_slip_generic"
+  ]
+}

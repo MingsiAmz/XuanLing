@@ -65,10 +65,10 @@ public class CreateGui extends Screen {
                                                                 new ComponentEditorScreen(XuanLingTypeEnum.SPELL))))
                                 .add(new GuiButton(btnW, btnH, art.getString())
                                                 .onClick(() -> minecraft.setScreen(
-                                                                new ComponentEditorScreen(XuanLingTypeEnum.SPELL))))
+                                                                new ComponentEditorScreen(XuanLingTypeEnum.ART))))
                                 .add(new GuiButton(btnW, btnH, realm.getString())
                                                 .onClick(() -> minecraft.setScreen(
-                                                                new ComponentEditorScreen(XuanLingTypeEnum.SPELL))));
+                                                                new ComponentEditorScreen(XuanLingTypeEnum.REALM))));
 
                 int contentY = this.py + (int) (this.panelH * 0.28f);
                 root.setPosition(this.px + CultivationTheme.PADDING, contentY);

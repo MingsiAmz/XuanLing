@@ -1,0 +1,33 @@
+{
+  "id": "npc:sect:disciple",
+  "name": "宗门弟子",
+  "description": "正统宗门培养的核心弟子",
+  "entityType": "minecraft:villager",
+  "rarity": "UNCOMMON",
+  "faction": "SECT",
+  "minRealmLevel": 2,
+  "maxRealmLevel": 8,
+  "artChance": 0.95,
+  "spellChance": 0.7,
+  "customRealmChance": 0.0,
+  "topProdigyChance": 0.02,
+  "statMultipliers": {
+    "health": 1.2,
+    "attack": 1.1,
+    "defense": 1.15,
+    "speed": 1.05
+  },
+  "preferredArtTypes": ["NEIGONG", "SHENZHI"],
+  "preferredSpellCategories": ["ATTACK", "HEAL", "DEFENSE"],
+  "preferredElements": ["FIRE", "WATER", "WOOD", "METAL", "LIGHT"],
+  "title": "弟子",
+  "lootTemplate": {
+    "baseDropChance": 0.25,
+    "minJadeSlips": 1,
+    "maxJadeSlips": 2,
+    "realmSlipChance": 0.4,
+    "artSlipChance": 0.4,
+    "spellSlipChance": 0.2,
+    "customLootTable": ""
+  }
+}

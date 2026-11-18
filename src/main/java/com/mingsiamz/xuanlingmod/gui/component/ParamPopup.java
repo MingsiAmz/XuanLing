@@ -98,24 +98,6 @@ public class ParamPopup {
                                         hoverPlus ? CultivationTheme.HOVER_CYAN : CultivationTheme.SOFT_OVERLAY);
                         GuiRenderUtil.border(g, plusX, row.y, plusX + 12, row.y + 16, CultivationTheme.BORDER_DIM);
                         g.drawString(font, "+", plusX + 4, row.y + 4, CultivationTheme.TEXT_PRIMARY, false);
-
-                        // int minusX = x + width - 65;
-                        // boolean hoverMinus = mouseX >= minusX && mouseX < minusX + 12 && mouseY >= row.y
-                        //                 && mouseY < row.y + 16;
-                        // g.fill(minusX, row.y, minusX + 12, row.y + 16, hoverMinus ? 0x60FF5555 : 0x30000000);
-                        // GuiRenderUtil.border(g, minusX, row.y, minusX + 12, row.y + 16, CultivationTheme.BORDER_DIM);
-                        // g.drawString(font, "-", minusX + 4, row.y + 4, CultivationTheme.TEXT_PRIMARY, false);
-
-                        // Object valObj = params.get(row.key);
-                        // String valStr = String.valueOf(valObj);
-                        // g.drawString(font, valStr, minusX + 16, row.y + 4, CultivationTheme.TEXT_GOLD, false);
-
-                        // int plusX = x + width - 25;
-                        // boolean hoverPlus = mouseX >= plusX && mouseX < plusX + 12 && mouseY >= row.y
-                        //                 && mouseY < row.y + 16;
-                        // g.fill(plusX, row.y, plusX + 12, row.y + 16, hoverPlus ? 0x6000E5FF : 0x30000000);
-                        // GuiRenderUtil.border(g, plusX, row.y, plusX + 12, row.y + 16, CultivationTheme.BORDER_DIM);
-                        // g.drawString(font, "+", plusX + 4, row.y + 4, CultivationTheme.TEXT_PRIMARY, false);
                 }
         }
 

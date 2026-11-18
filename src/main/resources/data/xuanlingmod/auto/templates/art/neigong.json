@@ -1,0 +1,57 @@
+{
+  "id": "art:neigong:basic",
+  "name": "基础内功模板",
+  "description": "最基础的内功修炼法门",
+  "type": "NEIGONG",
+  "rarity": "COMMON",
+  "elementType": "NONE",
+  "minRealmLevel": 1,
+  "maxRealmLevel": 3,
+  "prefixes": [
+    "基础",
+    "入门",
+    "初级",
+    "凡俗",
+    "粗浅"
+  ],
+  "bases": [
+    "吐纳法",
+    "导引术",
+    "内观诀",
+    "聚气诀",
+    "养气诀"
+  ],
+  "suffixes": [
+    "入门",
+    "心法",
+    "诀窍",
+    "法门",
+    "功法"
+  ],
+  "components": [
+    {
+      "componentId": "component:energy:basic_gather",
+      "weight": 100,
+      "required": true
+    },
+    {
+      "componentId": "component:energy:basic_circulate",
+      "weight": 80,
+      "required": false
+    },
+    {
+      "componentId": "component:energy:basic_store",
+      "weight": 60,
+      "required": false
+    }
+  ],
+  "statModifiers": {
+    "spiritualPower": 1.0,
+    "maxQi": 1.2,
+    "qiRecovery": 1.1,
+    "comprehension": 1.0
+  },
+  "elementAffinity": 0.0,
+  "unlockCondition": "realm >= 1",
+  "maxLevel": 10
+}

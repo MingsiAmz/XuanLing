@@ -1,9 +1,18 @@
 package com.mingsiamz.xuanlingmod.gui;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import java.lang.reflect.Type;
+
+import com.google.common.reflect.TypeToken;
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.client.ArtSpellCache;
+import com.mingsiamz.xuanlingmod.data.SpellComponent;
+import com.mingsiamz.xuanlingmod.data.controller.DataLoader;
+import com.mingsiamz.xuanlingmod.network.BindSkillPacket;
+import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationPanel;
@@ -15,8 +24,11 @@ import com.mingsiamz.xuanlingmod.util.gui.component.GuiButton;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+
+import org.lwjgl.glfw.GLFW;
 
 public class ArcaneMasteryMenuGui extends Screen {
 
@@ -47,6 +59,9 @@ public class ArcaneMasteryMenuGui extends Screen {
         private SectionDivider divider;
 
         private List<ArtSlot> slots;
+
+        private String bindingName;
+        private final StringBuilder bindingCombo = new StringBuilder();
 
         public ArcaneMasteryMenuGui(XuanLingTypeEnum type) {
                 super(Component.literal("arcane_mastery_menu_gui"));
@@ -83,7 +98,6 @@ public class ArcaneMasteryMenuGui extends Screen {
                 recomputeLayout();
         }
 
-        /** 根据当前面板尺寸重新计算网格列数 / 卡片尺寸 / 内容高度 / 按钮位置 */
         private void recomputeLayout() {
                 int innerW = this.panelW - CultivationTheme.PADDING * 2;
                 int innerH = this.panelH - CultivationTheme.PADDING * 2;
@@ -120,30 +134,31 @@ public class ArcaneMasteryMenuGui extends Screen {
 
         private List<ArtSlot> buildHardcodedSlots() {
                 List<ArtSlot> list = new ArrayList<>();
-                if (this.type == XuanLingTypeEnum.ART) {
-                        list.add(new ArtSlot("太虚剑典", 5, true));
-                        list.add(new ArtSlot("九阳神功", 4, true));
-                        list.add(new ArtSlot("北冥心法", 3, false));
-                        list.add(new ArtSlot("混元功", 2, false));
-                        list.add(new ArtSlot("紫霄雷诀", 5, false));
-                        list.add(new ArtSlot("玄冰真解", 3, false));
-                        list.add(new ArtSlot("焚天秘典", 4, false));
-                        list.add(new ArtSlot("万剑归宗", 5, false));
-                        for (int i = list.size(); i < 24; i++) {
-                                list.add(new ArtSlot(null, 0, false));
+                switch (this.type) {
+                        case ART -> {
+                                ArrayList<String> names = getNames();
+                                if (names == null || names.isEmpty())
+                                        list.add(new ArtSlot("null", 0, false));
+                                else
+                                        for (String name : names)
+                                                list.add(new ArtSlot(name, 5, true));
                         }
-                } else {
-                        list.add(new ArtSlot("天雷引", 4, true));
-                        list.add(new ArtSlot("御剑术", 3, true));
-                        list.add(new ArtSlot("缩地成寸", 5, false));
-                        list.add(new ArtSlot("火球术", 1, true));
-                        list.add(new ArtSlot("冰封千里", 4, false));
-                        list.add(new ArtSlot("金刚不坏", 3, false));
-                        list.add(new ArtSlot("大品天眼", 5, false));
-                        list.add(new ArtSlot("他心通", 2, false));
-                        for (int i = list.size(); i < 24; i++) {
-                                list.add(new ArtSlot(null, 0, false));
+                        case SPELL -> {
+                                ArrayList<String> names = getNames();
+                                if (names == null || names.isEmpty())
+                                        list.add(new ArtSlot("null", 0, false));
+                                else {
+                                        CompoundTag binds = minecraft.player.getPersistentData()
+                                                        .getCompound(BindSkillPacket.BIND_KEY);
+                                        for (String name : names) {
+                                                ArtSlot slot = new ArtSlot(name, 5, true);
+                                                slot.setBinding(binds.contains(name) ? binds.getString(name) : "");
+                                                slot.setOnClick(() -> startBinding(name));
+                                                list.add(slot);
+                                        }
+                                }
                         }
+                        default -> throw new IllegalArgumentException("Unexpected value: " + this.type);
                 }
                 return list;
         }
@@ -155,7 +170,8 @@ public class ArcaneMasteryMenuGui extends Screen {
                 panel.render(g, mouseX, mouseY, partialTick);
 
                 int cx = panel.getX() + this.panelW / 2;
-                String titleKey = (this.type == XuanLingTypeEnum.ART) ? "arcane_mastery_art_title" : "arcane_mastery_spell_title";
+                String titleKey = (this.type == XuanLingTypeEnum.ART) ? "arcane_mastery_art_title"
+                                : "arcane_mastery_spell_title";
                 Component title = XuanLing.trans(XuanlingLangPro.GUI_STRING, titleKey);
                 g.drawString(font, title, cx - font.width(title) / 2,
                                 panel.getY() + (int) (this.panelH * 0.06f), CultivationTheme.BORDER_GOLD, false);
@@ -183,6 +199,9 @@ public class ArcaneMasteryMenuGui extends Screen {
 
                 renderScrollbar(g, mouseX, mouseY);
                 backButton.render(g, mouseX, mouseY, partialTick);
+
+                if (this.bindingName != null)
+                        renderBindingOverlay(g);
         }
 
         private void renderScrollbar(GuiGraphics g, int mouseX, int mouseY) {
@@ -216,6 +235,14 @@ public class ArcaneMasteryMenuGui extends Screen {
 
         @Override
         public boolean mouseClicked(double mx, double my, int button) {
+                if (this.bindingName != null) {
+                        if (button == 1)
+                                confirmBinding();
+                        else
+                                cancelBinding();
+                        return true;
+                }
+
                 if (backButton.mouseClicked(mx, my, button))
                         return true;
 
@@ -281,6 +308,102 @@ public class ArcaneMasteryMenuGui extends Screen {
                 return super.mouseReleased(mx, my, button);
         }
 
+        private void startBinding(String name) {
+                this.bindingName = name;
+                this.bindingCombo.setLength(0);
+        }
+
+        private void confirmBinding() {
+                if (this.bindingName != null)
+                        Networking.sendToServer(
+                                        new BindSkillPacket(this.bindingName, this.bindingCombo.toString()));
+                this.bindingName = null;
+                this.bindingCombo.setLength(0);
+        }
+
+        private void cancelBinding() {
+                this.bindingName = null;
+                this.bindingCombo.setLength(0);
+        }
+
+        @Override
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+                if (this.bindingName != null) {
+                        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+                                cancelBinding();
+                                return true;
+                        }
+                        if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
+                                if (this.bindingCombo.length() > 0)
+                                        this.bindingCombo.deleteCharAt(this.bindingCombo.length() - 1);
+                                return true;
+                        }
+                        if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
+                                confirmBinding();
+                                return true;
+                        }
+                        char c = comboKeyOf(keyCode);
+                        if (c != 0 && this.bindingCombo.length() < BindSkillPacket.MAX_COMBO) {
+                                this.bindingCombo.append(c);
+                        }
+                        return true;
+                }
+                return super.keyPressed(keyCode, scanCode, modifiers);
+        }
+
+        private static char comboKeyOf(int keyCode) {
+                return switch (keyCode) {
+                        case GLFW.GLFW_KEY_R -> 'R';
+                        case GLFW.GLFW_KEY_G -> 'G';
+                        case GLFW.GLFW_KEY_C -> 'C';
+                        case GLFW.GLFW_KEY_V -> 'V';
+                        case GLFW.GLFW_KEY_B -> 'B';
+                        default -> 0;
+                };
+        }
+
+        private void renderBindingOverlay(GuiGraphics g) {
+                g.fill(0, 0, this.width, this.height, 0x90000000);
+
+                int boxW = 240;
+                int boxH = 96;
+                int x1 = (this.width - boxW) / 2;
+                int y1 = (this.height - boxH) / 2;
+
+                g.fill(x1, y1, x1 + boxW, y1 + boxH, CultivationTheme.PANEL_BG);
+                GuiRenderUtil.border(g, x1, y1, x1 + boxW, y1 + boxH, CultivationTheme.BORDER_GOLD);
+                GuiRenderUtil.cornerAccents(g, x1 + 4, y1 + 4, x1 + boxW - 4, y1 + boxH - 4, 6,
+                                CultivationTheme.BORDER_CYAN);
+
+                Component title = XuanLing.trans(XuanlingLangPro.GUI_STRING, "bind_title", this.bindingName);
+                g.drawString(font, title, x1 + (boxW - font.width(title)) / 2, y1 + 8,
+                                CultivationTheme.TEXT_GOLD, false);
+
+                int cell = 22;
+                int rowW = BindSkillPacket.MAX_COMBO * (cell + 4) - 4;
+                int rowX = x1 + (boxW - rowW) / 2;
+                int rowY = y1 + 24;
+                for (int i = 0; i < BindSkillPacket.MAX_COMBO; i++) {
+                        int cx = rowX + i * (cell + 4);
+                        boolean filled = i < this.bindingCombo.length();
+                        g.fill(cx, rowY, cx + cell, rowY + cell, filled ? 0x7000E5FF : CultivationTheme.PANEL_BG_DARK);
+                        GuiRenderUtil.border(g, cx, rowY, cx + cell, rowY + cell,
+                                        filled ? CultivationTheme.ACCENT : CultivationTheme.BORDER_DIM);
+                        if (filled) {
+                                String s = String.valueOf(this.bindingCombo.charAt(i));
+                                g.drawString(font, s, cx + (cell - font.width(s)) / 2, rowY + (cell - 8) / 2,
+                                                CultivationTheme.WHITE, false);
+                        }
+                }
+
+                Component keysHint = XuanLing.trans(XuanlingLangPro.GUI_STRING, "bind_keys_hint");
+                Component confirmHint = XuanLing.trans(XuanlingLangPro.GUI_STRING, "bind_confirm_hint");
+                g.drawString(font, keysHint, x1 + (boxW - font.width(keysHint)) / 2, rowY + cell + 6,
+                                CultivationTheme.TEXT_PRIMARY, false);
+                g.drawString(font, confirmHint, x1 + (boxW - font.width(confirmHint)) / 2, rowY + cell + 18,
+                                CultivationTheme.TEXT_SECONDARY, false);
+        }
+
         @Override
         public void resize(net.minecraft.client.Minecraft minecraft, int width, int height) {
                 super.resize(minecraft, width, height);
@@ -312,11 +435,17 @@ public class ArcaneMasteryMenuGui extends Screen {
                 private int height = 80;
                 private boolean hovered;
                 private Runnable onClickAction;
+                private String binding = "";
 
                 public ArtSlot(String name, int rarity, boolean unlocked) {
                         this.name = name;
                         this.rarity = rarity;
                         this.unlocked = unlocked;
+                }
+
+                public ArtSlot setBinding(String binding) {
+                        this.binding = binding == null ? "" : binding;
+                        return this;
                 }
 
                 public ArtSlot setOnClick(Runnable r) {
@@ -359,12 +488,20 @@ public class ArcaneMasteryMenuGui extends Screen {
                                         Component starComp = Component.literal(stars);
                                         int starX = x + (width - font.width(starComp)) / 2;
                                         g.drawString(font, starComp, starX, y + 6, getRarityColor(), false);
+
+                                        if (!binding.isEmpty()) {
+                                                Component bindComp = Component.literal(binding);
+                                                g.drawString(font, bindComp,
+                                                                x + (width - font.width(bindComp)) / 2, y + 18,
+                                                                CultivationTheme.ACCENT, false);
+                                        }
                                 } else {
                                         g.drawString(font, nameComp, textX, y + (height - 8) / 2,
                                                         CultivationTheme.TEXT_PRIMARY, false);
                                 }
                         } else {
-                                Component empty = XuanLing.trans(XuanlingLangPro.GUI_STRING, "arcane_mastery_empty_slot");
+                                Component empty = XuanLing.trans(XuanlingLangPro.GUI_STRING,
+                                                "arcane_mastery_empty_slot");
                                 int textX = x + (width - font.width(empty)) / 2;
                                 g.drawString(font, empty, textX, y + height / 2 - 4, CultivationTheme.TEXT_SECONDARY,
                                                 false);
@@ -406,5 +543,27 @@ public class ArcaneMasteryMenuGui extends Screen {
                 public int getHeight() {
                         return height;
                 }
+        }
+
+        private ArrayList<String> getNames() {
+                if (ArtSpellCache.isInitialized()) {
+                        List<String> cached = ArtSpellCache.getByType(this.type);
+                        if (cached != null && !cached.isEmpty()) {
+                                return new ArrayList<>(cached);
+                        }
+                        return new ArrayList<>();
+                }
+
+                CompoundTag nbt = minecraft.player.getPersistentData().getCompound(XuanLing.MODID + this.type.type);
+                if (nbt == null || nbt.isEmpty())
+                        return new ArrayList<>();
+
+                Iterator<String> it = nbt.getAllKeys().iterator();
+                ArrayList<String> list = new ArrayList<>();
+                while (it.hasNext()) {
+                        String name = nbt.getString(it.next());
+                        list.add(name);
+                }
+                return list;
         }
 }

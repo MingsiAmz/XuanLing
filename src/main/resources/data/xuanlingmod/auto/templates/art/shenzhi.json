@@ -1,0 +1,57 @@
+{
+  "id": "art:shenzhi:basic",
+  "name": "基础神智模板",
+  "description": "最基础的神识修炼法门",
+  "type": "SHENZHI",
+  "rarity": "COMMON",
+  "elementType": "LIGHT",
+  "minRealmLevel": 1,
+  "maxRealmLevel": 3,
+  "prefixes": [
+    "明心",
+    "凝神",
+    "观想",
+    "内视",
+    "觉醒"
+  ],
+  "bases": [
+    "神识",
+    "心法",
+    "冥想",
+    "观想法",
+    "证道"
+  ],
+  "suffixes": [
+    "诀",
+    "法门",
+    "心经",
+    "真解",
+    "大法"
+  ],
+  "components": [
+    {
+      "componentId": "component:spirit:basic_sense",
+      "weight": 100,
+      "required": true
+    },
+    {
+      "componentId": "component:spirit:basic_comprehend",
+      "weight": 70,
+      "required": false
+    },
+    {
+      "componentId": "component:spirit:basic_resist",
+      "weight": 50,
+      "required": false
+    }
+  ],
+  "statModifiers": {
+    "spiritualPower": 1.3,
+    "comprehension": 1.4,
+    "mentalResistance": 1.2,
+    "maxSoulForce": 1.1
+  },
+  "elementAffinity": 0.2,
+  "unlockCondition": "realm >= 1",
+  "maxLevel": 10
+}

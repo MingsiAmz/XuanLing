@@ -10,7 +10,7 @@ public class StateBar implements IGuiComponent {
         private int current, max;
         private int barColor;
 
-        // custom configure
+        
         private String label = "";
         private boolean showText = true;
         private boolean showTicks = true;

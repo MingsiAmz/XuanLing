@@ -62,10 +62,10 @@ public class Config {
 
         public static final ModConfigSpec.DoubleValue RANGE_CHARM = BUILDER
                         .comment("魅力的最小与最大值，最大不可超过" + Double.MAX_VALUE)
-                        .defineInRange("range_lucky", 0, 0, 50000.0);
+                        .defineInRange("range_charm", 0, 0, 50000.0);
 
         public static final ModConfigSpec.DoubleValue RANGE_M_SENSE = BUILDER
-                        .comment("魅力的最小与最大值，最大不可超过" + Double.MAX_VALUE)
+                        .comment("神识的最小与最大值，最大不可超过" + Double.MAX_VALUE)
                         .defineInRange("range_m_sense", 0, 0, 50000.0);
 
         public static final ModConfigSpec.IntValue ENERGY_BAR_X_VALUE = BUILDER

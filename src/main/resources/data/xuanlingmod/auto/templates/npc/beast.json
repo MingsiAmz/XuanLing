@@ -1,0 +1,33 @@
+{
+  "id": "npc:beast:yaoguai",
+  "name": "妖兽",
+  "description": "修炼成精的妖兽，拥有本源神通",
+  "entityType": "minecraft:ender_dragon",
+  "rarity": "EPIC",
+  "faction": "BEAST",
+  "minRealmLevel": 5,
+  "maxRealmLevel": 12,
+  "artChance": 0.3,
+  "spellChance": 1.0,
+  "customRealmChance": 0.1,
+  "topProdigyChance": 0.1,
+  "statMultipliers": {
+    "health": 2.0,
+    "attack": 1.5,
+    "defense": 1.3,
+    "speed": 1.2
+  },
+  "preferredArtTypes": ["SHENFA", "SHENZHI"],
+  "preferredSpellCategories": ["ATTACK", "DEFENSE", "MOVEMENT"],
+  "preferredElements": ["EARTH", "WIND", "WATER", "DARK"],
+  "title": "妖兽",
+  "lootTemplate": {
+    "baseDropChance": 0.6,
+    "minJadeSlips": 2,
+    "maxJadeSlips": 4,
+    "realmSlipChance": 0.6,
+    "artSlipChance": 0.2,
+    "spellSlipChance": 0.2,
+    "customLootTable": ""
+  }
+}

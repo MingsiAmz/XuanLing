@@ -39,8 +39,8 @@ public final class RegistryComponent {
         public RegistryComponent() {
         }
 
-        // public static List<IComponent<?>> getAvailable(XuanLingTypeEnum type,
-        // LocalPlayer player) {
+        
+        
         public static List<ImpComponent> getAvailable(XuanLingTypeEnum type, LocalPlayer player) {
 
                 List<ImpComponent> list = null;
@@ -52,13 +52,13 @@ public final class RegistryComponent {
                         default -> throw new IllegalArgumentException("unknown type + " + type);
                 }
 
-                // 示例：玩家拥有某物品/数据时才开放对应组件
-                // if (player != null && PlayerData.hasComponent(player, "logic_gate")) {
-                // list.add(new ComponentDef("logic_gate", "逻辑门", ComponentCategory.LOGIC));
-                // }
-                // if (player != null && PlayerData.hasComponent(player, "render_quad")) {
-                // list.add(new ComponentDef("render_quad", "渲染方块", ComponentCategory.RENDER));
-                // }
+                
+                
+                
+                
+                
+                
+                
 
                 return list;
         }

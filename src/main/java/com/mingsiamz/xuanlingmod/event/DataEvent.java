@@ -4,8 +4,12 @@ import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
+import com.mingsiamz.xuanlingmod.network.BindSkillPacket;
+import com.mingsiamz.xuanlingmod.network.Networking;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
+import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -17,7 +21,23 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 @EventBusSubscriber (modid = XuanLing.MODID)
 public class DataEvent {
-        @SubscribeEvent 
+
+        
+        private static final String[] SYNC_KEYS = {
+                        XuanLing.MODID + XuanLingTypeEnum.SPELL.type,
+                        XuanLing.MODID + XuanLingTypeEnum.ART.type,
+                        BindSkillPacket.BIND_KEY
+        };
+
+        
+        private static void syncToClient(Player player) {
+                if (!(player instanceof ServerPlayer serverPlayer))
+                        return;
+                for (String key : SYNC_KEYS)
+                        Networking.syncPersistentData(serverPlayer, key);
+        }
+
+        @SubscribeEvent
         public static void onPlayerJoinGame(PlayerEvent.PlayerLoggedInEvent event) {
                 Player player = event.getEntity();
                 if (!player.hasData(RegisterAttachments.BASIC_DATA)) {
@@ -33,6 +53,19 @@ public class DataEvent {
                 if (!player.hasData(RegisterAttachments.DEFAULT_ENERGY)) {
                         player.setData(RegisterAttachments.DEFAULT_ENERGY, new DefaultEnergy());
                 }
+
+                syncToClient(player);
+        }
+
+        
+        @SubscribeEvent
+        public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+                syncToClient(event.getEntity());
+        }
+
+        @SubscribeEvent
+        public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+                syncToClient(event.getEntity());
         }
 
         @SubscribeEvent 
@@ -47,27 +80,10 @@ public class DataEvent {
         @SubscribeEvent
         public static void onEntityDeath(LivingDeathEvent event){
                 LivingEntity entity = event.getEntity();
-                // if ((entity instanceof Player player) && !player.isAlive()) {
-                //         DefaultData data = DefaultData.init();
-                //         BasicData basic = BasicData.initData();
-                //         player.setData(RegisterAttachments.DEFAULT_DATA, data);
-                //         player.setData(RegisterAttachments.BASIC_DATA, basic);
-                // }
         }
 
         @SubscribeEvent
         public static void onPlayerTick(PlayerTickEvent.Pre event) {
-                Player player = event.getEntity();
-                
         }
-
-        // @SubscribeEvent
-        // public static void onEntityChangedDimesion() {
-	
-        // }
-
-        // @SubscribeEvent 
-        // public static void onEntityJoinGame() {
-	
-        // }
 }
+

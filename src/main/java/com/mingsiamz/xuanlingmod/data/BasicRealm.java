@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import com.google.common.reflect.TypeToken;
 import com.mingsiamz.xuanlingmod.data.component.ComponentRealm;
-import com.mingsiamz.xuanlingmod.data.controller.DataManager;
+import com.mingsiamz.xuanlingmod.data.controller.DataLoader;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
 public class BasicRealm {
@@ -87,9 +87,9 @@ public class BasicRealm {
                 Type type = new TypeToken<LinkedHashMap<Integer, ComponentRealm>>() {}.getType();
                 LinkedHashMap<Integer, ComponentRealm> data = null;
                 if (name.equals("normal")) {
-                        data = DataManager.loadData(type, XuanLingTypeEnum.REALM, "000", name);
+                        data = DataLoader.loadData(type, XuanLingTypeEnum.REALM, "000", name);
                 } else {
-                        data = DataManager.loadData(type, XuanLingTypeEnum.REALM, uuid.toString(), name);
+                        data = DataLoader.loadData(type, XuanLingTypeEnum.REALM, uuid.toString(), name);
                 }
                 if (data == null || data.isEmpty())
                         return null;

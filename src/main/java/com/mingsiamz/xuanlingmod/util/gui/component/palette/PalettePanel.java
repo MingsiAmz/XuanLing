@@ -24,7 +24,7 @@ import net.minecraft.util.Mth;
 public class PalettePanel {
         private int x, y, width, height;
         private final List<CollapsibleCategory> categories = new ArrayList<>();
-        // private PaletteItem.DragStart dragStart;
+        
         private BiConsumer<DragPayload, int[]> dragStart;
 
         private float scrollY = 0;
@@ -61,12 +61,12 @@ public class PalettePanel {
                         else if (packageName.contains("action"))
                                 byCat.computeIfAbsent(ActionType.TYPE, k -> new ArrayList<>()).add(def);
 
-                        // if (def instanceof BasicType)
-                        // byCat.computeIfAbsent(BasicType.TYPE, k -> new ArrayList<>()).add(def);
-                        // else if (def instanceof ActionType)
-                        // byCat.computeIfAbsent(ActionType.TYPE, k -> new ArrayList<>()).add(def);
-                        // else if (def instanceof SpecialType)
-                        // byCat.computeIfAbsent(SpecialType.TYPE, k -> new ArrayList<>()).add(def);
+                        
+                        
+                        
+                        
+                        
+                        
                 }
 
                 int itemWidth = width - 12 - (SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2);

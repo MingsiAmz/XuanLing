@@ -7,9 +7,12 @@ import org.slf4j.Logger;
 import com.mingsiamz.xuanlingmod.data.controller.DataLoader;
 import com.mingsiamz.xuanlingmod.data.controller.DataManager;
 import com.mingsiamz.xuanlingmod.network.Networking;
+import com.mingsiamz.xuanlingmod.auto.AutoModEntry;
+import com.mingsiamz.xuanlingmod.auto.config.GenerationConfig;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.register.RegisterBlocks;
 import com.mingsiamz.xuanlingmod.register.RegisterCreativeTabs;
+import com.mingsiamz.xuanlingmod.register.RegisterDataComponents;
 import com.mingsiamz.xuanlingmod.register.RegisterEffects;
 import com.mingsiamz.xuanlingmod.register.RegisterEntities;
 import com.mingsiamz.xuanlingmod.register.RegisterItems;
@@ -37,17 +40,22 @@ public class XuanLing {
 
         public XuanLing(IEventBus modEventBus, ModContainer modContainer) throws Exception {
                 RegisterAttachments.register(modEventBus);
+                RegisterDataComponents.register(modEventBus);
                 RegisterItems.register(modEventBus);
                 RegisterBlocks.register(modEventBus);
                 RegisterCreativeTabs.register(modEventBus);
                 RegisterEffects.register(modEventBus);
                 RegisterEntities.register(modEventBus);
 
+                
+                AutoModEntry.init(modEventBus);
+
                 modEventBus.addListener(this::commonSetup);
                 modEventBus.addListener(RegisterEntities::registerEntityAtb);
                 NeoForge.EVENT_BUS.register(this);
                 modEventBus.addListener(this::addCreative);
                 modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC, MODID + "/" + MODID + ".toml");
+                modContainer.registerConfig(ModConfig.Type.COMMON, GenerationConfig.SPEC, MODID + "/auto_generation.toml");
                 modEventBus.register(Networking.class);
                 modEventBus.addListener(RegisterKey::register);
 
@@ -56,17 +64,7 @@ public class XuanLing {
         }
 
         private void commonSetup(FMLCommonSetupEvent event) {
-                // Some common setup code
                 LOGGER.info("HELLO FROM COMMON SETUP");
-
-                // if (Config.LOG_DIRT_BLOCK.getAsBoolean()) {
-                // LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
-                // }
-
-                // LOGGER.info("{}{}", Config.MAGIC_NUMBER_INTRODUCTION.get(),
-                // Config.MAGIC_NUMBER.getAsInt());
-
-                // Config.ITEM_STRINGS.get().forEach((item) -> LOGGER.info("ITEM >> {}", item));
         }
 
         private void addCreative(BuildCreativeModeTabContentsEvent event) {
@@ -77,7 +75,6 @@ public class XuanLing {
 
         @SubscribeEvent
         public void onServerStarting(ServerStartingEvent event) {
-                // Do something when the server starts
                 LOGGER.info("HELLO from server starting");
         }
 

@@ -46,6 +46,25 @@ public class RegisterAttachments {
                 else return null;
         }
 
+        
+        public static DefaultData getOrCreateDefaultData(Entity entity) {
+                if (!entity.hasData(DEFAULT_DATA))
+                        entity.setData(DEFAULT_DATA, new DefaultData());
+                return entity.getData(DEFAULT_DATA);
+        }
+
+        public static BasicData getOrCreateBasicData(Entity entity) {
+                if (!entity.hasData(BASIC_DATA))
+                        entity.setData(BASIC_DATA, new BasicData());
+                return entity.getData(BASIC_DATA);
+        }
+
+        public static DefaultEnergy getOrCreateDefaultEnergy(Entity entity) {
+                if (!entity.hasData(DEFAULT_ENERGY))
+                        entity.setData(DEFAULT_ENERGY, new DefaultEnergy());
+                return entity.getData(DEFAULT_ENERGY);
+        }
+
         public static void register(IEventBus modBus) {
                 ATTACHMENT_TYPES.register(modBus);
         }

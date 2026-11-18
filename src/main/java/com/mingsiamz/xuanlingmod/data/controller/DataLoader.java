@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
@@ -28,13 +30,28 @@ public final class DataLoader {
 
         private static final Map<String, JsonObject> CACHE = new ConcurrentHashMap<>();
 
+        private static final Map<String, Object> TYPED_CACHE = new ConcurrentHashMap<>();
+
         private static final Map<WatchKey, Path> WATCHED_DIRS = new ConcurrentHashMap<>();
 
         private static WatchService watcher;
         private static Thread watchThread;
         private static Path rootDir;
 
+        private static volatile boolean typedCacheEnabled = true;
+
         private DataLoader() {
+        }
+
+        public enum LoadMode {
+                CACHE_FIRST,
+                CACHE_ONLY,
+                DISK,
+                RELOAD
+        }
+
+        public static void init() {
+                init(DataManager.MOD_CONFIG_DIR);
         }
 
         public static void init(Path configDir) {
@@ -69,6 +86,156 @@ public final class DataLoader {
                 }
                 WATCHED_DIRS.clear();
                 CACHE.clear();
+                TYPED_CACHE.clear();
+        }
+
+        public static <T> T loadData(Type type, XuanLingTypeEnum enumType, String entityUuid, String name) {
+                return loadData(type, enumType, entityUuid, name, LoadMode.CACHE_FIRST);
+        }
+
+        public static <T> T loadData(Type type, XuanLingTypeEnum enumType, String entityUuid, String name,
+                        LoadMode mode) {
+                Path file = DataManager.resolveFile(enumType, entityUuid, name);
+                String key = cacheKey(file);
+                String tKey = (key == null) ? null : typedKey(key, type);
+
+                if (mode == LoadMode.DISK) {
+                        return readTypedFromDisk(file, type);
+                }
+
+                if (mode == LoadMode.RELOAD) {
+                        JsonObject obj = readJsonObjectIntoCache(file);
+                        return obj == null ? null : convert(type, obj, tKey, typedCacheEnabled);
+                }
+
+                if (mode == LoadMode.CACHE_ONLY) {
+                        if (key == null) {
+                                return null;
+                        }
+                        if (typedCacheEnabled) {
+                                Object cachedTyped = TYPED_CACHE.get(tKey);
+                                if (cachedTyped != null) {
+                                        return (T) cachedTyped;
+                                }
+                        }
+                        JsonObject obj = CACHE.get(key);
+                        return obj == null ? null : convert(type, obj, tKey, typedCacheEnabled);
+                }
+
+                if (key != null && typedCacheEnabled) {
+                        Object cachedTyped = TYPED_CACHE.get(tKey);
+                        if (cachedTyped != null) {
+                                return (T) cachedTyped;
+                        }
+                        JsonObject obj = CACHE.get(key);
+                        if (obj == null) {
+                                obj = readJsonObjectIntoCache(file);
+                        }
+                        return obj == null ? null : convert(type, obj, tKey, typedCacheEnabled);
+                }
+
+                JsonObject obj = readJsonObjectIntoCache(file);
+                return obj == null ? null : convert(type, obj, tKey, false);
+        }
+
+        public static JsonObject loadJson(XuanLingTypeEnum enumType, String entityUuid, String name) {
+                return loadJson(enumType, entityUuid, name, LoadMode.CACHE_FIRST);
+        }
+
+        public static JsonObject loadJson(XuanLingTypeEnum enumType, String entityUuid, String name,
+                        LoadMode mode) {
+                Path file = DataManager.resolveFile(enumType, entityUuid, name);
+                String key = cacheKey(file);
+                return switch (mode) {
+                        case DISK -> exists(file) ? parseJsonObject(file) : null;
+                        case RELOAD -> readJsonObjectIntoCache(file);
+                        case CACHE_ONLY -> (key == null) ? null : CACHE.get(key);
+                        case CACHE_FIRST -> {
+                                JsonObject cached = (key == null) ? null : CACHE.get(key);
+                                yield cached != null ? cached : readJsonObjectIntoCache(file);
+                        }
+                };
+        }
+
+        public static JsonObject get(String key) {
+                return CACHE.get(key);
+        }
+
+        public static Map<String, JsonObject> getAll() {
+                return CACHE;
+        }
+
+        public static void clearTypedCache() {
+                TYPED_CACHE.clear();
+        }
+
+        public static void setTypedCacheEnabled(boolean enabled) {
+                typedCacheEnabled = enabled;
+                if (!enabled) {
+                        TYPED_CACHE.clear();
+                }
+        }
+
+        private static <T> T convert(Type type, JsonObject obj, String tKey, boolean cacheResult) {
+                T value = GSON.fromJson(obj, type);
+                if (cacheResult && tKey != null && value != null) {
+                        TYPED_CACHE.put(tKey, value);
+                }
+                return value;
+        }
+
+        private static JsonObject readJsonObjectIntoCache(Path file) {
+                if (!exists(file)) {
+                        return null;
+                }
+                JsonObject obj = parseJsonObject(file);
+                if (obj != null) {
+                        String key = cacheKey(file);
+                        if (key != null) {
+                                CACHE.put(key, obj);
+                                invalidateTyped(key);
+                        }
+                }
+                return obj;
+        }
+
+        private static JsonObject parseJsonObject(Path file) {
+                try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+                        return GSON.fromJson(reader, JsonObject.class);
+                } catch (IOException e) {
+                        XuanLing.LOGGER.warn("Failed to read {}", file, e);
+                        return null;
+                } catch (Exception e) {
+                        XuanLing.LOGGER.warn("Failed to parse {}", file, e);
+                        return null;
+                }
+        }
+
+        private static <T> T readTypedFromDisk(Path file, Type type) {
+                if (!exists(file)) {
+                        return null;
+                }
+                try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+                        return GSON.fromJson(reader, type);
+                } catch (IOException e) {
+                        throw new RuntimeException("Failed to load " + file.getFileName(), e);
+                }
+        }
+
+        private static boolean exists(Path file) {
+                return Files.isRegularFile(file);
+        }
+
+        private static String typedKey(String pathKey, Type type) {
+                return pathKey + "#" + type.getTypeName();
+        }
+
+        private static void invalidateTyped(String pathKey) {
+                if (pathKey == null) {
+                        return;
+                }
+                String prefix = pathKey + "#";
+                TYPED_CACHE.keySet().removeIf(k -> k.startsWith(prefix));
         }
 
         private static void registerAll(Path start) throws IOException {
@@ -95,7 +262,7 @@ public final class DataLoader {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                                 if (isJsonFile(file)) {
-                                        reloadFile(file);
+                                        readJsonObjectIntoCache(file);
                                 }
                                 return FileVisitResult.CONTINUE;
                         }
@@ -135,7 +302,7 @@ public final class DataLoader {
                                                 handleCreate(child);
                                         } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
                                                 if (isJsonFile(child)) {
-                                                        reloadFile(child);
+                                                        readJsonObjectIntoCache(child);
                                                 }
                                         } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
                                                 handleDelete(child);
@@ -158,7 +325,7 @@ public final class DataLoader {
                                 registerAll(child);
                                 loadAll(child);
                         } else if (isJsonFile(child)) {
-                                reloadFile(child);
+                                readJsonObjectIntoCache(child);
                         }
                 } catch (IOException e) {
                         XuanLing.LOGGER.warn("DataLoader failed to handle create for {}", child, e);
@@ -171,15 +338,18 @@ public final class DataLoader {
                         return;
                 }
                 if (CACHE.remove(key) != null) {
+                        invalidateTyped(key);
                         return;
                 }
                 String prefix = key + "/";
                 CACHE.keySet().removeIf(k -> k.startsWith(prefix));
+                TYPED_CACHE.keySet().removeIf(k -> k.startsWith(prefix));
         }
 
         private static void clearCacheForDir(Path dir) {
                 if (dir.equals(rootDir)) {
                         CACHE.clear();
+                        TYPED_CACHE.clear();
                         return;
                 }
                 String dirKey = cacheKey(dir);
@@ -188,27 +358,11 @@ public final class DataLoader {
                 }
                 String prefix = dirKey + "/";
                 CACHE.keySet().removeIf(k -> k.startsWith(prefix));
+                TYPED_CACHE.keySet().removeIf(k -> k.startsWith(prefix));
         }
 
         private static boolean isJsonFile(Path file) {
                 return Files.isRegularFile(file) && file.getFileName().toString().endsWith(".json");
-        }
-
-        private static void reloadFile(Path file) {
-                String key = cacheKey(file);
-                if (key == null) {
-                        return;
-                }
-                try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-                        JsonObject obj = GSON.fromJson(reader, JsonObject.class);
-                        if (obj != null) {
-                                CACHE.put(key, obj);
-                        }
-                } catch (IOException e) {
-                        XuanLing.LOGGER.warn("Failed to reload {}", file, e);
-                } catch (Exception e) {
-                        XuanLing.LOGGER.warn("Failed to parse {}", file, e);
-                }
         }
 
         private static String cacheKey(Path file) {
@@ -225,13 +379,5 @@ public final class DataLoader {
                 }
                 String s = rel.toString().replace('\\', '/');
                 return s.endsWith(".json") ? s.substring(0, s.length() - 5) : s;
-        }
-
-        public static JsonObject get(String key) {
-                return CACHE.get(key);
-        }
-
-        public static Map<String, JsonObject> getAll() {
-                return CACHE;
         }
 }

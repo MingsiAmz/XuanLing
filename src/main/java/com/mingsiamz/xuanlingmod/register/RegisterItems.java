@@ -1,5 +1,6 @@
 package com.mingsiamz.xuanlingmod.register;
 import com.mingsiamz.xuanlingmod.XuanLing;
+import com.mingsiamz.xuanlingmod.items.JadeSlipItem;
 import com.mingsiamz.xuanlingmod.items.TalismanPaperItem;
 
 import net.minecraft.world.food.FoodProperties;
@@ -16,8 +17,10 @@ public class RegisterItems {
 
         public static final DeferredItem<Item> TALISMAN_PAPER = ITEMS.registerItem("talisman_paper", TalismanPaperItem::new);
 
+        public static final DeferredItem<Item> JADE_SLIP = ITEMS.registerItem("jade_slip", properties -> new JadeSlipItem(properties.stacksTo(1).fireResistant()));
+
         public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerSimpleItem("example_item", new Item.Properties().food(new FoodProperties.Builder()
-                                                                                                                                  .alwaysEdible().nutrition(1).saturationModifier(2f).build()));
+                                                                                                                               .alwaysEdible().nutrition(1).saturationModifier(2f).build()));
 
         public static final DeferredItem<BlockItem> BODY_EX_STALE_ITEM = ITEMS.registerSimpleBlockItem("body_ex_stale_item", RegisterBlocks.BODY_EX_STALE_BLOCK);
 

@@ -1,0 +1,33 @@
+{
+  "id": "npc:rogue:casual",
+  "name": "散修",
+  "description": "无门无派的散修修仙者",
+  "entityType": "minecraft:villager",
+  "rarity": "COMMON",
+  "faction": "ROGUE",
+  "minRealmLevel": 1,
+  "maxRealmLevel": 5,
+  "artChance": 0.8,
+  "spellChance": 0.4,
+  "customRealmChance": 0.0,
+  "topProdigyChance": 0.0,
+  "statMultipliers": {
+    "health": 1.0,
+    "attack": 1.0,
+    "defense": 1.0,
+    "speed": 1.0
+  },
+  "preferredArtTypes": ["NEIGONG", "SHENFA"],
+  "preferredSpellCategories": ["ATTACK", "DEFENSE", "MOVEMENT"],
+  "preferredElements": ["NONE", "EARTH", "WIND"],
+  "title": "散修",
+  "lootTemplate": {
+    "baseDropChance": 0.15,
+    "minJadeSlips": 1,
+    "maxJadeSlips": 1,
+    "realmSlipChance": 0.3,
+    "artSlipChance": 0.5,
+    "spellSlipChance": 0.2,
+    "customLootTable": ""
+  }
+}

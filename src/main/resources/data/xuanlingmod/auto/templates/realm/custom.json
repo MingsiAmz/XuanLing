@@ -1,0 +1,141 @@
+{
+  "id": "realm:custom:prodigy",
+  "name": "天骄专属境界模板",
+  "description": "仅顶级天骄可拥有的特殊境界体系",
+  "category": "CUSTOM",
+  "rarity": "LEGENDARY",
+  "minRealmLevel": 10,
+  "maxRealmLevel": 18,
+  "realmNames": [
+    "筑基期·天骄",
+    "金丹期·天骄",
+    "元婴期·天骄",
+    "化神期·天骄",
+    "合体期·天骄",
+    "大乘期·天骄",
+    "渡劫期·天骄",
+    "真仙境·天骄",
+    "金仙境·天骄"
+  ],
+  "realmDescriptions": [
+    "以天地为炉，以造化为工，筑就不朽道基",
+    "金丹成就，内蕴乾坤，一丹开天门",
+    "元婴出窍，神识通灵，寿元大增",
+    "神识化神，法相天地，掌控法则雏形",
+    "合体天地，肉身成圣，法力无边",
+    "大乘圆满，触摸大道，准备渡劫",
+    "九九八十一重天劫，逆天改命",
+    "飞升成仙，踏入长生大道",
+    "金仙不朽，证道永恒"
+  ],
+  "baseStats": [
+    {
+      "level": 10,
+      "maxQi": 5000.0,
+      "qiRecovery": 10.0,
+      "spiritualPower": 500.0,
+      "attackPower": 100.0,
+      "defense": 50.0,
+      "maxHealth": 200.0,
+      "breakthroughChance": 0.08,
+      "requiredExp": 1000000.0
+    },
+    {
+      "level": 11,
+      "maxQi": 8000.0,
+      "qiRecovery": 15.0,
+      "spiritualPower": 800.0,
+      "attackPower": 150.0,
+      "defense": 80.0,
+      "maxHealth": 300.0,
+      "breakthroughChance": 0.06,
+      "requiredExp": 3000000.0
+    },
+    {
+      "level": 12,
+      "maxQi": 13000.0,
+      "qiRecovery": 22.0,
+      "spiritualPower": 1300.0,
+      "attackPower": 230.0,
+      "defense": 120.0,
+      "maxHealth": 450.0,
+      "breakthroughChance": 0.05,
+      "requiredExp": 8000000.0
+    },
+    {
+      "level": 13,
+      "maxQi": 21000.0,
+      "qiRecovery": 33.0,
+      "spiritualPower": 2100.0,
+      "attackPower": 350.0,
+      "defense": 180.0,
+      "maxHealth": 680.0,
+      "breakthroughChance": 0.04,
+      "requiredExp": 20000000.0
+    },
+    {
+      "level": 14,
+      "maxQi": 34000.0,
+      "qiRecovery": 50.0,
+      "spiritualPower": 3400.0,
+      "attackPower": 530.0,
+      "defense": 270.0,
+      "maxHealth": 1000.0,
+      "breakthroughChance": 0.03,
+      "requiredExp": 50000000.0
+    },
+    {
+      "level": 15,
+      "maxQi": 55000.0,
+      "qiRecovery": 75.0,
+      "spiritualPower": 5500.0,
+      "attackPower": 800.0,
+      "defense": 400.0,
+      "maxHealth": 1500.0,
+      "breakthroughChance": 0.025,
+      "requiredExp": 120000000.0
+    },
+    {
+      "level": 16,
+      "maxQi": 89000.0,
+      "qiRecovery": 112.0,
+      "spiritualPower": 8900.0,
+      "attackPower": 1200.0,
+      "defense": 600.0,
+      "maxHealth": 2200.0,
+      "breakthroughChance": 0.02,
+      "requiredExp": 300000000.0
+    },
+    {
+      "level": 17,
+      "maxQi": 144000.0,
+      "qiRecovery": 168.0,
+      "spiritualPower": 14400.0,
+      "attackPower": 1800.0,
+      "defense": 900.0,
+      "maxHealth": 3300.0,
+      "breakthroughChance": 0.015,
+      "requiredExp": 700000000.0
+    },
+    {
+      "level": 18,
+      "maxQi": 233000.0,
+      "qiRecovery": 250.0,
+      "spiritualPower": 23300.0,
+      "attackPower": 2700.0,
+      "defense": 1350.0,
+      "maxHealth": 5000.0,
+      "breakthroughChance": 0.01,
+      "requiredExp": 1500000000.0
+    }
+  ],
+  "breakthroughRequirements": {
+    "requiredItems": ["heaven_earth_treasure", "dao_fruit", "tribulation_pill"],
+    "requiredRealm": "previous_prodigy_realm",
+    "minComprehension": 200,
+    "successRateBase": 0.15,
+    "failurePenalty": "dao_heart_damage"
+  },
+  "unlockCondition": "is_top_prodigy == true",
+  "maxLevel": 9
+}

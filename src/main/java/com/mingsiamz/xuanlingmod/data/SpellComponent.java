@@ -3,73 +3,53 @@ package com.mingsiamz.xuanlingmod.data;
 import com.mingsiamz.xuanlingmod.data.controller.DataManager;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 import com.mingsiamz.xuanlingmod.type.spell.ActionType;
+import com.mingsiamz.xuanlingmod.type.spell.BasicType;
 import com.mingsiamz.xuanlingmod.type.spell.special.Normal;
 
 import net.minecraft.world.entity.LivingEntity;
+
 
 public class SpellComponent {
 
         private final XuanLingTypeEnum type = XuanLingTypeEnum.SPELL;
         private String name;
         private ComponentGroup group;
-        
+
         public SpellComponent(String name, ComponentGroup group) {
                 this.name = name;
                 this.group = group;
         }
 
         public void run() {
-                if (this.group.isEmpty())
+                if (!check())
                         return;
                 this.group.run();
         }
 
-        private void check() {
-                if (this.group.isEmpty())
-                        return;
-                if (this.group.getComponents(this.type, ActionType.GROUP).isEmpty())
+        
+        public boolean check() {
+                if (this.group == null || this.group.isEmpty())
+                        return false;
+                if (this.group.getComponents(this.type, BasicType.GROUP) == null)
+                        return false;
+                if (this.group.getComponents(this.type, ActionType.GROUP) == null)
                         this.group.addComponent(this.type, ActionType.GROUP, new Normal());
+                return true;
         }
 
-        public void toJson(LivingEntity entity) {
-                DataManager.saveData(this, this.type, entity.getStringUUID(), this.name);
+        
+        public boolean toJson(LivingEntity entity) {
+                if (!check())
+                        return false;
+                DataManager.saveComponent(this.type, entity.getStringUUID(), this.name, this.group);
+                return true;
+        }
+
+        
+        public static SpellComponent load(String entityUuid, String name) {
+                ComponentGroup group = ComponentCodec.loadGroup(XuanLingTypeEnum.SPELL, entityUuid, name);
+                if (group == null || group.isEmpty())
+                        return null;
+                return new SpellComponent(name, group);
         }
 }
-
-        // private SpellComponent(Builder builder) {
-        //         name = builder.name;
-        //         group = builder.group;
-        // }
-        
-
-//         public XuanLingTypeEnum getType() {
-//                 return type;
-//         }
-
-//         public ComponentGroup getGroup() {
-//                 return this.group;
-//         }
-
-//         public static Builder build(String name) {
-//                 Builder builder = new Builder(name);
-//                 return builder;
-//         }
-
-//         public static void run(SpellComponent spell) {
-//                 spell.group.run();
-//         }
-
-//         public static class Builder {
-//                 private ComponentGroup group = new ComponentGroup();
-//                 private String name;
-
-//                 public Builder(String name) {
-//                         this.name = name;
-//                 }
-
-//                 public Builder addComponent(String name, ImpComponent component) {
-//                         this.group.addComponent(XuanLingTypeEnum.SPELL, name, component);
-//                         return this;
-//                 }
-//         }
-// }

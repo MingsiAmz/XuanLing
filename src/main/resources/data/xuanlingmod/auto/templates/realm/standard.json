@@ -1,0 +1,141 @@
+{
+  "id": "realm:standard:qi_refining",
+  "name": "标准炼气境模板",
+  "description": "标准的炼气境界划分",
+  "category": "STANDARD",
+  "rarity": "COMMON",
+  "minRealmLevel": 1,
+  "maxRealmLevel": 9,
+  "realmNames": [
+    "炼气一层",
+    "炼气二层",
+    "炼气三层",
+    "炼气四层",
+    "炼气五层",
+    "炼气六层",
+    "炼气七层",
+    "炼气八层",
+    "炼气九层"
+  ],
+  "realmDescriptions": [
+    "初感灵气，体内生暖流",
+    "气感渐强，可引气入体",
+    "周天初成，气行一周",
+    "小周天成，气行经脉",
+    "大周天启，冲击丹田",
+    "丹田聚气，真元初现",
+    "真元液化，气海初建",
+    "气海扩张，真元充盈",
+    "炼气圆满，可筑基"
+  ],
+  "baseStats": [
+    {
+      "level": 1,
+      "maxQi": 100.0,
+      "qiRecovery": 1.0,
+      "spiritualPower": 5.0,
+      "attackPower": 2.0,
+      "defense": 1.0,
+      "maxHealth": 20.0,
+      "breakthroughChance": 0.3,
+      "requiredExp": 1000.0
+    },
+    {
+      "level": 2,
+      "maxQi": 150.0,
+      "qiRecovery": 1.2,
+      "spiritualPower": 8.0,
+      "attackPower": 3.0,
+      "defense": 1.5,
+      "maxHealth": 22.0,
+      "breakthroughChance": 0.28,
+      "requiredExp": 2500.0
+    },
+    {
+      "level": 3,
+      "maxQi": 220.0,
+      "qiRecovery": 1.5,
+      "spiritualPower": 12.0,
+      "attackPower": 4.0,
+      "defense": 2.0,
+      "maxHealth": 25.0,
+      "breakthroughChance": 0.25,
+      "requiredExp": 5000.0
+    },
+    {
+      "level": 4,
+      "maxQi": 320.0,
+      "qiRecovery": 1.8,
+      "spiritualPower": 18.0,
+      "attackPower": 6.0,
+      "defense": 3.0,
+      "maxHealth": 30.0,
+      "breakthroughChance": 0.22,
+      "requiredExp": 10000.0
+    },
+    {
+      "level": 5,
+      "maxQi": 450.0,
+      "qiRecovery": 2.2,
+      "spiritualPower": 25.0,
+      "attackPower": 8.0,
+      "defense": 4.0,
+      "maxHealth": 35.0,
+      "breakthroughChance": 0.2,
+      "requiredExp": 20000.0
+    },
+    {
+      "level": 6,
+      "maxQi": 620.0,
+      "qiRecovery": 2.7,
+      "spiritualPower": 35.0,
+      "attackPower": 11.0,
+      "defense": 5.0,
+      "maxHealth": 42.0,
+      "breakthroughChance": 0.18,
+      "requiredExp": 40000.0
+    },
+    {
+      "level": 7,
+      "maxQi": 850.0,
+      "qiRecovery": 3.3,
+      "spiritualPower": 50.0,
+      "attackPower": 15.0,
+      "defense": 7.0,
+      "maxHealth": 50.0,
+      "breakthroughChance": 0.15,
+      "requiredExp": 80000.0
+    },
+    {
+      "level": 8,
+      "maxQi": 1150.0,
+      "qiRecovery": 4.0,
+      "spiritualPower": 70.0,
+      "attackPower": 20.0,
+      "defense": 10.0,
+      "maxHealth": 60.0,
+      "breakthroughChance": 0.12,
+      "requiredExp": 160000.0
+    },
+    {
+      "level": 9,
+      "maxQi": 1550.0,
+      "qiRecovery": 5.0,
+      "spiritualPower": 100.0,
+      "attackPower": 28.0,
+      "defense": 14.0,
+      "maxHealth": 75.0,
+      "breakthroughChance": 0.1,
+      "requiredExp": 320000.0
+    }
+  ],
+  "breakthroughRequirements": {
+    "requiredItems": ["spirit_stone", "qi_gathering_pill"],
+    "requiredRealm": "炼气九层",
+    "minComprehension": 50,
+    "successRateBase": 0.3,
+    "failurePenalty": "qi_backlash"
+  },
+  "unlockCondition": "realm >= 1",
+  "maxLevel": 9
+}

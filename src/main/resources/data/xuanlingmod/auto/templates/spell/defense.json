@@ -1,0 +1,65 @@
+{
+  "id": "spell:defense:basic",
+  "name": "基础防御神通模板",
+  "description": "最基础的防御类神通",
+  "category": "DEFENSE",
+  "rarity": "COMMON",
+  "elementType": "METAL",
+  "minRealmLevel": 1,
+  "maxRealmLevel": 4,
+  "prefixes": [
+    "金钟",
+    "护体",
+    "护盾",
+    "坚甲",
+    "不坏"
+  ],
+  "bases": [
+    "罩",
+    "盾",
+    "壁",
+    "障",
+    "甲"
+  ],
+  "suffixes": [
+    "·初级",
+    "·入门",
+    "·基础",
+    "·一式",
+    "·起手"
+  ],
+  "components": [
+    {
+      "componentId": "component:spell:shield_self",
+      "weight": 100,
+      "required": true
+    },
+    {
+      "componentId": "component:spell:reflect_damage",
+      "weight": 40,
+      "required": false
+    },
+    {
+      "componentId": "component:spell:damage_reduction",
+      "weight": 60,
+      "required": false
+    }
+  ],
+  "cooldown": {
+    "baseCooldown": 300,
+    "cooldownReductionPerLevel": 10,
+    "minCooldown": 120,
+    "sharedCooldownGroup": "defense"
+  },
+  "scaling": {
+    "shieldBase": 30.0,
+    "shieldPerLevel": 8.0,
+    "shieldPerSpiritualPower": 1.0,
+    "durationBase": 5.0,
+    "durationPerLevel": 1.0,
+    "reflectChanceBase": 0.1,
+    "reflectChancePerLevel": 0.02
+  },
+  "unlockCondition": "realm >= 1",
+  "maxLevel": 10
+}

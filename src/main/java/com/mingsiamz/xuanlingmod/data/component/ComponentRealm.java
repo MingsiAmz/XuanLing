@@ -4,20 +4,14 @@ import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Builder;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 
-import net.minecraft.network.chat.Component;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-/**
- * @param size                   小境界层数
- * @param level                  境界所属层级
- * @param addHealth              小境界增加血量
- * @param addEnergy              小境界增加能量
- * @param addNormalLife          小境界增加身寿
- * @param addSoulLife            小境界增加灵寿
- * @param nextLevelAddHealth     大境界增加血量
- * @param nextLevelAddEnergy     大境界增加能量
- * @param nextLevelAddNormalLife 大境界增加神寿
- * @param nextLevelAddSoulLife   大境界增加灵寿
- */
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+
+
 public class ComponentRealm {
 
         private final int size;
@@ -50,6 +44,28 @@ public class ComponentRealm {
                 this.nextLevelAddSoulLife = builder.nextLevelAddSoulLife;
                 this.name = builder.name;
                 this.canTrans = builder.canTrans;
+        }
+
+        
+        ComponentRealm(int size, int level, double addHealth, double addParrentEnergy, double addChildEnergy,
+                        double addNormalLife, double addSoulLife, double nextLevelAddHealth,
+                        double nextLevelAddParrentEnergy, double nextLevelAddChildEnergy,
+                        double nextLevelAddNormalLife, double nextLevelAddSoulLife,
+                        String name, boolean canTrans) {
+                this.size = size;
+                this.level = level;
+                this.addHealth = addHealth;
+                this.addParrentEnergy = addParrentEnergy;
+                this.addChildEnergy = addChildEnergy;
+                this.addNormalLife = addNormalLife;
+                this.addSoulLife = addSoulLife;
+                this.nextLevelAddHealth = nextLevelAddHealth;
+                this.nextLevelAddParrentEnergy = nextLevelAddParrentEnergy;
+                this.nextLevelAddChildEnergy = nextLevelAddChildEnergy;
+                this.nextLevelAddNormalLife = nextLevelAddNormalLife;
+                this.nextLevelAddSoulLife = nextLevelAddSoulLife;
+                this.name = name;
+                this.canTrans = canTrans;
         }
 
         public int size() {
@@ -208,4 +224,61 @@ public class ComponentRealm {
                         return new ComponentRealm(this);
                 }
         }
+
+        public static final Codec<ComponentRealm> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                        Codec.INT.fieldOf("size").forGetter(ComponentRealm::size),
+                        Codec.INT.fieldOf("level").forGetter(ComponentRealm::getIndex),
+                        Codec.DOUBLE.fieldOf("addHealth").forGetter(ComponentRealm::getAddHealth),
+                        Codec.DOUBLE.fieldOf("addParrentEnergy").forGetter(ComponentRealm::getAddParrentEnergy),
+                        Codec.DOUBLE.fieldOf("addChildEnergy").forGetter(ComponentRealm::getAddChildEnergy),
+                        Codec.DOUBLE.fieldOf("addNormalLife").forGetter(ComponentRealm::getAddNormalLife),
+                        Codec.DOUBLE.fieldOf("addSoulLife").forGetter(ComponentRealm::getAddSoulLife),
+                        Codec.DOUBLE.fieldOf("nextLevelAddHealth").forGetter(ComponentRealm::getNextLevelAddHealth),
+                        Codec.DOUBLE.fieldOf("nextLevelAddParrentEnergy").forGetter(ComponentRealm::getNextLevelAddParrentEnergy),
+                        Codec.DOUBLE.fieldOf("nextLevelAddChildEnergy").forGetter(ComponentRealm::getNextLevelAddChildEnergy),
+                        Codec.DOUBLE.fieldOf("nextLevelAddNormalLife").forGetter(ComponentRealm::getNextLevelAddNormalLife),
+                        Codec.DOUBLE.fieldOf("nextLevelAddSoulLife").forGetter(ComponentRealm::getNextLevelAddSoulLife),
+                        Codec.STRING.fieldOf("name").forGetter(ComponentRealm::getName),
+                        Codec.BOOL.fieldOf("canTrans").forGetter(ComponentRealm::canTrans))
+                        .apply(instance, ComponentRealm::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, ComponentRealm> STREAM_CODEC = new StreamCodec<>() {
+                @Override
+                public ComponentRealm decode(RegistryFriendlyByteBuf buf) {
+                        return new ComponentRealm(
+                                buf.readInt(),
+                                buf.readInt(),
+                                buf.readDouble(),
+                                buf.readDouble(),
+                                buf.readDouble(),
+                                buf.readDouble(),
+                                buf.readDouble(),
+                                buf.readDouble(),
+                                buf.readDouble(),
+                                buf.readDouble(),
+                                buf.readDouble(),
+                                buf.readDouble(),
+                                buf.readUtf(64),
+                                buf.readBoolean()
+                        );
+                }
+
+                @Override
+                public void encode(RegistryFriendlyByteBuf buf, ComponentRealm value) {
+                        buf.writeInt(value.size);
+                        buf.writeInt(value.level);
+                        buf.writeDouble(value.addHealth);
+                        buf.writeDouble(value.addParrentEnergy);
+                        buf.writeDouble(value.addChildEnergy);
+                        buf.writeDouble(value.addNormalLife);
+                        buf.writeDouble(value.addSoulLife);
+                        buf.writeDouble(value.nextLevelAddHealth);
+                        buf.writeDouble(value.nextLevelAddParrentEnergy);
+                        buf.writeDouble(value.nextLevelAddChildEnergy);
+                        buf.writeDouble(value.nextLevelAddNormalLife);
+                        buf.writeDouble(value.nextLevelAddSoulLife);
+                        buf.writeUtf(value.name, 64);
+                        buf.writeBoolean(value.canTrans);
+                }
+        };
 }

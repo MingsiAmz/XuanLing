@@ -163,10 +163,8 @@ public class LevelProgressGui extends Screen {
                                 .setLayout(Layouts.row().setJustify(Justify.CENTER).setSpacing(10))
                                 .setFixedWidth(innerW)
                                 .add(new GuiButton(80, 20, startTrain.getString()).onClick(() -> {
-                                                        // TODO
                                 }))
                                 .add(new GuiButton(80, 20, refining.getString()).onClick(() -> {
-                                                        // TODO
                                 }));
 
                 btnGroup.setPosition(px + CultivationTheme.PADDING, py + panelH - 45);

@@ -1,0 +1,65 @@
+{
+  "id": "spell:heal:basic",
+  "name": "基础治疗神通模板",
+  "description": "最基础的治疗类神通",
+  "category": "HEAL",
+  "rarity": "COMMON",
+  "elementType": "WOOD",
+  "minRealmLevel": 1,
+  "maxRealmLevel": 4,
+  "prefixes": [
+    "青木",
+    "生机",
+    "回春",
+    "疗伤",
+    "愈合"
+  ],
+  "bases": [
+    "术",
+    "法",
+    "诀",
+    "咒",
+    "印"
+  ],
+  "suffixes": [
+    "·初级",
+    "·入门",
+    "·基础",
+    "·一式",
+    "·起手"
+  ],
+  "components": [
+    {
+      "componentId": "component:spell:heal_self",
+      "weight": 100,
+      "required": true
+    },
+    {
+      "componentId": "component:spell:heal_other",
+      "weight": 50,
+      "required": false
+    },
+    {
+      "componentId": "component:spell:remove_poison",
+      "weight": 30,
+      "required": false
+    }
+  ],
+  "cooldown": {
+    "baseCooldown": 200,
+    "cooldownReductionPerLevel": 8,
+    "minCooldown": 80,
+    "sharedCooldownGroup": "heal"
+  },
+  "scaling": {
+    "healBase": 20.0,
+    "healPerLevel": 5.0,
+    "healPerSpiritualPower": 0.8,
+    "rangeBase": 8.0,
+    "rangePerLevel": 1.0,
+    "maxTargetsBase": 1,
+    "maxTargetsPerLevel": 0
+  },
+  "unlockCondition": "realm >= 1",
+  "maxLevel": 10
+}

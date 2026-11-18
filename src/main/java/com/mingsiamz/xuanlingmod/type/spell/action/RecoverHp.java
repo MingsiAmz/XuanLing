@@ -10,7 +10,7 @@ public class RecoverHp extends ImpComponent {
         }
 
         public RecoverHp() {
-                this(ActionType.GROUP, ActionType.RECOVER_C_ENERGY.name, 0);
+                this(ActionType.GROUP, ActionType.RECOVER_HEALTH.name, 0);
         }
 
         @Override

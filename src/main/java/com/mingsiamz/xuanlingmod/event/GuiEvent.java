@@ -2,6 +2,7 @@ package com.mingsiamz.xuanlingmod.event;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
+import com.mingsiamz.xuanlingmod.gui.BattleModeHud;
 import com.mingsiamz.xuanlingmod.gui.PlayerVitalsHud;
 import com.mingsiamz.xuanlingmod.gui.TopLeftQiHud;
 import com.mingsiamz.xuanlingmod.layers.Tip;
@@ -31,6 +32,11 @@ public class GuiEvent {
                                 VanillaGuiLayers.HOTBAR,
                                 ResourceLocation.fromNamespaceAndPath(XuanLing.MODID, "top_left_qi"),
                                 TopLeftQiHud::render);
+
+                event.registerAbove(
+                                VanillaGuiLayers.HOTBAR,
+                                XuanLing.prefix("battle_mode"),
+                                BattleModeHud::render);
                 event.registerAbove(VanillaGuiLayers.HOTBAR, XuanLing.prefix("not_use_meditation_layer"),
                                 new Tip(() -> XuanLing.trans(XuanlingLangPro.GUI_STRING, "not_use_meditation"))
                                                 .setCondition(player -> {

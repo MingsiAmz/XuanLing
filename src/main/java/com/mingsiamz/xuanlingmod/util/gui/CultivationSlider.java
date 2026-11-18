@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 public class CultivationSlider implements IGuiComponent {
         private int x, y, width, height;
-        private float value = 0f; // 0.0 ~ 1.0
+        private float value = 0f; 
         private boolean dragging = false;
         private Consumer<Float> onValueChanged;
 

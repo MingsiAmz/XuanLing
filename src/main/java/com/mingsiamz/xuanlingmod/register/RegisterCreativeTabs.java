@@ -1,9 +1,12 @@
 package com.mingsiamz.xuanlingmod.register;
 
+import java.util.Iterator;
+
 import com.mingsiamz.xuanlingmod.XuanLing;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -15,14 +18,13 @@ public class RegisterCreativeTabs{
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS
             .register("xuanling_tabs", () -> CreativeModeTab.builder()
-                    .title(Component.translatable("itemGroup.xuanling")) // The language key for the title of your
-                                                                         // CreativeModeTab
+                    .title(Component.translatable("itemGroup.xuanling")) 
                     .withTabsBefore(CreativeModeTabs.COMBAT)
                     .icon(() -> RegisterItems.EXAMPLE_ITEM.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
-                        output.accept(RegisterItems.EXAMPLE_ITEM.get()); // Add the example item to the tab. For your
-                                                                         // own tabs, this method is preferred over the
-                                                                         // event
+                                    Iterator<DeferredHolder<Item, ? extends Item>> it = RegisterItems.ITEMS.getEntries().iterator();
+                                    while (it.hasNext())
+                                            output.accept(it.next().get());
                     }).build());
 
     public static void register(IEventBus modBus) {

@@ -14,6 +14,8 @@ import com.google.gson.GsonBuilder;
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicEnergy;
 import com.mingsiamz.xuanlingmod.data.BasicRealm;
+import com.mingsiamz.xuanlingmod.data.ComponentCodec;
+import com.mingsiamz.xuanlingmod.data.ComponentGroup;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
 public final class DataManager {
@@ -23,7 +25,8 @@ public final class DataManager {
                         .serializeNulls()
                         .create();
 
-        private static final Path CONFIG_DIR = Paths.get(".", "config");
+        
+        private static final Path CONFIG_DIR = Paths.get(".", "config").toAbsolutePath().normalize();
         public static final Path MOD_CONFIG_DIR = CONFIG_DIR.resolve(XuanLing.MODID);
         public static final Path ART_CONFIG_DIR = MOD_CONFIG_DIR.resolve("skills");
         public static final Path SPELL_CONFIG_DIR = MOD_CONFIG_DIR.resolve("spells");
@@ -55,16 +58,19 @@ public final class DataManager {
                 }
         }
 
-        public static <T> T loadData(Type type, XuanLingTypeEnum enumType, String entityUuid, String name) {
-                Path file = resolveFile(enumType, entityUuid, name);
-                if (!Files.exists(file)) {
-                        return null;
-                }
-                try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-                        return GSON.fromJson(reader, type);
+        public static boolean saveComponent(XuanLingTypeEnum type, String entityUuid, String name, ComponentGroup group) {
+                Path file = resolveFile(type, entityUuid, name);
+                try {
+                        Files.createDirectories(file.getParent());
+                        try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+                                GSON.toJson(ComponentCodec.encodeGroup(group), writer);
+                        }
                 } catch (IOException e) {
-                        throw new RuntimeException("Failed to load " + name, e);
+                        XuanLing.LOGGER.error("Failed to save {} for {}", name, entityUuid, e);
+                        return false;
                 }
+                DataLoader.loadJson(type, entityUuid, name, DataLoader.LoadMode.RELOAD);
+                return true;
         }
 
         public static void init() throws IOException {

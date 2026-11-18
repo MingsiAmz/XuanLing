@@ -113,7 +113,8 @@ public class StateGui extends Screen {
                 GuiComponentGroup statLeft = new GuiComponentGroup().setLayout(Layouts.column().setSpacing(6));
                 GuiComponentGroup statRight = new GuiComponentGroup().setLayout(Layouts.column().setSpacing(6));
 
-                String[] str = RegisterAttachments.getBasicData(minecraft.player).toString().split("\n");
+                BasicData basicData = RegisterAttachments.getBasicData(minecraft.player);
+                String[] str = basicData == null ? new String[0] : basicData.toString().split("\\n");
                 for (int i = 0; i < str.length / 2; i++) {
                         String[] tmp = str[i].split(":");
                         statLeft.add(new Label(tmp[0].toLowerCase(), tmp[1]).setWidth(100));

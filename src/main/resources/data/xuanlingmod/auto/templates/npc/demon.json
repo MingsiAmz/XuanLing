@@ -1,0 +1,33 @@
+{
+  "id": "npc:demon:cultivator",
+  "name": "魔道修士",
+  "description": "修习魔功的邪道修士",
+  "entityType": "minecraft:witch",
+  "rarity": "RARE",
+  "faction": "DEMON",
+  "minRealmLevel": 3,
+  "maxRealmLevel": 10,
+  "artChance": 0.9,
+  "spellChance": 0.8,
+  "customRealmChance": 0.05,
+  "topProdigyChance": 0.05,
+  "statMultipliers": {
+    "health": 1.3,
+    "attack": 1.3,
+    "defense": 1.0,
+    "speed": 1.1
+  },
+  "preferredArtTypes": ["NEIGONG", "SHENFA"],
+  "preferredSpellCategories": ["ATTACK", "MOVEMENT"],
+  "preferredElements": ["DARK", "FIRE", "POISON"],
+  "title": "魔修",
+  "lootTemplate": {
+    "baseDropChance": 0.4,
+    "minJadeSlips": 1,
+    "maxJadeSlips": 3,
+    "realmSlipChance": 0.5,
+    "artSlipChance": 0.3,
+    "spellSlipChance": 0.2,
+    "customLootTable": ""
+  }
+}

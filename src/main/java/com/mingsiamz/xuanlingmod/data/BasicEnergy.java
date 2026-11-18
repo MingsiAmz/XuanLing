@@ -9,7 +9,7 @@ import com.google.common.reflect.TypeToken;
 import com.mingsiamz.xuanlingmod.Config;
 import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy;
 import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Type;
-import com.mingsiamz.xuanlingmod.data.controller.DataManager;
+import com.mingsiamz.xuanlingmod.data.controller.DataLoader;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
 public class BasicEnergy {
@@ -36,9 +36,9 @@ public class BasicEnergy {
                 java.lang.reflect.Type type = new TypeToken<LinkedHashMap<Type, ComponentEnergy>>() {}.getType();
                 LinkedHashMap<String, ComponentEnergy> data = null;
                 if (name == "normal") {
-                        data = DataManager.loadData(type, XuanLingTypeEnum.ENERGY, "000", name);
+                        data = DataLoader.loadData(type, XuanLingTypeEnum.ENERGY, "000", name);
                 } else {
-                        data = DataManager.loadData(type, XuanLingTypeEnum.ENERGY, uuid.toString(), name);
+                        data = DataLoader.loadData(type, XuanLingTypeEnum.ENERGY, uuid.toString(), name);
                 }
                 if (data == null || data.isEmpty())
                         return null;

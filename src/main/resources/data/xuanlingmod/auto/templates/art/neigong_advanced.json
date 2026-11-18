@@ -1,0 +1,68 @@
+{
+  "id": "art:neigong:advanced",
+  "name": "进阶内功模板",
+  "description": "进阶内功，包含多种气运行周天",
+  "type": "NEIGONG",
+  "rarity": "UNCOMMON",
+  "elementType": "EARTH",
+  "minRealmLevel": 3,
+  "maxRealmLevel": 6,
+  "prefixes": [
+    "周天",
+    "大周天",
+    "玄奥",
+    "精深",
+    "上乘"
+  ],
+  "bases": [
+    "运气诀",
+    "炼气诀",
+    "凝元诀",
+    "化神诀",
+    "养元诀"
+  ],
+  "suffixes": [
+    "心法",
+    "内功",
+    "大法",
+    "真诀",
+    "秘典"
+  ],
+  "components": [
+    {
+      "componentId": "component:energy:advanced_gather",
+      "weight": 100,
+      "required": true
+    },
+    {
+      "componentId": "component:energy:cycle_major",
+      "weight": 90,
+      "required": true
+    },
+    {
+      "componentId": "component:energy:cycle_minor",
+      "weight": 80,
+      "required": false
+    },
+    {
+      "componentId": "component:energy:refine_essence",
+      "weight": 60,
+      "required": false
+    },
+    {
+      "componentId": "component:energy:store_deep",
+      "weight": 50,
+      "required": false
+    }
+  ],
+  "statModifiers": {
+    "spiritualPower": 1.3,
+    "maxQi": 1.5,
+    "qiRecovery": 1.4,
+    "comprehension": 1.2,
+    "breakthroughChance": 1.1
+  },
+  "elementAffinity": 0.4,
+  "unlockCondition": "realm >= 3",
+  "maxLevel": 20
+}

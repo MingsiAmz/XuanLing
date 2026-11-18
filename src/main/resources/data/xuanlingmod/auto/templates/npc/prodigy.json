@@ -1,0 +1,33 @@
+{
+  "id": "npc:prodigy:tianjiao",
+  "name": "顶级天骄",
+  "description": "万中无一的绝世天才，拥有自创境界",
+  "entityType": "minecraft:player",
+  "rarity": "LEGENDARY",
+  "faction": "PRODIGY",
+  "minRealmLevel": 10,
+  "maxRealmLevel": 18,
+  "artChance": 1.0,
+  "spellChance": 1.0,
+  "customRealmChance": 1.0,
+  "topProdigyChance": 1.0,
+  "statMultipliers": {
+    "health": 3.0,
+    "attack": 2.5,
+    "defense": 2.0,
+    "speed": 1.5
+  },
+  "preferredArtTypes": ["NEIGONG", "SHENFA", "SHENZHI"],
+  "preferredSpellCategories": ["ATTACK", "HEAL", "DEFENSE", "MOVEMENT", "UTILITY"],
+  "preferredElements": ["LIGHT", "DARK", "TIME", "SPACE", "CHAOS"],
+  "title": "天骄",
+  "lootTemplate": {
+    "baseDropChance": 1.0,
+    "minJadeSlips": 3,
+    "maxJadeSlips": 5,
+    "realmSlipChance": 1.0,
+    "artSlipChance": 0.8,
+    "spellSlipChance": 0.8,
+    "customLootTable": "xuanlingmod:prodigy_loot"
+  }
+}
