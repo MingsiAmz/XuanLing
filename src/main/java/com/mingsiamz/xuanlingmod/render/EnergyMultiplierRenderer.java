@@ -1,107 +1,170 @@
 package com.mingsiamz.xuanlingmod.render;
 
+import java.util.Optional;
+
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderPlayerEvent;
-
-import org.joml.Matrix4f;
 
 @EventBusSubscriber(modid = XuanLing.MODID, value = Dist.CLIENT)
 public final class EnergyMultiplierRenderer {
 
-        private static final int AURA_RGB = 0xB44DFF;
-        private static final float TWO_PI = (float) (Math.PI * 2.0);
-        private static final int SEGMENTS = 48;
+        private static final int OUTLINE_RED = 180;
+        private static final int OUTLINE_GREEN = 77;
+        private static final int OUTLINE_BLUE = 255;
+        private static final double EFFECT_RANGE = 64.0;
+        private static final double PARTICLE_RANGE = 32.0;
+
+        private static final MultiBufferSource.BufferSource OUTLINE_BACKING = MultiBufferSource
+                        .immediate(new ByteBufferBuilder(1536));
+        private static final OutlineBufferSource OUTLINE_SOURCE = new OutlineBufferSource(OUTLINE_BACKING);
+        private static final VertexConsumer DISCARD = new VertexConsumer() {
+                @Override
+                public VertexConsumer addVertex(float x, float y, float z) {
+                        return this;
+                }
+
+                @Override
+                public VertexConsumer setColor(int red, int green, int blue, int alpha) {
+                        return this;
+                }
+
+                @Override
+                public VertexConsumer setUv(float u, float v) {
+                        return this;
+                }
+
+                @Override
+                public VertexConsumer setUv1(int u, int v) {
+                        return this;
+                }
+
+                @Override
+                public VertexConsumer setUv2(int u, int v) {
+                        return this;
+                }
+
+                @Override
+                public VertexConsumer setNormal(float normalX, float normalY, float normalZ) {
+                        return this;
+                }
+        };
+
+        private static boolean renderingOutline;
 
         private EnergyMultiplierRenderer() {
         }
 
         @SubscribeEvent
         public static void onRenderPlayer(RenderPlayerEvent.Post event) {
-                Player player = event.getEntity();
-                if (player.isSpectator() || !player.isAlive())
+                if (renderingOutline)
                         return;
 
-                BasicData data = RegisterAttachments.getBasicData(player);
-                if (data == null)
+                Minecraft minecraft = Minecraft.getInstance();
+                if (minecraft.screen != null)
+                        return;
+                if (!(event.getEntity() instanceof AbstractClientPlayer player))
+                        return;
+                if (player.isSpectator() || !player.isAlive() || player.isInvisible())
                         return;
 
-                float multiplier = Mth.clamp(data.getEnergyMultiplier(), 0f, 1f);
+                float multiplier = multiplierOf(player);
                 if (multiplier <= 0f)
                         return;
 
-                Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-                if (player.position().distanceToSqr(camera) > 64.0 * 64.0)
+                Vec3 camera = minecraft.gameRenderer.getMainCamera().getPosition();
+                if (player.position().distanceToSqr(camera) > EFFECT_RANGE * EFFECT_RANGE)
+                        return;
+                if (!minecraft.levelRenderer.shouldShowEntityOutlines())
                         return;
 
-                float time = player.tickCount + event.getPartialTick();
-                PoseStack pose = event.getPoseStack();
+                float pulse = 0.82f + 0.18f * Mth.sin((player.tickCount + event.getPartialTick())
+                                * (0.08f + 0.12f * multiplier));
+                float strength = 0.55f + 0.45f * multiplier;
+                OUTLINE_SOURCE.setColor(
+                                Math.round(OUTLINE_RED * pulse * strength),
+                                Math.round(OUTLINE_GREEN * pulse * strength),
+                                Math.round(OUTLINE_BLUE * pulse * strength),
+                                255);
 
-                pose.pushPose();
-                renderBodyAura(pose, event.getMultiBufferSource(), player, time, multiplier);
-                pose.popPose();
-        }
-
-        private static void renderBodyAura(PoseStack pose, MultiBufferSource buffers, Player player,
-                        float time, float multiplier) {
-                float height = player.getBbHeight();
-                float radiusX = player.getBbWidth() * 0.5f + 0.08f;
-                float radiusZ = radiusX * 0.70f;
-
-                float breath = 0.72f + 0.28f * Mth.sin(time * (0.08f + 0.12f * multiplier));
-                float strength = 0.35f + 0.65f * multiplier;
-                float phase = (time * (0.004f + 0.010f * multiplier)) % 1f;
-                float pulseScale = 1f + 0.04f * (breath - 0.5f);
-
-                VertexConsumer lines = buffers.getBuffer(RenderType.lines());
-                Matrix4f matrix = pose.last().pose();
-                int rings = 32;
-
-                for (int i = 0; i < rings; i++) {
-                        float bodyT = (i + 0.5f) / rings;
-                        float headWave = Math.max(0f, Mth.cos(TWO_PI * (bodyT - phase)));
-                        float secondWave = Math.max(0f, Mth.cos(TWO_PI * (bodyT - phase - 0.5f))) * 0.55f;
-                        float wave = Math.max(headWave, secondWave);
-                        int alpha = Mth.clamp((int) ((10f + 200f * wave * wave) * strength * breath), 0, 255);
-                        float y = 0.04f + (height - 0.08f) * (1f - bodyT);
-
-                        ringEllipse(lines, matrix, y, radiusX * pulseScale, radiusZ * pulseScale, auraColor(alpha));
+                minecraft.levelRenderer.requestOutlineEffect();
+                renderingOutline = true;
+                try {
+                        event.getRenderer().render(player, player.getYRot(), event.getPartialTick(),
+                                        event.getPoseStack(), EnergyMultiplierRenderer::outlineBuffer,
+                                        event.getPackedLight());
+                } finally {
+                        OUTLINE_SOURCE.endOutlineBatch();
+                        renderingOutline = false;
                 }
         }
 
-        private static void ringEllipse(VertexConsumer vc, Matrix4f matrix, float y,
-                        float radiusX, float radiusZ, int color) {
-                for (int i = 0; i < SEGMENTS; i++) {
-                        float a0 = i * TWO_PI / SEGMENTS;
-                        float a1 = (i + 1) * TWO_PI / SEGMENTS;
-                        line(vc, matrix,
-                                        Mth.cos(a0) * radiusX, y, Mth.sin(a0) * radiusZ,
-                                        Mth.cos(a1) * radiusX, y, Mth.sin(a1) * radiusZ,
-                                        0f, 1f, 0f, color);
+        private static VertexConsumer outlineBuffer(RenderType renderType) {
+                Optional<RenderType> outline = renderType.outline();
+                return outline.isPresent() ? OUTLINE_SOURCE.getBuffer(outline.get()) : DISCARD;
+        }
+
+        @SubscribeEvent
+        public static void onClientTick(ClientTickEvent.Post event) {
+                Minecraft minecraft = Minecraft.getInstance();
+                if (minecraft.level == null || minecraft.player == null || minecraft.isPaused())
+                        return;
+
+                for (AbstractClientPlayer player : minecraft.level.players()) {
+                        float multiplier = multiplierOf(player);
+                        if (multiplier <= 0f || player.isInvisible())
+                                continue;
+                        if (player.distanceToSqr(minecraft.player) > PARTICLE_RANGE * PARTICLE_RANGE)
+                                continue;
+                        spawnParticles(minecraft, player, multiplier);
                 }
         }
 
-        private static void line(VertexConsumer vc, Matrix4f matrix,
-                        float x1, float y1, float z1, float x2, float y2, float z2,
-                        float nx, float ny, float nz, int color) {
-                vc.addVertex(matrix, x1, y1, z1).setColor(color).setNormal(nx, ny, nz);
-                vc.addVertex(matrix, x2, y2, z2).setColor(color).setNormal(nx, ny, nz);
+        private static void spawnParticles(Minecraft minecraft, Player player, float multiplier) {
+                RandomSource random = player.getRandom();
+                float spawnCount = multiplier * 3.0f;
+                int count = (int) spawnCount;
+                if (random.nextFloat() < spawnCount - count)
+                        count++;
+
+                for (int i = 0; i < count; i++) {
+                        double angle = random.nextDouble() * Math.PI * 2.0;
+                        double radius = player.getBbWidth() * 0.5 + random.nextDouble() * 0.15;
+                        double x = player.getX() + Math.cos(angle) * radius;
+                        double y = player.getY() + 0.15 + random.nextDouble() * (player.getBbHeight() - 0.3);
+                        double z = player.getZ() + Math.sin(angle) * radius;
+                        double speed = 0.015 + 0.05 * multiplier;
+                        double vy = (random.nextDouble() - 0.5) * 0.02;
+
+                        ParticleOptions particle = multiplier > 0.5f && random.nextFloat() < 0.3f
+                                        ? ParticleTypes.DRAGON_BREATH
+                                        : ParticleTypes.PORTAL;
+                        minecraft.level.addParticle(particle, x, y, z,
+                                        Math.cos(angle) * speed, vy, Math.sin(angle) * speed);
+                }
         }
 
-        private static int auraColor(int alpha) {
-                return (Mth.clamp(alpha, 0, 255) << 24) | AURA_RGB;
+        private static float multiplierOf(Player player) {
+                BasicData data = RegisterAttachments.getBasicData(player);
+                return data != null ? Mth.clamp(data.getEnergyMultiplier(), 0f, 1f) : 0f;
         }
 }
