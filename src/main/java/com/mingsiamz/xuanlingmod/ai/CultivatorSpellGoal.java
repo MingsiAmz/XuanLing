@@ -5,6 +5,8 @@ import java.util.EnumSet;
 import com.mingsiamz.xuanlingmod.entities.AoeSkillEntity;
 import com.mingsiamz.xuanlingmod.entities.ProjectileSkillEntity;
 import com.mingsiamz.xuanlingmod.event.AutoGenerationEvents;
+import com.mingsiamz.xuanlingmod.data.BasicData;
+import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
 import net.minecraft.nbt.CompoundTag;
@@ -62,14 +64,19 @@ public class CultivatorSpellGoal extends Goal {
             mob.getLookControl().setLookAt(target, 30.0f, 30.0f);
         }
 
+        int realmLevel = data.getInt(AutoGenerationEvents.REALM_LEVEL);
+        // 仙凡有别：境界越高，施法冷却越短
+        int artCd = Math.max(60, 200 - realmLevel * 30);
+        int spellCd = Math.max(20, data.getInt(AutoGenerationEvents.SPELL_COOLDOWN) - realmLevel * 5);
+
         if (artCooldown <= 0 && !data.getString(AutoGenerationEvents.ART_NAME).isEmpty()) {
             castArt(data, target);
-            artCooldown = 200;
+            artCooldown = artCd;
         }
 
         if (spellCooldown <= 0 && !data.getString(AutoGenerationEvents.SPELL_NAME).isEmpty()) {
             if (castSpell(data, target)) {
-                spellCooldown = Math.max(40, data.getInt(AutoGenerationEvents.SPELL_COOLDOWN));
+                spellCooldown = spellCd;
             }
         }
     }
@@ -80,20 +87,34 @@ public class CultivatorSpellGoal extends Goal {
         }
         int realmLevel = data.getInt(AutoGenerationEvents.REALM_LEVEL);
         float artPower = data.getFloat(AutoGenerationEvents.ART_POWER);
-        mob.heal(2.0f + realmLevel + artPower);
-        mob.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, Math.min(2, realmLevel / 4)));
+        // 仙凡有别：高境界修士的功法治疗与持续恢复远强于凡人
+        float heal = (2.0f + realmLevel + artPower) * (1.0f + realmLevel * 0.6f);
+        mob.heal(heal);
+        mob.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, Math.min(4, realmLevel / 2)));
         if (target != null) {
             mob.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100,
-                    Math.min(2, realmLevel / 5)));
+                    Math.min(4, realmLevel / 3)));
         }
     }
 
     private boolean castSpell(CompoundTag data, LivingEntity target) {
         String category = data.getString(AutoGenerationEvents.SPELL_CATEGORY);
         String name = data.getString(AutoGenerationEvents.SPELL_NAME);
-        float damage = data.getFloat(AutoGenerationEvents.SPELL_DAMAGE)
-                + data.getInt(AutoGenerationEvents.REALM_LEVEL);
-        float heal = data.getFloat(AutoGenerationEvents.SPELL_HEAL);
+        int realmLevel = data.getInt(AutoGenerationEvents.REALM_LEVEL);
+        // 仙凡有别：高境界修士的神通伤害远高于低境界
+        float damage = (data.getFloat(AutoGenerationEvents.SPELL_DAMAGE) + realmLevel)
+                * (1.0f + realmLevel * 0.8f);
+        float heal = data.getFloat(AutoGenerationEvents.SPELL_HEAL)
+                * (1.0f + realmLevel * 0.6f);
+
+        // 施法者能量倍率平滑加成（0=0，50%=1×，100%=2×）；NPC 无 BasicData 时视为中性 0.5
+        float multiplier = 1f;
+        var basicData = RegisterAttachments.getBasicData(mob);
+        if (basicData != null) {
+            multiplier = BasicData.smoothMultiplier(basicData.getEnergyMultiplier());
+        }
+        damage *= multiplier;
+        heal *= multiplier;
 
         if ("SELF".equals(category)) {
             if (heal > 0 && mob.getHealth() < mob.getMaxHealth()) {

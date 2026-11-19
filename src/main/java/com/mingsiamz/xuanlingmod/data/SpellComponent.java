@@ -90,8 +90,9 @@ public class SpellComponent {
                 if (actions == null) {
                         return;
                 }
+                float multiplier = BasicData.smoothMultiplier(casterEnergyMultiplier(caster));
                 for (ImpComponent component : actions) {
-                        float amount = actionAmount(component);
+                        float amount = actionAmount(component, multiplier);
                         if (amount <= 0) {
                                 continue;
                         }
@@ -107,12 +108,24 @@ public class SpellComponent {
                 }
         }
 
-        private float actionAmount(ImpComponent component) {
+        private float actionAmount(ImpComponent component, float multiplier) {
                 Object value = component.getParams().get(ParamType.NORMAL_VALUE);
                 if (!(value instanceof Number)) {
                         value = component.getParams().get(ParamType.DAMAGE);
                 }
-                return value instanceof Number number ? Math.max(0, number.floatValue()) : 0;
+                return value instanceof Number number ? Math.max(0, number.floatValue()) * multiplier : 0;
+        }
+
+        /**
+         * 获取施法者的能量倍率；若无 BasicData 则视为中性 0.5（1× 默认值）。
+         */
+        private static float casterEnergyMultiplier(LivingEntity caster) {
+                com.mingsiamz.xuanlingmod.data.BasicData data = com.mingsiamz.xuanlingmod.register.RegisterAttachments
+                                .getBasicData(caster);
+                if (data == null) {
+                        return 0.5f;
+                }
+                return data.getEnergyMultiplier();
         }
 
         private void recoverEnergy(LivingEntity caster, ComponentEnergy.Type energyType, float amount) {

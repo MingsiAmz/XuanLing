@@ -73,6 +73,16 @@ public class Networking {
                                 TribulationFxPacket.TYPE,
                                 TribulationFxPacket.CODEC,
                                 Networking::handler);
+
+                reg.playToServer(
+                                EnergyMultiplierPacket.TYPE,
+                                EnergyMultiplierPacket.CODEC,
+                                Networking::handler);
+
+                reg.playToClient(
+                                EnergyMultiplierPacket.TYPE,
+                                EnergyMultiplierPacket.CODEC,
+                                Networking::handler);
         }
 
         public static <T extends CustomPackageImp> void handler(T t, IPayloadContext ctx) {

@@ -50,6 +50,8 @@ public class BasicData {
         private boolean isCriticalInjured = false;
         /** 重伤倒计时（tick） */
         private int criticalInjuryTick = 0;
+        /** 技能能量倍率（0.0~1.0），释放技能时伤害与数值乘以平滑非线性函数，0=0，50%=1×，100%=2× */
+        private float energyMultiplier = 0.0f;
 
         /** 善恶标签：善 / 中立 / 恶 */
         public enum Alignment {
@@ -91,9 +93,9 @@ public class BasicData {
                                         Codec.INT.fieldOf("morality").orElse(0).forGetter(BasicData::getMorality),
                                         Codec.INT.fieldOf("condemnation").orElse(0).forGetter(BasicData::getCondemnation),
                                         Codec.INT.fieldOf("lifespan_month").orElse(120).forGetter(BasicData::getLifespanMonth),
-                                        Codec.LONG.fieldOf("last_lifespan_check_day").orElse(0L).forGetter(BasicData::getLastLifespanCheckDay),
                                         Codec.STRING.fieldOf("sect").forGetter(BasicData::getSect),
-                                        Codec.STRING.fieldOf("nick_name").forGetter(BasicData::getNickName)
+                                        Codec.STRING.fieldOf("nick_name").forGetter(BasicData::getNickName),
+                                        Codec.FLOAT.fieldOf("energy_multiplier").orElse(0f).forGetter(BasicData::getEnergyMultiplier)
                         )
                         .apply(builder, BasicData::fromCodec));
 
@@ -111,7 +113,8 @@ public class BasicData {
                           int realmLevel, double realmExp, boolean isTribulating, int tribulationTick, int comprehensionLevel,
                           double comprehensionExp, boolean isComprehending, int comprehensionTick, String comprehensionTarget,
                           float comprehensionIntensity, int comprehensionMaxTick,
-                          boolean isDeviating, int deviationTick, boolean isCriticalInjured, int criticalInjuryTick) {
+                          boolean isDeviating, int deviationTick, boolean isCriticalInjured, int criticalInjuryTick,
+                          float energyMultiplier) {
             this.normalLife = normalLife;
             this.soulLife = soulLife;
             this.moveSpeedMof = moveSpeedMof;
@@ -147,16 +150,18 @@ public class BasicData {
             this.deviationTick = deviationTick;
             this.isCriticalInjured = isCriticalInjured;
             this.criticalInjuryTick = criticalInjuryTick;
+            this.energyMultiplier = energyMultiplier;
         }
 
         private static BasicData fromCodec(double normalLife, double soulLife, double moveSpeedMof, double flySpeedMof,
                                            double TPAO, double lucky, double charm, double insight,
                                            double inspiration, double mindSense, int morality, int condemnation,
-                                           int lifespanMonth, long lastLifespanCheckDay, String sect, String nickName) {
+                                           int lifespanMonth, String sect, String nickName,
+                                           float energyMultiplier) {
             return new BasicData(normalLife, soulLife, moveSpeedMof, flySpeedMof, TPAO, lucky, charm, insight,
                                  inspiration, mindSense, false, morality, condemnation, lifespanMonth,
-                                 lastLifespanCheckDay, sect, nickName, 0, 0, 0, 0, 0.0, false, 0, 0, 0.0, false, 0, "",
-                                 0f, 0, false, 0, false, 0);
+                                 0L, sect, nickName, 0, 0, 0, 0, 0.0, false, 0, 0, 0.0, false, 0, "",
+                                 0f, 0, false, 0, false, 0, energyMultiplier);
         }
 
         public BasicData(RegistryFriendlyByteBuf buf) {
@@ -195,6 +200,7 @@ public class BasicData {
                 this.deviationTick = buf.readInt();
                 this.isCriticalInjured = buf.readBoolean();
                 this.criticalInjuryTick = buf.readInt();
+                this.energyMultiplier = buf.readFloat();
         }
 
         public BasicData(
@@ -230,7 +236,8 @@ public class BasicData {
                         boolean isDeviating,
                         int deviationTick,
                         boolean isCriticalInjured,
-                        int criticalInjuryTick) {
+                        int criticalInjuryTick,
+                        float energyMultiplier) {
                 this.normalLife = normalLife;
                 this.soulLife = soulLife;
                 this.moveSpeedMof = moveSpeedMof;
@@ -263,6 +270,7 @@ public class BasicData {
                 this.deviationTick = deviationTick;
                 this.isCriticalInjured = isCriticalInjured;
                 this.criticalInjuryTick = criticalInjuryTick;
+                this.energyMultiplier = energyMultiplier;
         }
 
         public double getNormalLife() {
@@ -575,6 +583,26 @@ public class BasicData {
                 this.criticalInjuryTick = criticalInjuryTick;
         }
 
+        public float getEnergyMultiplier() {
+                return energyMultiplier;
+        }
+
+        public void setEnergyMultiplier(float energyMultiplier) {
+                this.energyMultiplier = Mth.clamp(energyMultiplier, 0f, 1f);
+        }
+
+        /**
+         * 平滑非线性倍率函数：0=0，50%=1×默认值，100%=2×。
+         * 使用 f(m) = 4m³ - 6m² + 4m，在 [0,1] 上单调递增且光滑。
+         *
+         * @param multiplier 能量倍率（0.0~1.0）
+         * @return 最终伤害/数值倍数（0.0~2.0）
+         */
+        public static float smoothMultiplier(float multiplier) {
+                float m = Mth.clamp(multiplier, 0f, 1f);
+                return 4f * m * m * m - 6f * m * m + 4f * m;
+        }
+
         public void setLastPos(Vec3 vec3) {
                 this.lastMediX = vec3.x;
                 this.lastMediY = vec3.y;
@@ -621,6 +649,7 @@ public class BasicData {
                 buf.writeInt(this.deviationTick);
                 buf.writeBoolean(this.isCriticalInjured);
                 buf.writeInt(this.criticalInjuryTick);
+                buf.writeFloat(this.energyMultiplier);
         }
 
         public static BasicData initData() {
@@ -677,6 +706,7 @@ public class BasicData {
                 setCriticalInjured(false);
                 setCriticalInjuryTick(0);
                 setMeditation(false);
+                setEnergyMultiplier(0f);
         }
 
         @Override
@@ -690,7 +720,8 @@ public class BasicData {
                                 "TPAO:" + (int) TPAO + "\n" +
                                 "insight:" + (int) insight + "\n" +
                                 "inspiration:" + (int) inspiration + "\n" +
-                                "mindSense:" + (int) mindSense;
+                                "mindSense:" + (int) mindSense +
+                                "\nenergyMultiplier:" + energyMultiplier;
                 return str;
         }
 
@@ -725,7 +756,8 @@ public class BasicData {
                                 && this.isDeviating == b.isDeviating
                                 && this.deviationTick == b.deviationTick
                                 && this.isCriticalInjured == b.isCriticalInjured
-                                && this.criticalInjuryTick == b.criticalInjuryTick;
+                                && this.criticalInjuryTick == b.criticalInjuryTick
+                                && Float.compare(this.energyMultiplier, b.energyMultiplier) == 0;
         }
 
         public void setComprehending(boolean comprehending) {
@@ -776,7 +808,7 @@ public class BasicData {
                                      data.realmLevel, data.realmExp, data.isTribulating, data.tribulationTick,
                                      data.comprehensionLevel, data.comprehensionExp, data.isComprehending, data.comprehensionTick, data.comprehensionTarget,
                                      data.comprehensionIntensity, data.comprehensionMaxTick,
-                                     data.isDeviating, data.deviationTick, data.isCriticalInjured, data.criticalInjuryTick);
+                                     data.isDeviating, data.deviationTick, data.isCriticalInjured, data.criticalInjuryTick,
+                                     data.energyMultiplier);
         }
-
 }

@@ -99,6 +99,7 @@ public class XuanlingLangPro {
                         this.add("key.xuanlingmod.c", "搓招 C");
                         this.add("key.xuanlingmod.v", "搓招 V");
                         this.add("key.xuanlingmod.b", "搓招 B");
+                        this.add("key.xuanlingmod.expend_energy_use", "调整能量倍率（H / Shift+H）");
                         this.add("key.xuanlingmod.release", "释放神通");
                         this.add(COMPONEN_STRING + "basic_type", "基础");
                         this.add(COMPONEN_STRING + "projectle", "弹射物");
@@ -265,6 +266,7 @@ public class XuanlingLangPro {
                         this.add("key.xuanlingmod.c", "Combo C");
                         this.add("key.xuanlingmod.v", "Combo V");
                         this.add("key.xuanlingmod.b", "Combo B");
+                        this.add("key.xuanlingmod.expend_energy_use", "Adjust Energy Multiplier (H / Shift+H)");
                         this.add("key.xuanlingmod.release", "Release Spell");
                         this.add(COMPONEN_STRING + "basic_type", "basic");
                         this.add(COMPONEN_STRING + "projectle", "Projectle");
