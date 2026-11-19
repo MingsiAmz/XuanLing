@@ -88,22 +88,24 @@ public final class EnergyMultiplierRenderer {
 
         private static void renderRipple(PoseStack pose, MultiBufferSource buffers, float time, float multiplier) {
                 Matrix4f matrix = pose.last().pose();
-                VertexConsumer quads = buffers.getBuffer(RenderType.debugQuads());
-                VertexConsumer lines = buffers.getBuffer(RenderType.lines());
-
                 float speed = 0.009f + 0.015f * multiplier;
                 float maxRadius = 0.75f + 1.0f * multiplier;
                 int rings = 3;
 
+                VertexConsumer quads = buffers.getBuffer(RenderType.debugQuads());
                 for (int i = 0; i < rings; i++) {
                         float phase = (time * speed + (float) i / rings) % 1f;
                         float radius = 0.32f + maxRadius * phase;
                         int alpha = (int) ((1f - phase) * (40f + 100f * multiplier));
-                        int bandColor = auraColor(alpha);
-                        int edgeColor = auraColor(alpha + 40);
+                        ringBand(quads, matrix, 0.02f, radius, radius + 0.06f, auraColor(alpha));
+                }
 
-                        ringBand(quads, matrix, 0.02f, radius, radius + 0.06f, bandColor);
-                        ringLine(lines, matrix, 0.025f, radius + 0.06f, edgeColor);
+                VertexConsumer lines = buffers.getBuffer(RenderType.lines());
+                for (int i = 0; i < rings; i++) {
+                        float phase = (time * speed + (float) i / rings) % 1f;
+                        float radius = 0.32f + maxRadius * phase;
+                        int alpha = (int) ((1f - phase) * (40f + 100f * multiplier));
+                        ringLine(lines, matrix, 0.025f, radius + 0.06f, auraColor(alpha + 40));
                 }
         }
 
