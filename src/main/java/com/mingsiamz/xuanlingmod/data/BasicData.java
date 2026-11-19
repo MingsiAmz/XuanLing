@@ -94,8 +94,8 @@ public class BasicData {
                                         Codec.INT.fieldOf("morality").orElse(0).forGetter(BasicData::getMorality),
                                         Codec.INT.fieldOf("condemnation").orElse(0).forGetter(BasicData::getCondemnation),
                                         Codec.INT.fieldOf("lifespan_month").orElse(120).forGetter(BasicData::getLifespanMonth),
-                                        Codec.LONG.fieldOf("last_lifespan_check_day").orElse(0L).forGetter(BasicData::getLastLifespanCheckDay),
                                         Codec.STRING.fieldOf("sect").forGetter(BasicData::getSect),
+                                        Codec.STRING.fieldOf("nick_name").forGetter(BasicData::getNickName),
                                         Codec.FLOAT.fieldOf("energy_multiplier").orElse(0f).forGetter(BasicData::getEnergyMultiplier)
                         )
                         .apply(builder, BasicData::fromCodec));
@@ -157,11 +157,11 @@ public class BasicData {
         private static BasicData fromCodec(double normalLife, double soulLife, double moveSpeedMof, double flySpeedMof,
                                            double TPAO, double lucky, double charm, double insight,
                                            double inspiration, double mindSense, int morality, int condemnation,
-                                           int lifespanMonth, long lastLifespanCheckDay, String sect,
+                                           int lifespanMonth, String sect, String nickName,
                                            float energyMultiplier) {
             return new BasicData(normalLife, soulLife, moveSpeedMof, flySpeedMof, TPAO, lucky, charm, insight,
                                  inspiration, mindSense, false, morality, condemnation, lifespanMonth,
-                                 lastLifespanCheckDay, sect, "", 0, 0, 0, 0, 0.0, false, 0, 0, 0.0, false, 0, "",
+                                 0L, sect, nickName, 0, 0, 0, 0, 0.0, false, 0, 0, 0.0, false, 0, "",
                                  0f, 0, false, 0, false, 0, energyMultiplier);
         }
 
