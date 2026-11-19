@@ -74,12 +74,7 @@ public class Networking {
                                 TribulationFxPacket.CODEC,
                                 Networking::handler);
 
-                reg.playToServer(
-                                EnergyMultiplierPacket.TYPE,
-                                EnergyMultiplierPacket.CODEC,
-                                Networking::handler);
-
-                reg.playToClient(
+                reg.playBidirectional(
                                 EnergyMultiplierPacket.TYPE,
                                 EnergyMultiplierPacket.CODEC,
                                 Networking::handler);
