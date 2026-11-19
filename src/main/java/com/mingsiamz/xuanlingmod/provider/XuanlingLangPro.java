@@ -71,6 +71,13 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "comprehend_progress", "参悟进度");
                         this.add(GUI_STRING + "comprehend_meditating", "参悟中...");
                         this.add(GUI_STRING + "lifespan", "寿命:%s月");
+                        this.add(GUI_STRING + "morality", "道德值:%s");
+                        this.add(GUI_STRING + "condemnation", "天谴值:%s");
+                        this.add(GUI_STRING + "alignment", "善恶:%s");
+                        this.add(GUI_STRING + "alignment_good", "善");
+                        this.add(GUI_STRING + "alignment_neutral", "中立");
+                        this.add(GUI_STRING + "alignment_evil", "恶");
+                        this.add(GUI_STRING + "realm_exp", "修为:%s");
                         this.add(GUI_STRING + "not_use_meditation", "无法打坐，你并未入门");
                         this.add(GUI_STRING + "battle_mode", "战  斗");
                         this.add(GUI_STRING + "battle_release_hint", "按 ~ 释 放");
@@ -210,6 +217,9 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "cultivate_title_btn", "Cultivate");
                         this.add(GUI_STRING + "level_progress_gui_title", "Secluding myself for training");
                         this.add(GUI_STRING + "cultivate_time_year", "%sYear");
+                        this.add(GUI_STRING + "player_time_year", "%s years old");
+                        this.add(GUI_STRING + "physical_defense", "Physical Defense:%s");
+                        this.add(GUI_STRING + "magic_defense", "Magic Defense:%s");
                         this.add(GUI_STRING + "input_time_month", "training month");
                         this.add(GUI_STRING + "start_train", "Start Train");
                         this.add(GUI_STRING + "refining", "Refining");
@@ -219,6 +229,13 @@ public class XuanlingLangPro {
                         this.add(GUI_STRING + "comprehend_progress", "Comprehension Progress");
                         this.add(GUI_STRING + "comprehend_meditating", "Comprehending...");
                         this.add(GUI_STRING + "lifespan", "Lifespan: %s months");
+                        this.add(GUI_STRING + "morality", "Morality:%s");
+                        this.add(GUI_STRING + "condemnation", "Condemnation:%s");
+                        this.add(GUI_STRING + "alignment", "Alignment:%s");
+                        this.add(GUI_STRING + "alignment_good", "Good");
+                        this.add(GUI_STRING + "alignment_neutral", "Neutral");
+                        this.add(GUI_STRING + "alignment_evil", "Evil");
+                        this.add(GUI_STRING + "realm_exp", "Realm Exp:%s");
                         this.add(GUI_STRING + "not_use_meditation",
                                         "You’re not ready to use meditation because you haven’t learned the basics yet.");
                         this.add(GUI_STRING + "battle_mode", "Combat");

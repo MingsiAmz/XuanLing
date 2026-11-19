@@ -3,6 +3,7 @@ package com.mingsiamz.xuanlingmod.gui;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import com.mingsiamz.xuanlingmod.Config;
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.BasicRealm;
@@ -191,16 +192,48 @@ public class StateGui extends Screen {
                 renderPlayer(g, mouseX, mouseY);
 
                 root.render(g, mouseX, mouseY, partialTick);
+
+                // 修为条每帧按当前境界所需修为计算百分比，并在条体中央绘制百分比文字
+                int curPct = 0;
+                boolean hasBasicData = minecraft.player.hasData(RegisterAttachments.BASIC_DATA);
+                if (hasBasicData) {
+                        BasicData bd = RegisterAttachments.getBasicData(minecraft.player);
+                        double need = Config.needExp(bd.getRealmLevel());
+                        curPct = need > 0 ? (int) Math.max(0.0, Math.min(100.0, bd.getRealmExp() / need * 100.0)) : 100;
+                        progressBar.setValue(curPct, 100);
+                }
                 progressBar.render(g, mouseX, mouseY, partialTick);
+                if (hasBasicData) {
+                        renderProgressText(g, curPct + "%");
+                }
                 renderSideBtn(g, mouseX, mouseY, partialTick);
+        }
+
+        private void renderProgressText(GuiGraphics g, String text) {
+                int barW = progressBar.getWidth();
+                int barH = progressBar.getBarHeight();
+                int textW = font.width(text);
+                if (textW <= barW - 2) {
+                        g.drawString(font, text, progressBar.getX() + (barW - textW) / 2,
+                                        progressBar.getY() + (barH - 8) / 2, CultivationTheme.TEXT_PRIMARY, false);
+                        return;
+                }
+
+                float scale = (barW - 2f) / textW;
+                g.pose().pushPose();
+                g.pose().translate(progressBar.getX() + 1, progressBar.getY() + (barH - 8 * scale) / 2f, 0);
+                g.pose().scale(scale, scale, 1f);
+                g.drawString(font, text, 0, 0, CultivationTheme.TEXT_PRIMARY, false);
+                g.pose().popPose();
         }
 
         public void renderRealm(GuiGraphics g, int rightX, int idY) {
                 DefaultData data = RegisterAttachments.getDefaultData(minecraft.player);
+                BasicData basicData = RegisterAttachments.getBasicData(minecraft.player);
                 Component realmComp = XuanLing.trans(XuanlingLangPro.GUI_STRING, "realm");
-                if (data != null) {
+                if (data != null && basicData != null) {
                         ComponentRealm comRealm = BasicRealm.getRealm(minecraft.player.getUUID(), data.getRealmType(),
-                                        data.getRealmLevel());
+                                        basicData.getRealmLevel());
                         if (comRealm != null) {
                                 g.drawString(font, realmComp, rightX - font.width(realmComp) - 20, idY,
                                                 CultivationTheme.TEXT_GOLD, true);

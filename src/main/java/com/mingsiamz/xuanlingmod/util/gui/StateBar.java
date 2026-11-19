@@ -107,6 +107,10 @@ public class StateBar implements IGuiComponent {
                 return width;
         }
 
+        public int getBarHeight() {
+                return barHeight;
+        }
+
         @Override
         public int getHeight() {
                 return showText ? barHeight + 12 : barHeight;

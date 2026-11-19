@@ -2,7 +2,6 @@ package com.mingsiamz.xuanlingmod.gui;
 
 import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
-import com.mingsiamz.xuanlingmod.data.BasicRealm;
 import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
@@ -10,9 +9,7 @@ import com.mingsiamz.xuanlingmod.util.gui.CultivationPanel;
 import com.mingsiamz.xuanlingmod.util.gui.CultivationTheme;
 import com.mingsiamz.xuanlingmod.util.gui.GuiComponentGroup;
 import com.mingsiamz.xuanlingmod.util.gui.Label;
-import com.mingsiamz.xuanlingmod.util.gui.Label.Align;
 import com.mingsiamz.xuanlingmod.util.gui.SectionDivider;
-import com.mingsiamz.xuanlingmod.util.gui.StateBar;
 import com.mingsiamz.xuanlingmod.util.gui.component.GuiButton;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Justify;
 import com.mingsiamz.xuanlingmod.util.gui.layout.Layouts;
@@ -34,9 +31,6 @@ public class DetailDataGui extends Screen {
         private GuiComponentGroup root;
         private GuiButton leftButton;
         private GuiButton rightButton;
-        private StateBar progressBar;
-        private Label realmLabel;
-        private Component realmText;
 
         public DetailDataGui() {
                 super(Component.literal("detail_data_gui"));
@@ -97,34 +91,17 @@ public class DetailDataGui extends Screen {
                 leftCol.add(new Label("tpao", (int) basicData.getTPAO()).setWidth(140));
                 rightCol.add(new Label("mindsense", (int) basicData.getMindSense()).setWidth(140));
 
-                leftCol.add(new Label(Component.literal("morality: " + basicData.getMorality())).setWidth(140));
-                rightCol.add(new Label(Component.literal("condemnation: " + basicData.getCondemnation()))
-                                .setWidth(140));
+                leftCol.add(new Label("morality", basicData.getMorality()).setWidth(140));
+                rightCol.add(new Label("condemnation", basicData.getCondemnation()).setWidth(140));
 
-                leftCol.add(new Label(Component.literal("lifespan: " + basicData.getLifespanMonth())).setWidth(140));
-                rightCol.add(new Label(
-                                Component.literal("inspiration: " + String.format("%.2f", basicData.getInspiration())))
-                                .setWidth(140));
+                leftCol.add(new Label("lifespan", basicData.getLifespanMonth()).setWidth(140));
+                rightCol.add(new Label("inspiration", String.format("%.2f", basicData.getInspiration())).setWidth(140));
 
-                leftCol.add(new Label(Component.literal("realmexp: " + String.format("%.2f", basicData.getRealmExp())))
-                                .setWidth(140));
-                rightCol.add(
-                                new Label(Component.literal("alignment: " + basicData.getAlignmentLabel()))
-                                                .setWidth(140));
+                leftCol.add(new Label("realm_exp", String.format("%.2f", basicData.getRealmExp())).setWidth(140));
+                rightCol.add(new Label("alignment", alignmentText(basicData.getAlignmentLabel())).setWidth(140));
 
                 statsGroup.add(leftCol);
                 statsGroup.add(rightCol);
-
-                Component realm = XuanLing.trans(XuanlingLangPro.GUI_STRING, "realm");
-                String curRealm = BasicRealm.getRealm(minecraft.player.getUUID(), defaultData.getRealmType(),
-                                defaultData.getRealmLevel()).getName();
-                
-                realmText = Component.literal(realm.getString() + Component.translatable(curRealm).getString());
-                
-                realmLabel = new Label(realmText)
-                                .setWidth(innerW)
-                                .setAlign(Align.CENTER)
-                                .setColor(CultivationTheme.TEXT_GOLD);
 
                 root = new GuiComponentGroup()
                                 .setLayout(Layouts.column().setSpacing(8))
@@ -137,19 +114,19 @@ public class DetailDataGui extends Screen {
                 int rootY = py + (int) (PANEL_H * 0.20f);
                 root.setPosition(px + CultivationTheme.PADDING, rootY);
 
-                int progressY = (int) (py + PANEL_H / 1.275);
-                progressBar = new StateBar(innerW)
-                                .setColor(CultivationTheme.BORDER_CYAN)
-                                .setBarHeight(8)
-                                .showText(false)
-                                .showTicks(false)
-                                .setValue(0, 100);
-                progressBar.setPosition(px + CultivationTheme.PADDING, progressY);
-
                 GuiButton[] bts = StateGui.initSideBtn(PANEL_W, PANEL_H, px, py);
                 leftButton = bts[0];
                 rightButton = bts[1];
                 super.init();
+        }
+
+        private Component alignmentText(BasicData.Alignment alignment) {
+                String key = switch (alignment) {
+                        case GOOD -> "alignment_good";
+                        case EVIL -> "alignment_evil";
+                        default -> "alignment_neutral";
+                };
+                return XuanLing.trans(XuanlingLangPro.GUI_STRING, key);
         }
 
         private Component formatAge(double age) {
@@ -186,12 +163,6 @@ public class DetailDataGui extends Screen {
 
                 root.render(g, mouseX, mouseY, partialTick);
                 StateGui.renderSideBtn(g, mouseX, mouseY, partialTick);
-
-                int realmY = progressBar.getY() - 26; 
-                realmLabel.setPosition(inX, realmY);
-                realmLabel.render(g, mouseX, mouseY, partialTick);
-
-                progressBar.render(g, mouseX, mouseY, partialTick);
         }
 
         @Override
