@@ -25,7 +25,6 @@ public final class EnergyMultiplierRenderer {
         private static final int AURA_RGB = 0xB44DFF;
         private static final float TWO_PI = (float) (Math.PI * 2.0);
         private static final int SEGMENTS = 48;
-        private static final int OUTLINE_SIDES = 8;
 
         private EnergyMultiplierRenderer() {
         }
@@ -50,86 +49,48 @@ public final class EnergyMultiplierRenderer {
 
                 float time = player.tickCount + event.getPartialTick();
                 PoseStack pose = event.getPoseStack();
-                MultiBufferSource buffers = event.getMultiBufferSource();
 
                 pose.pushPose();
-                renderOutline(pose, buffers, player, time, multiplier);
-                renderRipple(pose, buffers, time, multiplier);
+                renderBodyAura(pose, event.getMultiBufferSource(), player, time, multiplier);
                 pose.popPose();
         }
 
-        private static void renderOutline(PoseStack pose, MultiBufferSource buffers, Player player,
+        private static void renderBodyAura(PoseStack pose, MultiBufferSource buffers, Player player,
                         float time, float multiplier) {
-                float pulse = 0.5f + 0.5f * Mth.sin(time * (0.10f + 0.20f * multiplier));
-                float intensity = 0.45f + 0.55f * multiplier;
-                int alpha = Mth.clamp((int) ((65f + 125f * pulse) * intensity), 0, 255);
-
-                float radius = player.getBbWidth() * 0.5f + 0.25f;
                 float height = player.getBbHeight();
-                Matrix4f matrix = pose.last().pose();
+                float radiusX = player.getBbWidth() * 0.5f + 0.08f;
+                float radiusZ = radiusX * 0.70f;
 
-                VertexConsumer vc = buffers.getBuffer(RenderType.lines());
-                drawCage(vc, matrix, radius * 1.10f, height, auraColor(alpha / 3));
-                drawCage(vc, matrix, radius, height, auraColor(alpha));
-        }
-
-        private static void drawCage(VertexConsumer vc, Matrix4f matrix, float radius, float height, int color) {
-                int verticals = OUTLINE_SIDES;
-                for (int i = 0; i < verticals; i++) {
-                        float angle = i * TWO_PI / verticals;
-                        float x = Mth.cos(angle) * radius;
-                        float z = Mth.sin(angle) * radius;
-                        line(vc, matrix, x, 0.03f, z, x, height, z, x, 0f, z, color);
-                }
-                ringLine(vc, matrix, 0.03f, radius, color);
-                ringLine(vc, matrix, height * 0.5f, radius, color);
-                ringLine(vc, matrix, height * 0.97f, radius, color);
-        }
-
-        private static void renderRipple(PoseStack pose, MultiBufferSource buffers, float time, float multiplier) {
-                Matrix4f matrix = pose.last().pose();
-                float speed = 0.009f + 0.015f * multiplier;
-                float maxRadius = 0.75f + 1.0f * multiplier;
-                int rings = 3;
-
-                VertexConsumer quads = buffers.getBuffer(RenderType.debugQuads());
-                for (int i = 0; i < rings; i++) {
-                        float phase = (time * speed + (float) i / rings) % 1f;
-                        float radius = 0.32f + maxRadius * phase;
-                        int alpha = (int) ((1f - phase) * (40f + 100f * multiplier));
-                        ringBand(quads, matrix, 0.02f, radius, radius + 0.06f, auraColor(alpha));
-                }
+                float breath = 0.72f + 0.28f * Mth.sin(time * (0.08f + 0.12f * multiplier));
+                float strength = 0.35f + 0.65f * multiplier;
+                float phase = (time * (0.004f + 0.010f * multiplier)) % 1f;
+                float pulseScale = 1f + 0.04f * (breath - 0.5f);
 
                 VertexConsumer lines = buffers.getBuffer(RenderType.lines());
+                Matrix4f matrix = pose.last().pose();
+                int rings = 32;
+
                 for (int i = 0; i < rings; i++) {
-                        float phase = (time * speed + (float) i / rings) % 1f;
-                        float radius = 0.32f + maxRadius * phase;
-                        int alpha = (int) ((1f - phase) * (40f + 100f * multiplier));
-                        ringLine(lines, matrix, 0.025f, radius + 0.06f, auraColor(alpha + 40));
+                        float bodyT = (i + 0.5f) / rings;
+                        float headWave = Math.max(0f, Mth.cos(TWO_PI * (bodyT - phase)));
+                        float secondWave = Math.max(0f, Mth.cos(TWO_PI * (bodyT - phase - 0.5f))) * 0.55f;
+                        float wave = Math.max(headWave, secondWave);
+                        int alpha = Mth.clamp((int) ((10f + 200f * wave * wave) * strength * breath), 0, 255);
+                        float y = 0.04f + (height - 0.08f) * (1f - bodyT);
+
+                        ringEllipse(lines, matrix, y, radiusX * pulseScale, radiusZ * pulseScale, auraColor(alpha));
                 }
         }
 
-        private static void ringLine(VertexConsumer vc, Matrix4f matrix, float y, float radius, int color) {
+        private static void ringEllipse(VertexConsumer vc, Matrix4f matrix, float y,
+                        float radiusX, float radiusZ, int color) {
                 for (int i = 0; i < SEGMENTS; i++) {
                         float a0 = i * TWO_PI / SEGMENTS;
                         float a1 = (i + 1) * TWO_PI / SEGMENTS;
                         line(vc, matrix,
-                                        Mth.cos(a0) * radius, y, Mth.sin(a0) * radius,
-                                        Mth.cos(a1) * radius, y, Mth.sin(a1) * radius,
+                                        Mth.cos(a0) * radiusX, y, Mth.sin(a0) * radiusZ,
+                                        Mth.cos(a1) * radiusX, y, Mth.sin(a1) * radiusZ,
                                         0f, 1f, 0f, color);
-                }
-        }
-
-        private static void ringBand(VertexConsumer vc, Matrix4f matrix, float y,
-                        float inner, float outer, int color) {
-                for (int i = 0; i < SEGMENTS; i++) {
-                        float a0 = i * TWO_PI / SEGMENTS;
-                        float a1 = (i + 1) * TWO_PI / SEGMENTS;
-
-                        vc.addVertex(matrix, Mth.cos(a0) * inner, y, Mth.sin(a0) * inner).setColor(color);
-                        vc.addVertex(matrix, Mth.cos(a0) * outer, y, Mth.sin(a0) * outer).setColor(color);
-                        vc.addVertex(matrix, Mth.cos(a1) * outer, y, Mth.sin(a1) * outer).setColor(color);
-                        vc.addVertex(matrix, Mth.cos(a1) * inner, y, Mth.sin(a1) * inner).setColor(color);
                 }
         }
 

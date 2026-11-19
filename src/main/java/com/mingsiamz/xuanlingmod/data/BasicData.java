@@ -739,8 +739,7 @@ public class BasicData {
                                 "TPAO:" + (int) TPAO + "\n" +
                                 "insight:" + (int) insight + "\n" +
                                 "inspiration:" + (int) inspiration + "\n" +
-                                "mindSense:" + (int) mindSense +
-                                "\nenergyMultiplier:" + energyMultiplier;
+                                "mindSense:" + (int) mindSense;
                 return str;
         }
 
