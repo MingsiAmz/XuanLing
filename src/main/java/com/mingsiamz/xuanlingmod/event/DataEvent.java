@@ -101,17 +101,26 @@ public class DataEvent {
         LivingEntity entity = event.getEntity();
         Entity killer = event.getSource() != null ? event.getSource().getEntity() : null;
 
-        // C1：若击杀者是玩家，则给玩家增加修为（包括凡人期）
+        // C1：仅 level 0 凡人击杀生物可获得修为，按目标生命值与护甲值的平滑曲线计算
+        // level ≥1 杀怪不再增加修为（修炼改由参悟/闭关获得）
         if (entity instanceof LivingEntity victim && killer instanceof Player killerPlayer) {
-            if (killerPlayer.hasData(RegisterAttachments.BASIC_DATA)) {
+            if (killerPlayer instanceof ServerPlayer serverKiller
+                            && killerPlayer.hasData(RegisterAttachments.BASIC_DATA)) {
                 BasicData killerData = RegisterAttachments.getBasicData(killerPlayer);
-                if (killerData != null) {
-                    int victimRealm = getEntityRealmLevel(victim);
-                    double gain = Config.getKillRealmExpBase()
-                                    + Config.getKillRealmExpPerLevel() * victimRealm;
+                if (killerData != null && killerData.getRealmLevel() == 0) {
+                    // 平滑曲线：base × sqrt(最大生命值 + 护甲值)，避免高血量生物修为线性失控
+                    double healthAndArmor = victim.getMaxHealth() + victim.getArmorValue();
+                    double gain = Config.getKillRealmExpBase() * Math.sqrt(healthAndArmor);
                     killerData.setRealmExp(killerData.getRealmExp() + gain);
-                    XuanLing.LOGGER.info("{} 击杀生物获得 {} 修为，目标境界 {}", killerPlayer.getName().getString(),
-                                    gain, victimRealm);
+                    XuanLing.LOGGER.info("{} 击杀生物获得 {} 修为（生命值+护甲 {}），境界等级 {}",
+                                    killerPlayer.getName().getString(), gain, healthAndArmor,
+                                    killerData.getRealmLevel());
+
+                    // 击杀后检查突破，允许凡人直接突破到练气（level<4 不渡天劫）
+                    checkBreakthrough(killerPlayer, killerData, killerPlayer.level(), serverKiller);
+
+                    // 重新附加 BasicData，触发客户端附件同步（使 statgui 修为条实时推进）
+                    killerPlayer.setData(RegisterAttachments.BASIC_DATA, BasicData.copy(killerData));
                 }
             }
         }
@@ -134,15 +143,6 @@ public class DataEvent {
         // 重置并随机所有属性
         data.resetAndRandomize();
         XuanLing.LOGGER.info("{} 死亡，重置并随机所有属性，移除全部自定义 buff", player.getName().getString());
-    }
-
-    /** 获取生物的境界等级，普通生物视为 0，已生成的修士 NPC 按其 NPC_DATA 读取 */
-    private static int getEntityRealmLevel(LivingEntity entity) {
-        var tag = entity.getPersistentData().getCompound(AutoGenerationEvents.NPC_DATA);
-        if (tag.contains(AutoGenerationEvents.REALM_LEVEL)) {
-            return tag.getInt(AutoGenerationEvents.REALM_LEVEL);
-        }
-        return 0;
     }
 
     @SubscribeEvent
