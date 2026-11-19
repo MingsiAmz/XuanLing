@@ -15,8 +15,8 @@ Implemented 凡人杀怪修为与实时进度 in `DataEvent.onEntityDeath`:
 - 击杀后重新附加 `BasicData`（`killerPlayer.setData(BASIC_DATA, BasicData.copy(killerData))`）触发客户端附件同步，使 `StateGui` 修为条按 `realmExp / needExp(level)` 百分比实时推进（StateGui 百分比渲染已由 01 完成，此处仅依赖同步）。
 - 编译通过（`./gradlew compileJava` BUILD SUCCESSFUL）。仓库无游戏测试/模组专用 JUnit，类检查以编译为准。
 
-- [ ] DataEvent.onEntityDeath 仅在 killer realmLevel == 0 时授予修为
-- [ ] 修为增量按 victim maxHealth + armor 的平滑曲线计算
-- 击杀后重新附加 BasicData 到玩家，触发客户端附件同步
-- 击杀后调用 checkBreakthrough，允许凡人直接突破到练气
-- [ ] StateGui 修为条在杀怪后可见推进（依赖 01 的百分比渲染）
+- [x] DataEvent.onEntityDeath 仅在 killer realmLevel == 0 时授予修为
+- [x] 修为增量按 victim maxHealth + armor 的平滑曲线计算
+- [x] 击杀后重新附加 BasicData 到玩家，触发客户端附件同步
+- [x] 击杀后调用 checkBreakthrough，允许凡人直接突破到练气
+- [x] StateGui 修为条在杀怪后可见推进（依赖 01 的百分比渲染）
