@@ -1,0 +1,16 @@
+{
+  "type": "neoforge:add_table",
+  "conditions": [
+    {
+      "condition": "minecraft:killed_by_player"
+    },
+    {
+      "condition": "xuanling:npc_top_prodigy"
+    },
+    {
+      "condition": "minecraft:random_chance",
+      "chance": 0.25
+    }
+  ],
+  "table": "xuanling:entities/jade_slip_prodigy"
+}

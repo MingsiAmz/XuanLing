@@ -17,6 +17,8 @@ import com.mingsiamz.xuanlingmod.register.RegisterEffects;
 import com.mingsiamz.xuanlingmod.register.RegisterEntities;
 import com.mingsiamz.xuanlingmod.register.RegisterItems;
 import com.mingsiamz.xuanlingmod.register.RegisterKey;
+import com.mingsiamz.xuanlingmod.loot.RegisterLootConditions;
+import com.mingsiamz.xuanlingmod.loot.RegisterLootFunctions;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.network.chat.Component;
@@ -46,6 +48,8 @@ public class XuanLing {
                 RegisterCreativeTabs.register(modEventBus);
                 RegisterEffects.register(modEventBus);
                 RegisterEntities.register(modEventBus);
+                RegisterLootConditions.register(modEventBus);
+                RegisterLootFunctions.register(modEventBus);
 
                 
                 AutoModEntry.init(modEventBus);

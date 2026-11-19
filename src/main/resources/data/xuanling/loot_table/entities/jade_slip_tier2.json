@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "xuanling:jade_slip",
+          "functions": [
+            {
+              "function": "xuanling:create_jade_slip",
+              "rarity": "rare",
+              "realm_level": 2,
+              "source": "loot"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

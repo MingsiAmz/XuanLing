@@ -56,6 +56,12 @@ public class XuanlingLangPro {
                         this.add(BasicRealm.getRealms()[2].getName(), "筑基");
                         this.add(BasicRealm.getRealms()[3].getName(), "金丹");
                         this.add(BasicRealm.getRealms()[4].getName(), "元婴");
+                        this.add(ENERGY_STRING + "炼气", "炼气");
+                        this.add(ENERGY_STRING + "筑基", "筑基");
+                        this.add(ENERGY_STRING + "金丹", "金丹");
+                        this.add(ENERGY_STRING + "元婴", "元婴");
+                        this.add(ENERGY_STRING + "混沌", "混沌");
+                        this.add(ENERGY_STRING + "永恒", "永恒");
                         this.add(MISC_STRING + "entity_now_sect", "无门无派");
                         this.add(MISC_STRING + "entity_nick_name", "无道号");
                         this.add(GUI_STRING + "cultivate_title_btn", "修炼");
@@ -145,6 +151,7 @@ public class XuanlingLangPro {
                         this.add("item.xuanling.jade_slip.tooltip.source", "来源: %s");
                         this.add("item.xuanling.jade_slip.tooltip.killer", "击杀者: %s");
                         this.add("item.xuanling.jade_slip.tooltip.time", "时间: %s");
+                        this.add("item.xuanling.jade_slip.tooltip.system", "体系: %s");
                         this.add("item.xuanling.jade_slip.tooltip.description", "蕴含修仙境界感悟");
                         this.add("item.xuanling.jade_slip.rarity.common", "普通");
                         this.add("item.xuanling.jade_slip.rarity.uncommon", "优秀");
@@ -212,6 +219,12 @@ public class XuanlingLangPro {
                         this.add(BasicRealm.getRealms()[2].getName(), "ZhuJi");
                         this.add(BasicRealm.getRealms()[3].getName(), "JinDan");
                         this.add(BasicRealm.getRealms()[4].getName(), "YuanYing");
+                        this.add(ENERGY_STRING + "炼气", "LianQi");
+                        this.add(ENERGY_STRING + "筑基", "ZhuJi");
+                        this.add(ENERGY_STRING + "金丹", "JinDan");
+                        this.add(ENERGY_STRING + "元婴", "YuanYing");
+                        this.add(ENERGY_STRING + "混沌", "Chaos");
+                        this.add(ENERGY_STRING + "永恒", "Eternal");
                         this.add(MISC_STRING + "entity_now_sect", "None Sect");
                         this.add(MISC_STRING + "entity_nick_name", "None NickName");
                         this.add(GUI_STRING + "cultivate_title_btn", "Cultivate");
@@ -302,6 +315,7 @@ public class XuanlingLangPro {
                         this.add("item.xuanling.jade_slip.tooltip.source", "Source: %s");
                         this.add("item.xuanling.jade_slip.tooltip.killer", "Killer: %s");
                         this.add("item.xuanling.jade_slip.tooltip.time", "Time: %s");
+                        this.add("item.xuanling.jade_slip.tooltip.system", "System: %s");
                         this.add("item.xuanling.jade_slip.tooltip.description", "Contains cultivation realm insights");
                         this.add("item.xuanling.jade_slip.rarity.common", "Common");
                         this.add("item.xuanling.jade_slip.rarity.uncommon", "Uncommon");

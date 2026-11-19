@@ -28,6 +28,6 @@
     "realmSlipChance": 1.0,
     "artSlipChance": 0.8,
     "spellSlipChance": 0.8,
-    "customLootTable": "xuanlingmod:prodigy_loot"
+    "customLootTable": "xuanling:entities/jade_slip_prodigy"
   }
 }

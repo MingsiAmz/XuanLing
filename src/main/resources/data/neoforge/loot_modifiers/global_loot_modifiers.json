@@ -1,0 +1,12 @@
+{
+	"comment": "Entries will be loaded, parsed, and executed in order, first to last. Duplicate entries will override earlier entries and missing entries will be ignored while replace:true will clear the list first.",
+	"replace": false,
+	"entries": [
+		"xuanling:loot_modifiers/add_jade_slip_tier0",
+		"xuanling:loot_modifiers/add_jade_slip_tier1",
+		"xuanling:loot_modifiers/add_jade_slip_tier2",
+		"xuanling:loot_modifiers/add_jade_slip_tier3",
+		"xuanling:loot_modifiers/add_jade_slip_tier4",
+		"xuanling:loot_modifiers/add_jade_slip_prodigy"
+	]
+}

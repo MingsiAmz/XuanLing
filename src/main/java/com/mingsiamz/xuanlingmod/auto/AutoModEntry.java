@@ -9,7 +9,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
@@ -40,7 +39,6 @@ public class AutoModEntry {
                 NeoForge.EVENT_BUS.addListener(AutoModEntry::onServerStarting);
                 NeoForge.EVENT_BUS.addListener(AutoModEntry::onServerStopping);
 
-                NeoForge.EVENT_BUS.addListener(LivingDeathEvent.class, AutoGenerationEvents::onLivingDeath);
                 NeoForge.EVENT_BUS.addListener(EntityJoinLevelEvent.class, AutoGenerationEvents::onEntityJoinLevel);
 
                 initialized = true;

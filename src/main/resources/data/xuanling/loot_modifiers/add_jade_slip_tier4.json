@@ -1,0 +1,23 @@
+{
+  "type": "neoforge:add_table",
+  "conditions": [
+    {
+      "condition": "minecraft:killed_by_player"
+    },
+    {
+      "condition": "xuanling:npc_realm_level",
+      "min_level": 4
+    },
+    {
+      "condition": "minecraft:inverted",
+      "term": {
+        "condition": "xuanling:npc_top_prodigy"
+      }
+    },
+    {
+      "condition": "minecraft:random_chance",
+      "chance": 0.0015
+    }
+  ],
+  "table": "xuanling:entities/jade_slip_tier4"
+}

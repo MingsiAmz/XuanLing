@@ -3,9 +3,11 @@ package com.mingsiamz.xuanlingmod.items;
 import com.mingsiamz.xuanlingmod.auto.config.Rarity;
 import com.mingsiamz.xuanlingmod.auto.generator.GenerationEngine;
 import com.mingsiamz.xuanlingmod.auto.generator.StatGenerator;
+import com.mingsiamz.xuanlingmod.data.BasicRealm;
 import com.mingsiamz.xuanlingmod.data.component.ComponentRealm;
 import com.mingsiamz.xuanlingmod.data.component.JadeSlipData;
 import com.mingsiamz.xuanlingmod.data.controller.DataManager;
+import com.mingsiamz.xuanlingmod.provider.XuanlingLangPro;
 import com.mingsiamz.xuanlingmod.register.RegisterDataComponents;
 import com.mingsiamz.xuanlingmod.register.RegisterItems;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
@@ -55,43 +57,42 @@ public class JadeSlipItem extends Item {
 
     
     public static ItemStack createWithRealm(ComponentRealm realm, Rarity rarity, String source, String creator) {
+        return createWithSystem(realm, rarity, source, creator, JadeSlipData.DEFAULT_SYSTEM);
+    }
+
+    
+    public static ItemStack createWithSystem(ComponentRealm realm, Rarity rarity, String source, String creator,
+            String system) {
         ItemStack stack = createBlank();
         setRealmData(stack, realm);
         setRarity(stack, rarity);
         setSource(stack, source);
         setCreator(stack, creator);
+        setSystem(stack, system);
         updateDisplayName(stack);
         return stack;
     }
 
     
-    public static ItemStack createRandom(Rarity rarity, int realmLevel, String source) {
-        GenerationEngine engine = GenerationEngine.getInstance();
-        var jadeSlipData = engine.generateJadeSlip(rarity, realmLevel);
-
-        if (jadeSlipData.realmData() != null) {
-            
-            ComponentRealm realm = convertToComponentRealm(jadeSlipData.realmData());
-            ItemStack stack = createWithRealm(realm, rarity, source, "world_gen");
-
-            
-            var data = stack.get(RegisterDataComponents.JADE_SLIP_DATA.get());
-            if (data != null) {
-                stack.set(RegisterDataComponents.JADE_SLIP_DATA.get(), data.withCreator("world_gen"));
-            }
-            return stack;
+    public static ItemStack createRandom(Rarity rarity, int realmLevel, String source, String creator, String system) {
+        ComponentRealm realm = resolveStandardRealm(rarity, realmLevel);
+        if (realm == null) {
+            return createBlank();
         }
-
-        return createBlank();
+        return createWithSystem(realm, rarity, source, creator, system);
     }
 
     
-    public static ItemStack createFromTopProdigy(StatGenerator.NPCGeneratedStats npcStats, String killerName) {
-        if (npcStats.customRealm() != null) {
-            ComponentRealm realm = convertToComponentRealm(npcStats.customRealm());
-            return createWithRealm(realm, npcStats.rarity(), "top_prodigy_kill", killerName);
+    public static ComponentRealm resolveStandardRealm(Rarity rarity, int realmLevel) {
+        if (realmLevel <= 0) {
+            return BasicRealm.getRealms()[0];
         }
-        return createBlank();
+        GenerationEngine engine = GenerationEngine.getInstance();
+        var jadeSlipData = engine.generateJadeSlip(rarity, realmLevel);
+        if (jadeSlipData.realmData() == null) {
+            return null;
+        }
+        return convertToComponentRealm(jadeSlipData.realmData());
     }
 
     
@@ -154,6 +155,22 @@ public class JadeSlipItem extends Item {
         return data != null ? data.creator() : "";
     }
 
+    public static void setSystem(ItemStack stack, String system) {
+        JadeSlipData currentData = stack.get(RegisterDataComponents.JADE_SLIP_DATA.get());
+        if (currentData == null) {
+            currentData = JadeSlipData.EMPTY;
+        }
+        stack.set(RegisterDataComponents.JADE_SLIP_DATA.get(), currentData.withSystem(system));
+    }
+
+    public static String getSystem(ItemStack stack) {
+        JadeSlipData data = stack.get(RegisterDataComponents.JADE_SLIP_DATA.get());
+        if (data == null || data.system() == null || data.system().isEmpty()) {
+            return JadeSlipData.DEFAULT_SYSTEM;
+        }
+        return data.system();
+    }
+
     public static void setStoredData(ItemStack stack, String storedType, String storedPayload) {
         JadeSlipData currentData = stack.get(RegisterDataComponents.JADE_SLIP_DATA.get());
         if (currentData == null) {
@@ -188,9 +205,7 @@ public class JadeSlipItem extends Item {
         Rarity rarity = getRarity(stack);
 
         if (realmOpt.isPresent()) {
-            ComponentRealm realm = realmOpt.get();
-            String realmName = realm.getName();
-            MutableComponent name = Component.literal("玉简·" + realmName)
+            MutableComponent name = Component.literal("玉修·" + getSystem(stack))
                     .withStyle(getRarityStyle(rarity));
             stack.set(DataComponents.CUSTOM_NAME, name);
         } else {
@@ -218,7 +233,9 @@ public class JadeSlipItem extends Item {
         Optional<ComponentRealm> realmOpt = getRealmData(stack);
         if (realmOpt.isPresent()) {
             ComponentRealm realm = realmOpt.get();
-            tooltip.add(Component.literal(realm.getName()).withStyle(ChatFormatting.WHITE));
+            tooltip.add(getRealmNameComponent(realm).withStyle(ChatFormatting.WHITE));
+            tooltip.add(Component.translatable("item.xuanling.jade_slip.tooltip.system", getSystem(stack))
+                    .withStyle(ChatFormatting.AQUA));
             String description = realm.canTrans()
                     ? "此法门蕴含着渡劫飞升的感悟。"
                     : "此玉简记录了一门修真法门的修炼感悟。";
@@ -226,6 +243,14 @@ public class JadeSlipItem extends Item {
         } else {
             tooltip.add(Component.literal("右键使用可记录当前境界").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         }
+    }
+
+    private static MutableComponent getRealmNameComponent(ComponentRealm realm) {
+        String name = realm.getName();
+        if (name.startsWith(XuanlingLangPro.ENERGY_STRING)) {
+            return Component.translatable(name);
+        }
+        return Component.literal(name);
     }
 
     private String getSourceDisplayName(String source) {
@@ -257,7 +282,7 @@ public class JadeSlipItem extends Item {
 
     
 
-    private static ComponentRealm convertToComponentRealm(StatGenerator.RealmGeneratedStats stats) {
+    public static ComponentRealm convertToComponentRealm(StatGenerator.RealmGeneratedStats stats) {
         ComponentRealm.Builder builder = com.mingsiamz.xuanlingmod.data.component.ComponentRealm.builder(stats.name())
                 .level(stats.majorLevel())
                 .size(stats.size())
