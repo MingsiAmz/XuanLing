@@ -65,6 +65,28 @@ public final class TopLeftQiHud {
                 if (!isHaveNeili())
                         drawNeiliBar(g, X, Y + QI_HEIGHT + NEILI_GAP,
                                      NEILI_WIDTH, NEILI_HEIGHT, dispNeili, t);
+
+                if (!isHaveQi())
+                        drawMultiplierOverlay(g, X, Y, QI_WIDTH, QI_HEIGHT);
+                else if (!isHaveNeili())
+                        drawMultiplierOverlay(g, X, Y + QI_HEIGHT + NEILI_GAP, NEILI_WIDTH, NEILI_HEIGHT);
+        }
+
+        private static void drawMultiplierOverlay(GuiGraphics g, int x, int y, int w, int h) {
+                float multiplier = clamp(HudDataProvider.getEnergyMultiplier());
+
+                int lineW = Math.max(2, Math.round(w * multiplier));
+                g.fill(x, y, x + lineW, y + 1, CultivationTheme.WHITE);
+                g.fill(x + lineW - 1, y - 1, x + lineW + 1, y + 2, CultivationTheme.WHITE);
+
+                String pct = Math.round(multiplier * 100f) + "%";
+                int textWidth = mc.font.width(pct);
+                PoseStack pose = g.pose();
+                pose.pushPose();
+                pose.translate(x + w - 2f, y + (h - 4.5f) * 0.5f, 0f);
+                pose.scale(0.5f, 0.5f, 1f);
+                g.drawString(mc.font, pct, -textWidth, 0, CultivationTheme.WHITE, true);
+                pose.popPose();
         }
 
         private static void drawQiBar(GuiGraphics g, int x, int y, int w, int h, float ratio, long t) {
