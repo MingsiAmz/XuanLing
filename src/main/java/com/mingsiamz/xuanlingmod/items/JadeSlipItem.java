@@ -154,6 +154,29 @@ public class JadeSlipItem extends Item {
         return data != null ? data.creator() : "";
     }
 
+    public static void setStoredData(ItemStack stack, String storedType, String storedPayload) {
+        JadeSlipData currentData = stack.get(RegisterDataComponents.JADE_SLIP_DATA.get());
+        if (currentData == null) {
+            currentData = JadeSlipData.EMPTY;
+        }
+        stack.set(RegisterDataComponents.JADE_SLIP_DATA.get(), currentData.withStored(storedType, storedPayload));
+    }
+
+    public static String getStoredType(ItemStack stack) {
+        JadeSlipData data = stack.get(RegisterDataComponents.JADE_SLIP_DATA.get());
+        return data != null ? data.storedType() : null;
+    }
+
+    public static String getStoredPayload(ItemStack stack) {
+        JadeSlipData data = stack.get(RegisterDataComponents.JADE_SLIP_DATA.get());
+        return data != null ? data.storedPayload() : null;
+    }
+
+    public static boolean hasStoredData(ItemStack stack) {
+        JadeSlipData data = stack.get(RegisterDataComponents.JADE_SLIP_DATA.get());
+        return data != null && data.hasStoredData();
+    }
+
     public static boolean hasRealmData(ItemStack stack) {
         return getRealmData(stack).isPresent();
     }

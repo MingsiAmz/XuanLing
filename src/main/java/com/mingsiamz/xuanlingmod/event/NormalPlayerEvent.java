@@ -12,9 +12,13 @@ import com.mingsiamz.xuanlingmod.data.DefaultData;
 import com.mingsiamz.xuanlingmod.data.DefaultEnergy;
 import com.mingsiamz.xuanlingmod.data.component.ComponentEnergy.Type;
 import com.mingsiamz.xuanlingmod.gui.ChangeGui;
+import com.mingsiamz.xuanlingmod.gui.JadeSlipStorageGui;
+import com.mingsiamz.xuanlingmod.items.JadeSlipItem;
 import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.register.RegisterBlocks;
 import com.mingsiamz.xuanlingmod.register.RegisterEffects;
+import com.mingsiamz.xuanlingmod.register.RegisterItems;
+import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -69,6 +73,12 @@ public class NormalPlayerEvent {
                 Level level = player.level();
                 DefaultEnergy energy = RegisterAttachments.getDefaultEnergy(player);
                 ItemStack item = player.getItemInHand(event.getHand());
+                if (level.isClientSide && item.getItem() == RegisterItems.JADE_SLIP.get()
+                                && !JadeSlipItem.hasStoredData(item) && JadeSlipItem.getRealmData(item).isEmpty()) {
+                        Minecraft.getInstance().setScreen(new JadeSlipStorageGui(XuanLingTypeEnum.ART));
+                        return;
+                }
+
                 if (!level.isClientSide) {
                         pushEnergyItem(item, energy);
                 }

@@ -45,6 +45,11 @@ public class Networking {
                                 Networking::handler);
 
                 reg.playToServer(
+                                StoreDataPacket.TYPE,
+                                StoreDataPacket.CODEC,
+                                Networking::handler);
+
+                reg.playToServer(
                                 ManageDataPacket.TYPE,
                                 ManageDataPacket.CODEC,
                                 Networking::handler);
