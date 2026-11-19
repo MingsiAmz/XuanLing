@@ -11,6 +11,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 public class BasicData {
@@ -93,8 +94,8 @@ public class BasicData {
                                         Codec.INT.fieldOf("morality").orElse(0).forGetter(BasicData::getMorality),
                                         Codec.INT.fieldOf("condemnation").orElse(0).forGetter(BasicData::getCondemnation),
                                         Codec.INT.fieldOf("lifespan_month").orElse(120).forGetter(BasicData::getLifespanMonth),
+                                        Codec.LONG.fieldOf("last_lifespan_check_day").orElse(0L).forGetter(BasicData::getLastLifespanCheckDay),
                                         Codec.STRING.fieldOf("sect").forGetter(BasicData::getSect),
-                                        Codec.STRING.fieldOf("nick_name").forGetter(BasicData::getNickName),
                                         Codec.FLOAT.fieldOf("energy_multiplier").orElse(0f).forGetter(BasicData::getEnergyMultiplier)
                         )
                         .apply(builder, BasicData::fromCodec));
@@ -156,11 +157,11 @@ public class BasicData {
         private static BasicData fromCodec(double normalLife, double soulLife, double moveSpeedMof, double flySpeedMof,
                                            double TPAO, double lucky, double charm, double insight,
                                            double inspiration, double mindSense, int morality, int condemnation,
-                                           int lifespanMonth, String sect, String nickName,
+                                           int lifespanMonth, long lastLifespanCheckDay, String sect,
                                            float energyMultiplier) {
             return new BasicData(normalLife, soulLife, moveSpeedMof, flySpeedMof, TPAO, lucky, charm, insight,
                                  inspiration, mindSense, false, morality, condemnation, lifespanMonth,
-                                 0L, sect, nickName, 0, 0, 0, 0, 0.0, false, 0, 0, 0.0, false, 0, "",
+                                 lastLifespanCheckDay, sect, "", 0, 0, 0, 0, 0.0, false, 0, 0, 0.0, false, 0, "",
                                  0f, 0, false, 0, false, 0, energyMultiplier);
         }
 
@@ -601,6 +602,24 @@ public class BasicData {
         public static float smoothMultiplier(float multiplier) {
                 float m = Mth.clamp(multiplier, 0f, 1f);
                 return 4f * m * m * m - 6f * m * m + 4f * m;
+        }
+
+        /**
+         * 获取实体的技能倍率：基于其 energyMultiplier 的平滑非线性函数。
+         * 若实体无 BasicData，则视为中性 0.5（即 1× 默认值）。
+         *
+         * @param entity 施法者
+         * @return 最终伤害/数值倍数（0.0~2.0）
+         */
+        public static float spellMultiplier(LivingEntity entity) {
+                if (entity == null) {
+                        return 1f;
+                }
+                BasicData data = RegisterAttachments.getBasicData(entity);
+                if (data == null) {
+                        return smoothMultiplier(0.5f);
+                }
+                return smoothMultiplier(data.getEnergyMultiplier());
         }
 
         public void setLastPos(Vec3 vec3) {

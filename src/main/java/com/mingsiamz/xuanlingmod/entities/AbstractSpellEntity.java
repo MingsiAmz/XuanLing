@@ -7,7 +7,6 @@ import com.mingsiamz.xuanlingmod.XuanLing;
 import com.mingsiamz.xuanlingmod.data.BasicData;
 import com.mingsiamz.xuanlingmod.data.ComponentGroup;
 import com.mingsiamz.xuanlingmod.data.ComponentCodec;
-import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.type.ImpComponent;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
@@ -180,13 +179,7 @@ public abstract class AbstractSpellEntity extends SkillEntity {
                         return;
                 }
                 // 释放技能的伤害乘以施法者能量倍率的平滑非线性函数（0=0，50%=1×，100%=2×）
-                float multiplier = 1f;
-                if (caster != null) {
-                        BasicData data = RegisterAttachments.getBasicData(caster);
-                        if (data != null) {
-                                multiplier = BasicData.smoothMultiplier(data.getEnergyMultiplier());
-                        }
-                }
+                float multiplier = BasicData.spellMultiplier(caster);
                 if (damage > 0) {
                         target.hurt(level.damageSources().generic(), damage * multiplier);
                 }

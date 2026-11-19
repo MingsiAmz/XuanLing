@@ -6,7 +6,6 @@ import com.mingsiamz.xuanlingmod.entities.AoeSkillEntity;
 import com.mingsiamz.xuanlingmod.entities.ProjectileSkillEntity;
 import com.mingsiamz.xuanlingmod.event.AutoGenerationEvents;
 import com.mingsiamz.xuanlingmod.data.BasicData;
-import com.mingsiamz.xuanlingmod.register.RegisterAttachments;
 import com.mingsiamz.xuanlingmod.type.XuanLingTypeEnum;
 
 import net.minecraft.nbt.CompoundTag;
@@ -108,11 +107,7 @@ public class CultivatorSpellGoal extends Goal {
                 * (1.0f + realmLevel * 0.6f);
 
         // 施法者能量倍率平滑加成（0=0，50%=1×，100%=2×）；NPC 无 BasicData 时视为中性 0.5
-        float multiplier = 1f;
-        var basicData = RegisterAttachments.getBasicData(mob);
-        if (basicData != null) {
-            multiplier = BasicData.smoothMultiplier(basicData.getEnergyMultiplier());
-        }
+        float multiplier = BasicData.spellMultiplier(mob);
         damage *= multiplier;
         heal *= multiplier;
 
